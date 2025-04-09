@@ -23,6 +23,7 @@
 
   # Set the default editor to vim
   environment.variables.EDITOR = "vim";
+  system.stateVersion = 6;
 
   users.users.I544489 = {
     name = "I544489";
