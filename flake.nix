@@ -23,7 +23,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.I544489 = import ./home.nix;
+            home-manager.users.I544489 = import ./users/I544489/home.nix;
           }
         ];
       };
