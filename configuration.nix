@@ -24,7 +24,7 @@
   # Set the default editor to vim
   environment.variables.EDITOR = "vim";
 
-  users.users.phil = {
+  users.users.I544489 = {
     name = "I544489";
     home = "/Users/I544489";
   };

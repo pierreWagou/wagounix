@@ -17,6 +17,15 @@
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        nix-darwin.nixosModules.default = {
+          # Set Git commit hash for darwin-version.
+          system.configurationRevision = self.rev or self.dirtyRev or null;
+
+          # Used for backwards compatibility, please read the changelog before changing.
+          # $ darwin-rebuild changelog
+          system.stateVersion = 6;
+
+        };
         modules = [
           ./configuration.nix
           home-manager.darwinModules.home-manager
