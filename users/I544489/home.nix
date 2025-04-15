@@ -1,20 +1,10 @@
 {pkgs, ...}: {
-  ##################################################################################################################
-  #
-  # All Hearty's Home Manager Configuration
-  #
-  ##################################################################################################################
 
   imports = [
-     ../../home/core.nix
+    ../../home/core.nix
+    ./git.nix
   ];
 
-  # Let Home Manager install and manage itself.
+  # Let Homeg Manager install and manage itself.
   programs.home-manager.enable = true;
-
-
-  programs.git = {
-    userName = "Pierre Romon";
-    userEmail = "alex.vialar@gmail.com";
-  };
 }

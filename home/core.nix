@@ -3,6 +3,7 @@
   # paths it should manage.
   home = {
     homeDirectory = "/Users/I544489";
+    # home.username = "I544489";
 
     # This value determines the Home Manager release that your
     # configuration is compatible with. This helps avoid breakage
