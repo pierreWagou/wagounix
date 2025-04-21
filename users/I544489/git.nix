@@ -4,14 +4,6 @@
     userName = "Pierre Romon";
     userEmail = "pierre.romon@gmail.com";
     includes = [
-      # {
-      #   # path = "~/Repositories/wagou/.gitconfig-wagou";
-      #   contentSuffix = "wagou";
-      #   condition = "gitdir:~/Repositories/wagou/";
-      #   contents.signingkey = {
-      #     signingkey = "7743C35B23185A0D";
-      #   };
-      # }
       {
         contentSuffix = "sap";
         condition = "gitdir:~/Repositories/sap/";
@@ -28,7 +20,7 @@
         signingkey = "7743C35B23185A0D";
       };
       gpg = {
-        program = "/opt/homebrew/bin/gpg";
+        program = "${pkgs.gnupg}";
       };
       push = {
         autoSetupRemote = true;
