@@ -9,6 +9,7 @@
     ./ghostty.nix
     ./bat.nix
     ./starship.nix
+    ./zoxyde.nix
     ./zsh.nix
   ];
 

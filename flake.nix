@@ -44,7 +44,7 @@
                 "homebrew/homebrew-cask" = homebrew-cask;
                 "Dashlane/homebrew-taps" = homebrew-dashlane;
               };
-              mutableTaps = false;
+              # mutableTaps = false;
             };
           }
           ./homebrew.nix

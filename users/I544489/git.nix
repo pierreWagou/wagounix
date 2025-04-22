@@ -9,7 +9,7 @@
         condition = "gitdir:~/Repositories/sap/";
         contents.user = {
           email = "pierre.romon@sap.com";
-          signingkey = "237A7DA06D9C7293";
+          signingkey = "A797343E0BE26535";
         };
       }
     ];
@@ -17,7 +17,7 @@
       user = {
         name = "Pierre Romon";
         email = "pierre.romon@gmail.com";
-        signingkey = "7743C35B23185A0D";
+        signingkey = "45D3CEC692099E37";
       };
       gpg = {
         program = "${pkgs.gnupg}";

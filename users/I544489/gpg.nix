@@ -60,6 +60,63 @@
         '';
         trust = "ultimate";
       }
+      {
+        text = ''
+          -----BEGIN PGP PUBLIC KEY BLOCK-----
+
+          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
+          34s5z0WqIOGM9TI=
+          =CRB/
+          -----END PGP PUBLIC KEY BLOCK-----
+        '';
+        trust = "ultimate";
+      }
     ];
   };
 
