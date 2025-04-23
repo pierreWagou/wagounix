@@ -13,48 +13,35 @@
     ./zsh.nix
   ];
 
-programs.home-manager.enable = true;
+  programs.home-manager.enable = true;
 
-home = {
+  home = {
     homeDirectory = "/Users/I544489";
     stateVersion = "24.11";
     packages = with pkgs; [
-      alt-tab-macos
-      arc-browser
-      bruno
       copier
       databricks-cli
       docker
-      drawio
       fd
       figlet
       fortune
       git-credential-manager
       gnupg
-      google-chrome
-      hidden-bar
       htop
       mas
       maven
-      netflix
       pinentry_mac
       pipx
       poetry
-      postman
       pyenv
       qrencode
       R
-      raycast
-      rectangle
       ripgrep
       scala
-      slack
       spark
       speedtest-cli
       spicetify-cli
-      spotify
       spotify-player
-      synology-drive-client
       starship
       thefuck
       tmux
