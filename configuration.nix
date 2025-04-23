@@ -24,14 +24,4 @@
   };
 
   programs.zsh.enable = true;
-
-  # programs.zsh = {
-  #   enable = true;
-  #   # Here you may customize additional options
-  #   aliases = {
-  #     ll = "ls -lh";
-  #     la = "ls -lha";
-  #   };
-  # };
-
 }
