@@ -1,6 +1,21 @@
-{ config, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }: {
 
-{
+  imports = [
+    inputs.nix-homebrew.darwinModules.nix-homebrew
+  ];
+
+  nix-homebrew = {
+    enable = true;
+    enableRosetta = true;
+    user = "I544489";
+    taps = {
+      "homebrew/homebrew-core" = inputs.homebrew-core;
+      "homebrew/homebrew-cask" = inputs.homebrew-cask;
+      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+    };
+    mutableTaps = false;
+  };
+
   homebrew.enable = true;
   homebrew.brews = [
     "dashlane-cli"
