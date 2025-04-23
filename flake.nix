@@ -33,8 +33,8 @@
         system = "aarch64-darwin";
         modules = [
           ./configuration.nix
-          ./homebrew.nix
           ./home_manager.nix
+          ./homebrew.nix
         ];
         specialArgs = { inherit inputs;};
       };
