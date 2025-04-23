@@ -1,27 +1,18 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [
-  ];
-
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  environment.systemPackages = with pkgs; [
-    git
-    vim
-    zsh
-  ];
-
-  environment.variables.EDITOR = "vim";
-  environment.shells = [ pkgs.zsh ];
+  
   system.stateVersion = 5;
 
-  users.users.I544489 = {
-    name = "I544489";
-    home = "/Users/I544489";
-    shell = pkgs.zsh;
+  users.users= {
+    I544489 = {
+      name = "I544489";
+      home = "/Users/I544489";
+    };
   };
 
-  programs.zsh.enable = true;
+  security.pam.services.sudo_local.touchIdAuth = true;
 }

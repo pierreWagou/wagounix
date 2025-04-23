@@ -1,18 +1,7 @@
 {pkgs, ...}: {
 
   programs.git = {
-    userName = "Pierre Romon";
-    userEmail = "pierre.romon@gmail.com";
-    includes = [
-      {
-        contentSuffix = "sap";
-        condition = "gitdir:~/Repositories/sap/";
-        contents.user = {
-          email = "pierre.romon@sap.com";
-          signingkey = "A797343E0BE26535";
-        };
-      }
-    ];
+    enable = true;
     extraConfig = {
       user = {
         name = "Pierre Romon";
@@ -41,7 +30,18 @@
         gpgSign = true;
       };
     };
-
-    enable = true;
+    includes = [
+      {
+        contentSuffix = "sap";
+        condition = "gitdir:~/Repositories/sap/";
+        contents.user = {
+          email = "pierre.romon@sap.com";
+          signingkey = "A797343E0BE26535";
+        };
+      }
+    ];
+    lfs = {
+      enable = true;
+    };
   };
 }
