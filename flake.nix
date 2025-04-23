@@ -33,34 +33,10 @@
         system = "aarch64-darwin";
         modules = [
           ./configuration.nix
-          nix-homebrew.darwinModules.nix-homebrew
-          {
-            nix-homebrew = {
-              enable = true;
-              enableRosetta = true;
-              user = "I544489";
-              taps = {
-                "homebrew/homebrew-core" = homebrew-core;
-                "homebrew/homebrew-cask" = homebrew-cask;
-                "Dashlane/homebrew-taps" = homebrew-dashlane;
-              };
-              # mutableTaps = false;
-            };
-          }
           ./homebrew.nix
-          home-manager.darwinModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "backup";
-            home-manager.users.I544489 = {
-              imports = [
-                ./users/I544489/home.nix
-                catppuccin.homeModules.catppuccin
-              ];
-            };
-          }
+          ./home_manager.nix
         ];
+        specialArgs = { inherit inputs;};
       };
     };
   };

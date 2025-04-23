@@ -9,14 +9,14 @@
     ./ghostty.nix
     ./bat.nix
     ./starship.nix
-    ./zoxyde.nix
+    ./zoxide.nix
     ./zsh.nix
   ];
 
   home.packages = with pkgs; [
     bruno
     bat
-    spark
+    copier
     databricks-cli 
     docker
     eza
@@ -31,11 +31,13 @@
     maven
     pinentry_mac
     pipx
+    poetry
     pyenv
     qrencode
     R
     ripgrep
     scala
+    spark
     speedtest-cli
     spicetify-cli
     spotify-player

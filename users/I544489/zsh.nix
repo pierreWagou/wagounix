@@ -20,9 +20,6 @@
     syntaxHighlighting = {
         enable = true;
     };
-    # initExtra = ''
-    #   eval "$(starship init zsh)"
-    # '';
     shellAliases = {
       ll = "ls -l";
       edit = "sudo -e";
