@@ -1,11 +1,25 @@
 { config, lib, pkgs, ... }:
 
 {
+
+  imports = [
+    ./settings/control-center.nix
+    ./settings/dock.nix
+    ./settings/global-domain.nix
+    ./settings/finder.nix
+    ./settings/screen-capture.nix
+    ./settings/screen-saver.nix
+    ./settings/software-update.nix
+    ./settings/spaces.nix
+    ./settings/trackpad.nix
+  ];
+  
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
   system.stateVersion = 5;
+
 
   users.users= {
     I544489 = {
@@ -15,4 +29,5 @@
   };
 
   security.pam.services.sudo_local.touchIdAuth = true;
+
 }

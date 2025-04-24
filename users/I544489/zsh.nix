@@ -46,6 +46,15 @@
         name = "zsh-you-should-use";
         src = "${pkgs.zsh-you-should-use}/share/zsh-you-should-use";
       }
+      {
+        name = "zsh-autoswitch-virtualenv"; # Choose a name for the plugin
+        src = pkgs.fetchFromGitHub {
+          owner = "MichaelAquilina"; # Replace with the repo owner's username
+          repo = "zsh-autoswitch-virtualenv"; # Replace with the repo name
+          rev = "master"; # Or specify a specific commit hash or branch
+          # src = "name-of-your-archive.zip"; # if needed, specify an archive name
+        };
+      }
     ];
     localVariables = {
       preview_ls_cmd = "eza -a --level=1 --tree --icons --group-directories-first --git-ignore -I '.DS_Store|.localized' --color=always";
