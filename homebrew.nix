@@ -18,7 +18,7 @@
 
   homebrew = {
     enable = true;
-    onActivation.cleanup = "zap";
+    # onActivation.cleanup = "zap";
     brews = [
       "dashlane-cli"
     ];
@@ -39,6 +39,7 @@
       "jellybeansoup-netflix"
       "messenger"
       "microsoft-auto-update"
+      "microsoft-azure-storage-explorer"
       "microsoft-edge"
       "microsoft-excel"
       "microsoft-onenote"
@@ -58,5 +59,15 @@
       "vlc"
       "zen-browser"
     ];
+    masApps = {
+      "Amazon Prime Video" = 545519333;
+      "Dashlane Password Manager" = 517914548;
+      "Dune: Imperium" = 1575414319;
+      Finary = 1569413444;
+      "Hotspot Shield—Meilleur VPN" = 771076721;
+      kindle = 302584613;
+      myCANAL = 694580816;
+      Xcode = 497799835;
+    };
   };
 }

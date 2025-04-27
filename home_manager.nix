@@ -11,6 +11,7 @@
     imports = [
       ./users/I544489/home.nix
       inputs.catppuccin.homeModules.catppuccin
+      inputs.spicetify-nix.homeManagerModules.spicetify
     ];
   };
 }
