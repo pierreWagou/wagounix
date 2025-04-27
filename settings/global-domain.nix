@@ -8,10 +8,6 @@
     "com.apple.springing.delay" = 2.0;
     "com.apple.springing.enabled" = true;
     "com.apple.swipescrolldirection" = true;
-    "com.apple.trackpad.enableSecondaryClick" = true;
-    "com.apple.trackpad.forceClick" = true;
-    "com.apple.trackpad.scaling" = 2.0;
-    "com.apple.trackpad.trackpadCornerClickBehavior" = 1;
     _HIHideMenuBar = false;
     AppleEnableMouseSwipeNavigateWithScrolls = true;
     AppleEnableSwipeNavigateWithScrolls = true;
@@ -51,5 +47,9 @@
     PMPrintingExpandedStateForPrint = true;
     PMPrintingExpandedStateForPrint2 = true;
   };
+
+  # system.defaults.CustomUserPreferences = {
+  #    "com.apple.trackpad.scaling" = 1.0;
+  # };
 
 }

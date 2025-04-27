@@ -8,6 +8,9 @@
     ./gpg.nix
     ./ghostty.nix
     ./home_manager.nix
+    ./pyenv.nix
+    ./spicetify.nix
+    ./spotify-player.nix
     ./starship.nix
     ./zoxide.nix
     ./zsh.nix
@@ -49,7 +52,6 @@
       tree
       unzip
       uv
-      vscode
       vivid
       yt-dlp
       zip
@@ -65,6 +67,5 @@
   
   catppuccin.flavor = "mocha";
   catppuccin.enable = true;
-
   
 }

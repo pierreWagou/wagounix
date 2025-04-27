@@ -21,9 +21,9 @@
         enable = true;
     };
     shellAliases = {
-      ll = "ls -l";
-      edit = "sudo -e";
-      update = "sudo nixos-rebuild switch";
+      python = "python3";
+      ga = "git add .";
+
     };
     plugins = [
       {
@@ -47,12 +47,13 @@
         src = "${pkgs.zsh-you-should-use}/share/zsh-you-should-use";
       }
       {
-        name = "zsh-autoswitch-virtualenv"; # Choose a name for the plugin
+        name = "zsh-autoswitch-virtualenv";
+        file = "autoswitch_virtualenv.plugin.zsh";
         src = pkgs.fetchFromGitHub {
-          owner = "MichaelAquilina"; # Replace with the repo owner's username
-          repo = "zsh-autoswitch-virtualenv"; # Replace with the repo name
-          rev = "master"; # Or specify a specific commit hash or branch
-          # src = "name-of-your-archive.zip"; # if needed, specify an archive name
+          owner = "MichaelAquilina";
+          repo = "zsh-autoswitch-virtualenv";
+          tag = "3.7.1";
+          sha256 = "hwg9wDMU2XqJ5FQEwMVVaz0n+xZ8NI82tH9VhLfFRC4=";
         };
       }
     ];
