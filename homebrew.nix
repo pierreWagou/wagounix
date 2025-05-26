@@ -46,6 +46,7 @@
       "microsoft-powerpoint"
       "microsoft-teams"
       "microsoft-word"
+      "obsidian"
       "onedrive"
       "philips-hue-sync"
       "postman"

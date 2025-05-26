@@ -2,6 +2,7 @@
 
   imports = [
     ./bat.nix
+    ./databricks.nix
     ./eza.nix
     ./fzf.nix
     ./git.nix
@@ -41,6 +42,7 @@
       R
       ripgrep
       scala
+      sops
       spark
       speedtest-cli
       spicetify-cli
