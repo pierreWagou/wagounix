@@ -60,7 +60,6 @@
       "upscayl"
       "visual-studio-code"
       "vlc"
-      "wordpresscom"
       "wordpresscom-studio"
       "zen-browser"
     ];
