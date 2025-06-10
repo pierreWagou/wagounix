@@ -17,6 +17,7 @@
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.enable = false;
   
   system.stateVersion = 5;
 
