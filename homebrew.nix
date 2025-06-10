@@ -37,6 +37,7 @@
       "google-drive"
       "hiddenbar"
       "jellybeansoup-netflix"
+      "local"
       "messenger"
       "microsoft-auto-update"
       "microsoft-azure-storage-explorer"
@@ -56,19 +57,22 @@
       "spotify"
       "steam"
       "synology-drive"
+      "upscayl"
       "visual-studio-code"
       "vlc"
+      "wordpresscom"
+      "wordpresscom-studio"
       "zen-browser"
     ];
-    masApps = {
-      "Amazon Prime Video" = 545519333;
-      "Dashlane Password Manager" = 517914548;
-      "Dune: Imperium" = 1575414319;
-      Finary = 1569413444;
-      "Hotspot Shield—Meilleur VPN" = 771076721;
-      kindle = 302584613;
-      myCANAL = 694580816;
-      Xcode = 497799835;
-    };
+    # masApps = {
+    #   "Amazon Prime Video" = 545519333;
+    #   "Dashlane Password Manager" = 517914548;
+    #   "Dune: Imperium" = 1575414319;
+    #   Finary = 1569413444;
+    #   "Hotspot Shield—Meilleur VPN" = 771076721;
+    #   kindle = 302584613;
+    #   myCANAL = 694580816;
+    #   Xcode = 497799835;
+    # };
   };
 }
