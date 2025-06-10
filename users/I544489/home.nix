@@ -2,7 +2,7 @@
 
   imports = [
     ./bat.nix
-    ./databricks.nix
+    # ./databricks.nix
     ./eza.nix
     ./fzf.nix
     ./git.nix

@@ -21,7 +21,7 @@
         defaultBranch = "main";
       };
       credential = {
-        helper = "osxke/usr/local/share/gcm-core/git-credential-managerychain";
+        helper = "/etc/profiles/per-user/I544489/bin/git-credential-manager";
       };
       core = {
         excludeFile = "~/.gitiginore";
