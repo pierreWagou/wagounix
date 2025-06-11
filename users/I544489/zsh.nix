@@ -15,7 +15,6 @@
     history = {
       extended = true;
       ignoreDups = true;
-      share = true;
     };
     syntaxHighlighting = {
         enable = true;
