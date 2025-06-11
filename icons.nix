@@ -28,6 +28,34 @@
         icon = ./icons/google_chrome.icns;
       }
       {
+        path = "/Applications/Google Docs.app";
+        icon = ./icons/google_docs.icns;
+      }
+      {
+        path = "/Applications/Google Drive.app";
+        icon = ./icons/google_drive.icns;
+      }
+      {
+        path = "/Applications/Google Sheets.app";
+        icon = ./icons/google_sheets.icns;
+      }
+      {
+        path = "/Applications/Google Slides.app";
+        icon = ./icons/google_slides.icns;
+      }
+      {
+        path = "/Applications/Hidden Bar.app";
+        icon = ./icons/hidden_bar.icns;
+      }
+      {
+        path = "/Applications/Hue Sync.app";
+        icon = ./icons/hue_sync.icns;
+      }
+      {
+        path = "/Applications/iMovie.app";
+        icon = ./icons/imovie.icns;
+      }
+      {
         path = "/Applications/Obsidian.app";
         icon = ./icons/obsidian.icns;
       }
@@ -62,6 +90,10 @@
       {
         path = "/Applications/Netflix.app";
         icon = ./icons/netflix.icns;
+      }
+            {
+        path = "/Applications/OneDrive.app";
+        icon = ./icons/microsoft_onedrive.icns;
       }
       {
         path = "/Applications/Raycast.app";
