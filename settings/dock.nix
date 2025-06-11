@@ -3,7 +3,7 @@
   system.defaults.dock = {
     autohide = true;
     persistent-apps = [
-      "/System/Applications/Mail.app/"
+      "/Applications/Thunderbird.app/"
       "/Applications/Arc.app/"
       "/Applications/Microsoft Outlook.app/"
       "/Applications/Microsoft Teams.app/"

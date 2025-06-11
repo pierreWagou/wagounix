@@ -6,7 +6,7 @@
       user = {
         name = "Pierre Romon";
         email = "pierre.romon@gmail.com";
-        signingkey = "45D3CEC692099E37";
+        signingkey = "B780FECB8A2B46AF";
       };
       gpg = {
         program = "${pkgs.gnupg}";

@@ -1,0 +1,4 @@
+{
+    "github-actions.use-enterprise": false,
+    "github-enterprise.uri": "https://github.tools.sap/"
+}
