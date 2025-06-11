@@ -57,6 +57,7 @@
       "spotify"
       "steam"
       "synology-drive"
+      "thunderbird"
       "upscayl"
       "visual-studio-code"
       "vlc"
