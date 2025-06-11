@@ -36,7 +36,7 @@
         condition = "gitdir:~/Repositories/sap/";
         contents.user = {
           email = "pierre.romon@sap.com";
-          signingkey = "A797343E0BE26535";
+          signingkey = "B662CC76CE0DF9D3";
         };
       }
     ];
