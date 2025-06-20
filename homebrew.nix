@@ -12,8 +12,9 @@
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
     };
-    mutableTaps = false;
+    mutableTaps = true;
   };
 
   homebrew = {
@@ -21,6 +22,7 @@
     # onActivation.cleanup = "zap";
     brews = [
       "dashlane-cli"
+      "speedtest"
     ];
     casks = [
       "aerial"
@@ -31,7 +33,7 @@
       "bruno"
       "docker"
       "drawio"
-      # "font-jetbrains-mono-nerd-font"
+      "font-jetbrains-mono-nerd-font"
       "ghostty"
       "google-chrome"
       "google-drive"

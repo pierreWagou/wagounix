@@ -8,6 +8,10 @@
     enable = true;
     icons = [
       {
+        path = "/System/Library/CoreServices/Finder.app";
+        icon = ./icons/finder.icns;
+      }
+      {
         path = "/Applications/AltServer.app";
         icon = ./icons/altserver.icns;
       }
@@ -72,6 +76,10 @@
         icon = ./icons/microsoft_excel.icns;
       }
       {
+        path = "/Applications/Microsoft OneNote.app";
+        icon = ./icons/microsoft_onenote.icns;
+      }
+      {
         path = "/Applications/Microsoft Outlook.app";
         icon = ./icons/microsoft_outlook.icns;
       }
@@ -102,6 +110,10 @@
       {
         path = "/Applications/Spotify.app";
         icon = ./icons/spotify.icns;
+      }
+      {
+        path = "/Applications/Steam.app";
+        icon = ./icons/steam.icns;
       }
       {
         path = "/Applications/Thunderbird.app";

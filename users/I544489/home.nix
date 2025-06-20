@@ -44,7 +44,7 @@
       scala
       sops
       spark
-      speedtest-cli
+      # speedtest-cli
       spicetify-cli
       spotify-player
       starship
@@ -65,6 +65,15 @@
       zsh-completions
       zsh-syntax-highlighting
     ];
+    shellAliases = {
+      ga = "git add .";
+      gc = "git commit -m";
+      gp = "git push";
+      gl = "git push";
+      gco = "git checkout";
+      gb = "git branch";
+      build = "darwin-rebuild switch --flake ~/.config/wagounix#sap";
+    };
   };
   
   catppuccin.flavor = "mocha";
