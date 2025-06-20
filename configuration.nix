@@ -21,6 +21,7 @@
   
   system.stateVersion = 5;
 
+  fonts.packages = with pkgs; [ nerd-fonts.jetbrains-mono ];
 
   users.users= {
     I544489 = {
