@@ -28,7 +28,6 @@
       docker
       fd
       ffmpeg
-      ftp
       figlet
       fortune
       git-credential-manager
