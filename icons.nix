@@ -8,10 +8,6 @@
     enable = true;
     icons = [
       {
-        path = "/System/Library/CoreServices/Finder.app";
-        icon = ./icons/finder.icns;
-      }
-      {
         path = "/Applications/AltServer.app";
         icon = ./icons/altserver.icns;
       }
@@ -22,6 +18,10 @@
       {
         path = "/Applications/Bruno.app";
         icon = ./icons/bruno.icns;
+      }
+      {
+        path = "/Applications/FileZilla.app";
+        icon = ./icons/filezilla.icns;
       }
       {
         path = "/Applications/Ghostty.app";
@@ -126,6 +126,10 @@
       {
         path = "/Applications/VLC.app";
         icon = ./icons/vlc.icns;
+      }
+      {
+        path = "/Applications/Zen.app";
+        icon = ./icons/zen.icns;
       }
     ];
   };

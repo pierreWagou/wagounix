@@ -4,7 +4,7 @@
     autohide = true;
     persistent-apps = [
       "/Applications/Thunderbird.app/"
-      "/Applications/Arc.app/"
+      "/Applications/Zen.app/"
       "/Applications/Microsoft Outlook.app/"
       "/Applications/Microsoft Teams.app/"
       "/Applications/Visual Studio Code.app/"

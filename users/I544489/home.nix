@@ -27,11 +27,14 @@
       databricks-cli
       docker
       fd
+      ffmpeg
+      ftp
       figlet
       fortune
       git-credential-manager
       gnupg
       htop
+      imagemagick
       mas
       maven
       pinentry_mac
