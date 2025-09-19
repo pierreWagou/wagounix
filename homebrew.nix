@@ -18,6 +18,11 @@
   };
 
   homebrew = {
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "uninstall";
+      upgrade = true;
+    };
     enable = true;
     # onActivation.cleanup = "zap";
     brews = [
