@@ -36,6 +36,7 @@
       imagemagick
       mas
       maven
+      pay-respects
       pinentry_mac
       pipx
       poetry
@@ -50,7 +51,6 @@
       spicetify-cli
       spotify-player
       starship
-      thefuck
       tmux
       darwin.trash
       tree
