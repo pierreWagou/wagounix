@@ -20,6 +20,7 @@
   nix.enable = false;
   
   system.stateVersion = 5;
+  system.primaryUser = "I544489";
 
   fonts.packages = with pkgs; [ nerd-fonts.jetbrains-mono ];
 
