@@ -14,21 +14,21 @@
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
       "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
     };
-    mutableTaps = false;
+    mutableTaps = true;
   };
 
   homebrew = {
-    # onActivation = {
-    #   autoUpdate = true;
-    #   cleanup = "zap";
-    #   upgrade = true;
-    # };
-    onActivation.cleanup = "zap";
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "uninstall";
+      upgrade = true;
+    };
     enable = true;
     taps = [
-      "homebrew/cask"
-      "dashlane/taps"
-      "teamookla/speedtest"
+      "homebrew/homebrew-core"
+      "homebrew/homebrew-cask"
+      "Dashlane/homebrew-taps"
+      "teamookla/homebrew-speedtest"
     ];
     brews = [
       "dashlane-cli"
@@ -74,8 +74,6 @@
       "visual-studio-code"
       "vlc"
       "wordpresscom-studio"
-      # "zen-browser"
-      # "zen"
     ];
     # masApps = {
     #   "Amazon Prime Video" = 545519333;
