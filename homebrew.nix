@@ -20,11 +20,10 @@
   homebrew = {
     onActivation = {
       autoUpdate = true;
-      cleanup = "uninstall";
+      cleanup = "zap";
       upgrade = true;
     };
     enable = true;
-    # onActivation.cleanup = "zap";
     brews = [
       "dashlane-cli"
       "speedtest"
@@ -69,7 +68,7 @@
       "visual-studio-code"
       "vlc"
       "wordpresscom-studio"
-      "zen-browser"
+      "zen"
     ];
     # masApps = {
     #   "Amazon Prime Video" = 545519333;
