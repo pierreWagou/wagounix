@@ -59,7 +59,7 @@
     localVariables = {
       preview_ls_cmd = "eza -a --level=1 --tree --icons --group-directories-first --git-ignore -I '.DS_Store|.localized' --color=always";
     };
-    initExtra = ''
+    initContent = ''
       zstyle ':fzf-tab:complete:*' fzf-flags $(echo $FZF_DEFAULT_OPTS)
       zstyle ':fzf-tab:complete:code:*' fzf-preview 'bat $realpath 2>/dev/null ||' $preview_ls_cmd '$realpath'
       zstyle ':fzf-tab:complete:cd:*' fzf-preview $preview_ls_cmd '$realpath'

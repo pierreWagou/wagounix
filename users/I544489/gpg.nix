@@ -123,7 +123,7 @@
   services.gpg-agent = {
     enable = true;
     enableZshIntegration = true;
-    pinentryPackage = pkgs.pinentry_mac;
+    pinentry.package = pkgs.pinentry_mac;
     enableSshSupport = true;
   };
 }
