@@ -18,12 +18,12 @@
   };
 
   homebrew = {
-    onActivation = {
-      autoUpdate = true;
-      cleanup = "uninstall";
-      upgrade = true;
-    };
     enable = true;
+    global.autoUpdate = true;
+    greedyCasks = true;
+    onActivation = {
+      cleanup = "uninstall";
+    };
     taps = [
       "homebrew/homebrew-core"
       "homebrew/homebrew-cask"
@@ -74,6 +74,7 @@
       "visual-studio-code"
       "vlc"
       "wordpresscom-studio"
+      "zen"
     ];
     # masApps = {
     #   "Amazon Prime Video" = 545519333;

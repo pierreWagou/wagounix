@@ -47,9 +47,4 @@
     PMPrintingExpandedStateForPrint = true;
     PMPrintingExpandedStateForPrint2 = true;
   };
-
-  # system.defaults.CustomUserPreferences = {
-  #    "com.apple.trackpad.scaling" = 1.0;
-  # };
-
 }

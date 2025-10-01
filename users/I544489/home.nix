@@ -29,6 +29,7 @@
       fd
       ffmpeg
       figlet
+      flutter
       fortune
       git-credential-manager
       gnupg
@@ -74,7 +75,7 @@
       gl = "git push";
       gco = "git checkout";
       gb = "git branch";
-      build = "darwin-rebuild switch --flake ~/.config/wagounix#sap";
+      build = "sudo darwin-rebuild switch --flake ~/.config/wagounix#sap";
     };
   };
   
