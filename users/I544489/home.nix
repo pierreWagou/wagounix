@@ -47,7 +47,7 @@
       ripgrep
       scala
       sops
-      spark
+      # spark
       # speedtest-cli
       spicetify-cli
       spotify-player
