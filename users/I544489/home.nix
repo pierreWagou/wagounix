@@ -29,7 +29,7 @@
       fd
       ffmpeg
       figlet
-      flutter
+      # flutter
       fortune
       git-credential-manager
       gnupg
