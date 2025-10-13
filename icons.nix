@@ -108,7 +108,7 @@
         icon = ./icons/raycast.icns;
       }
       {
-        path = "/Applications/Spotify.app";
+        path = "/Users/I544489/Applications/Spotify.app";
         icon = ./icons/spotify.icns;
       }
       {

@@ -42,7 +42,6 @@
           ./configuration.nix
           ./home_manager.nix
           ./homebrew.nix
-          # ./sops.nix
           ./icons.nix
         ];
         specialArgs = { inherit inputs;};

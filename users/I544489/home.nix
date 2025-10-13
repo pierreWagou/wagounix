@@ -2,7 +2,6 @@
 
   imports = [
     ./bat.nix
-    # ./databricks.nix
     ./eza.nix
     ./fzf.nix
     ./git.nix
@@ -23,6 +22,7 @@
     homeDirectory = "/Users/I544489";
     stateVersion = "24.11";
     packages = with pkgs; [
+      cocoapods
       copier
       databricks-cli
       docker
