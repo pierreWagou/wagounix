@@ -9,7 +9,7 @@
       "/Applications/Microsoft Teams.app/"
       "/Applications/Visual Studio Code.app/"
       "/Applications/Ghostty.app/"
-      "/Applications/Spotify.app/"
+      "/Users/I544489/Applications/Spotify.app/"
     ];
     persistent-others = [
       "/Users/I544489/Downloads"
