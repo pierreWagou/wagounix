@@ -13,8 +13,9 @@
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
       "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
+      "hAIperspace/hai" = inputs.homebrew-hai;
     };
-    mutableTaps = true;
+    mutableTaps = false;
   };
 
   homebrew = {
@@ -29,9 +30,15 @@
       "homebrew/homebrew-cask"
       "Dashlane/homebrew-taps"
       "teamookla/homebrew-speedtest"
+      {
+        name = "hAIperspace/hai";
+        clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      }
     ];
     brews = [
       "dashlane-cli"
+      "gh"
+      "hai"
       "speedtest"
     ];
     casks = [
@@ -52,7 +59,7 @@
       "google-drive"
       "hiddenbar"
       "jellybeansoup-netflix"
-      "ledger-live"
+      # "ledger-live"
       "local"
       "messenger"
       "microsoft-auto-update"

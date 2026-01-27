@@ -32,6 +32,7 @@
       figlet
       # flutter
       fortune
+      gh
       git-credential-manager
       gnupg
       htop
