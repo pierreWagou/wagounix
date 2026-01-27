@@ -29,12 +29,16 @@
       url = "github:teamookla/homebrew-speedtest";
       flake = false;
     };
+    homebrew-hai = {
+      url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      flake = false;
+    };
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
     darwin-custom-icons.url = "github:ryanccn/nix-darwin-custom-icons";
     sops-nix.url = "github:Mic92/sops-nix";
   };
 
-  outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, homebrew-core, homebrew-cask, homebrew-dashlane, homebrew-speedtest, spicetify-nix, catppuccin, darwin-custom-icons, sops-nix }: {
+  outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, homebrew-core, homebrew-cask, homebrew-dashlane, homebrew-speedtest, homebrew-hai, spicetify-nix, catppuccin, darwin-custom-icons, sops-nix }: {
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";

@@ -118,6 +118,18 @@
         "type": "github"
       }
     },
+    "homebrew-hai": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-IyiQTg55ytXsuO/A4U24zfISEcERLoDCBoHvyeEGzVY=",
+        "type": "file",
+        "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
+      }
+    },
     "homebrew-speedtest": {
       "flake": false,
       "locked": {
@@ -243,6 +255,7 @@
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "homebrew-dashlane": "homebrew-dashlane",
+        "homebrew-hai": "homebrew-hai",
         "homebrew-speedtest": "homebrew-speedtest",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
