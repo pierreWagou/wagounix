@@ -25,6 +25,7 @@
       cocoapods
       copier
       databricks-cli
+      delta
       docker
       fd
       ffmpeg
@@ -35,8 +36,12 @@
       gnupg
       htop
       imagemagick
+      lazygit
       mas
       maven
+      neovim
+      openapi-generator-cli
+      openvpn
       pay-respects
       pinentry_mac
       pipx
@@ -76,6 +81,7 @@
       gco = "git checkout";
       gb = "git branch";
       build = "sudo darwin-rebuild switch --flake ~/.config/wagounix#sap";
+      vpn = "sudo openvpn --config ~/.openvpn/home.ovpn";
     };
   };
   

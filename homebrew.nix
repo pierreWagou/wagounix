@@ -37,9 +37,10 @@
     casks = [
       "aerial"
       "alt-tab"
+      "altserver"
       "android-studio"
       "arc"
-      "altserver"
+      "AltServer"
       "ankama"
       "bruno"
       "docker-desktop"
@@ -51,6 +52,7 @@
       "google-drive"
       "hiddenbar"
       "jellybeansoup-netflix"
+      "ledger-live"
       "local"
       "messenger"
       "microsoft-auto-update"
@@ -63,6 +65,7 @@
       "microsoft-word"
       "obsidian"
       "onedrive"
+      "openvpn-connect"
       "philips-hue-sync"
       "postman"
       "raycast"
@@ -72,6 +75,8 @@
       "steam"
       "synology-drive"
       "thunderbird"
+      "twine-app"
+      "ultimaker-cura"
       "upscayl"
       "visual-studio-code"
       "vlc"
@@ -84,7 +89,7 @@
       # "Dune: Imperium" = 1575414319;
       # Finary = 1569413444;
       "Hotspot Shield—Meilleur VPN" = 771076721;
-      kindle = 302584613;
+      # kindle = 302584613;
       myCANAL = 694580816;
       Xcode = 497799835;
     };

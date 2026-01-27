@@ -20,6 +20,10 @@
         icon = ./icons/bruno.icns;
       }
       {
+        path = "/Applications/Docker.app";
+        icon = ./icons/docker.icns;
+      }
+      {
         path = "/Applications/FileZilla.app";
         icon = ./icons/filezilla.icns;
       }
