@@ -24,7 +24,7 @@
     onActivation = {
       upgrade = true;
       autoUpdate = true;
-      cleanup = "uninstall";
+      cleanup = "zap";
     };
     taps = [
       "homebrew/homebrew-core"
@@ -39,7 +39,7 @@
     brews = [
       "dashlane-cli"
       "gh"
-      # "hai"
+      "hai"
       "speedtest"
     ];
     casks = [
@@ -95,11 +95,9 @@
     masApps = {
       "Amazon Prime Video" = 545519333;
       "Dashlane Password Manager" = 517914548;
-      # "Dune: Imperium" = 1575414319;
-      # Finary = 1569413444;
       "Hotspot Shield—Meilleur VPN" = 771076721;
-      # kindle = 302584613;
-      # myCANAL = 694580816;
+      kindle = 302584613;
+      "Canal+" = 694580816;
       Xcode = 497799835;
     };
   };
