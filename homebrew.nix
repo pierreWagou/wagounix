@@ -20,9 +20,10 @@
 
   homebrew = {
     enable = true;
-    global.autoUpdate = true;
     greedyCasks = true;
     onActivation = {
+      upgrade = true;
+      autoUpdate = true;
       cleanup = "uninstall";
     };
     taps = [
@@ -59,9 +60,8 @@
       "google-drive"
       "hiddenbar"
       "jellybeansoup-netflix"
-      # "ledger-live"
+      "ledger-live"
       "local"
-      "messenger"
       "microsoft-auto-update"
       "microsoft-azure-storage-explorer"
       "microsoft-edge"
