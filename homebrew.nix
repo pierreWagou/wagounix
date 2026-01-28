@@ -15,7 +15,7 @@
       "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
       "hAIperspace/hai" = inputs.homebrew-hai;
     };
-    mutableTaps = false;
+    mutableTaps = true;
   };
 
   homebrew = {
@@ -39,7 +39,7 @@
     brews = [
       "dashlane-cli"
       "gh"
-      "hai"
+      # "hai"
       "speedtest"
     ];
     casks = [
@@ -60,7 +60,7 @@
       "google-drive"
       "hiddenbar"
       "jellybeansoup-netflix"
-      "ledger-live"
+      "ledger-wallet"
       "local"
       "microsoft-auto-update"
       "microsoft-azure-storage-explorer"
@@ -74,11 +74,13 @@
       "onedrive"
       "openvpn-connect"
       "philips-hue-sync"
-      "postman"
       "raycast"
       "rectangle"
       "slack"
-      "spotify"
+      {
+        name = "spotify";
+        args = { appdir = "~/Applications"; };
+      }
       "steam"
       "synology-drive"
       "thunderbird"
@@ -97,7 +99,7 @@
       # Finary = 1569413444;
       "Hotspot Shield—Meilleur VPN" = 771076721;
       # kindle = 302584613;
-      myCANAL = 694580816;
+      # myCANAL = 694580816;
       Xcode = 497799835;
     };
   };
