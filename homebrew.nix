@@ -53,6 +53,7 @@
       "bruno"
       "docker-desktop"
       "drawio"
+      "figma"
       "flutter"
       "font-jetbrains-mono-nerd-font"
       "ghostty"
