@@ -24,6 +24,10 @@
         icon = ./icons/docker.icns;
       }
       {
+        path = "/Applications/Figma.app";
+        icon = ./icons/figma.icns;
+      }
+      {
         path = "/Applications/FileZilla.app";
         icon = ./icons/filezilla.icns;
       }
