@@ -26,9 +26,9 @@
       core = {
         excludeFile = "~/.gitiginore";
       };
-      commit = {
-        gpgSign = true;
-      };
+      # commit = {
+      #   gpgSign = true;
+      # };
     };
     includes = [
       {

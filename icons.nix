@@ -129,7 +129,7 @@
       }
       {
         path = "/Applications/Visual Studio Code.app";
-        icon = ./icons/vscode.icns;
+        icon = ./icons/vscode.icon;
       }
       {
         path = "/Applications/VLC.app";
