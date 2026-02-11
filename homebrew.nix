@@ -51,6 +51,10 @@
       "AltServer"
       "ankama"
       "bruno"
+      {
+        name = "discord";
+        args = { appdir = "~/Applications"; };
+      }
       "docker-desktop"
       "drawio"
       "figma"
