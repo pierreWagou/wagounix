@@ -24,6 +24,10 @@
         icon = ./icons/docker.icns;
       }
       {
+        path = "/Applications/Docker.app/Contents/MacOS/Docker Desktop.app";
+        icon = ./icons/docker.icns;
+      }
+      {
         path = "/Applications/Figma.app";
         icon = ./icons/figma.icns;
       }
