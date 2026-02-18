@@ -82,10 +82,10 @@
       "raycast"
       "rectangle"
       "slack"
-      {
-        name = "spotify";
-        args = { appdir = "~/Applications"; };
-      }
+      # {
+      #   name = "spotify";
+      #   args = { appdir = "~/Applications"; };
+      # }
       "steam"
       "synology-drive"
       "thunderbird"
