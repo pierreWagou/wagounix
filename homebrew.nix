@@ -24,7 +24,7 @@
     greedyCasks = true;
     onActivation = {
       upgrade = true;
-      autoUpdate = true;
+      autoUpdate = false;
       cleanup = "zap";
     };
     taps = [
