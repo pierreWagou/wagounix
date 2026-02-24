@@ -17,7 +17,7 @@
     darwin-custom-icons.url = "github:ryanccn/nix-darwin-custom-icons";
   };
 
-  outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, spicetify-nix, catppuccin, darwin-custom-icons, sops-nix, ... }: {
+  outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, spicetify-nix, catppuccin, darwin-custom-icons, ... }: {
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
