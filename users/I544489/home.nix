@@ -22,6 +22,7 @@
     homeDirectory = "/Users/I544489";
     stateVersion = "24.11";
     packages = with pkgs; [
+      claude-code
       cocoapods
       copier
       databricks-cli
@@ -34,6 +35,7 @@
       fortune
       gh
       git-credential-manager
+      github-copilot-cli
       gnupg
       htop
       imagemagick

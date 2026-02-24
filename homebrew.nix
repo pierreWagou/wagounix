@@ -8,14 +8,6 @@
     enable = true;
     enableRosetta = true;
     user = "I544489";
-    taps = {
-      "homebrew/homebrew-core" = inputs.homebrew-core;
-      "homebrew/homebrew-cask" = inputs.homebrew-cask;
-      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
-      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
-      "hAIperspace/hai" = inputs.homebrew-hai;
-    };
-    mutableTaps = true;
   };
 
   homebrew = {
@@ -31,6 +23,7 @@
       "homebrew/homebrew-cask"
       "Dashlane/homebrew-taps"
       "teamookla/homebrew-speedtest"
+      "cline/homebrew-cline"
       {
         name = "hAIperspace/hai";
         clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
@@ -41,6 +34,7 @@
       "gh"
       "hai"
       "speedtest"
+      # "cline"
     ];
     casks = [
       "aerial"
