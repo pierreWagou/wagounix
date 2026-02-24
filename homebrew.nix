@@ -8,6 +8,15 @@
     enable = true;
     enableRosetta = true;
     user = "I544489";
+    taps = {
+      "homebrew/homebrew-core" = inputs.homebrew-core;
+      "homebrew/homebrew-cask" = inputs.homebrew-cask;
+      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
+      "hAIperspace/hai" = inputs.homebrew-hai;
+      "cline/homebrew-cline" = inputs.homebrew-cline;
+    };
+    mutableTaps = true;
   };
 
   homebrew = {
