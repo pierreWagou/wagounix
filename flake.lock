@@ -121,6 +121,22 @@
         "type": "github"
       }
     },
+    "homebrew-cline": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770067543,
+        "narHash": "sha256-K0HOtTigr1LJrYDprVvA9in3nyvBsDrIGGg6SftiBFI=",
+        "owner": "cline",
+        "repo": "homebrew-cline",
+        "rev": "dc8afad51026eb18904678a11997ca394301227c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cline",
+        "repo": "homebrew-cline",
+        "type": "github"
+      }
+    },
     "homebrew-core": {
       "flake": false,
       "locked": {
@@ -134,6 +150,50 @@
       "original": {
         "owner": "homebrew",
         "repo": "homebrew-core",
+        "type": "github"
+      }
+    },
+    "homebrew-dashlane": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1770740227,
+        "narHash": "sha256-oUruGFzwGMFbu1dRjUZvQZwjnXbExsTU9+0pyYpgeYc=",
+        "owner": "Dashlane",
+        "repo": "homebrew-tap",
+        "rev": "920f1909e0cf1277b14bcd490a28332327ef9ebb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Dashlane",
+        "repo": "homebrew-tap",
+        "type": "github"
+      }
+    },
+    "homebrew-hai": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-s3QSKekH+YCXAyR/aEyIYyDf9LhjMP5/QOJZ87piQ8k=",
+        "type": "file",
+        "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
+      }
+    },
+    "homebrew-speedtest": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1660162552,
+        "narHash": "sha256-IaVzg2Nw02RXXz0hmWHP5oq94aAN4Qn6+Y1dC+k+JVM=",
+        "owner": "teamookla",
+        "repo": "homebrew-speedtest",
+        "rev": "1ff487f465bb01c3007c0bc17f1f793244ee2eaa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "teamookla",
+        "repo": "homebrew-speedtest",
         "type": "github"
       }
     },
@@ -200,7 +260,11 @@
         "homebrew-brew": "homebrew-brew",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
+        "homebrew-cline": "homebrew-cline",
         "homebrew-core": "homebrew-core",
+        "homebrew-dashlane": "homebrew-dashlane",
+        "homebrew-hai": "homebrew-hai",
+        "homebrew-speedtest": "homebrew-speedtest",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",

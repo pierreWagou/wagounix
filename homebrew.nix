@@ -40,10 +40,10 @@
       }
     ];
     brews = [
-      # "dashlane-cli"
+      "dashlane-cli"
       "gh"
-      # "hai"
-      # "speedtest"
+      "hai"
+      "speedtest"
     ];
     casks = [
       "aerial"
