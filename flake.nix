@@ -18,14 +18,6 @@
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
     };
-    homebrew-brew = {
-      url = "github:homebrew/brew";
-      flake = false;
-    };
-    homebrew-bundle = {
-      url = "github:homebrew/homebrew-bundle";
-      flake = false;
-    };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
