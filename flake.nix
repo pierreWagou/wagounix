@@ -58,7 +58,7 @@
         modules = [
           ./configuration.nix
           ./home_manager.nix
-          # ./homebrew.nix
+          ./homebrew.nix
           ./icons.nix
         ];
         specialArgs = { inherit inputs;};
