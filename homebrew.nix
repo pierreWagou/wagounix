@@ -11,13 +11,18 @@
     enableRosetta = true;
 
     # User owning the Homebrew prefix
-    user = "yourname";
+    user = "I544489";
 
     # Automatically migrate existing Homebrew installations
     autoMigrate = true;
+
+    # Declarative homebrew installation
+    homebrew = inputs.homebrew-brew;
+
     taps = {
-      "homebrew/homebrew-core" = homebrew-core;
-      "homebrew/homebrew-cask" = homebrew-cask;
+      "homebrew/homebrew-core" = inputs.homebrew-core;
+      "homebrew/homebrew-cask" = inputs.homebrew-cask;
+      "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
     };
     mutableTaps = false;
     # enable = true;
