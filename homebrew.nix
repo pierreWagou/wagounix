@@ -25,7 +25,6 @@
     greedyCasks = true;
     onActivation = {
       upgrade = true;
-      autoUpdate = false;
       cleanup = "zap";
     };
     taps = [
@@ -40,6 +39,7 @@
       }
     ];
     brews = [
+      # "cline"
       "dashlane-cli"
       "gh"
       "hai"
