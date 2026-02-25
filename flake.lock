@@ -73,14 +73,46 @@
         "type": "github"
       }
     },
+    "homebrew-brew": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1771959560,
+        "narHash": "sha256-GmukWkinCHHNlNn6OAZz0iCuxAGGfNneS5XPyVEVB1w=",
+        "owner": "homebrew",
+        "repo": "brew",
+        "rev": "b09c0cc3be143156c7ca280ce24c511b23b9ec3e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homebrew",
+        "repo": "brew",
+        "type": "github"
+      }
+    },
+    "homebrew-bundle": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1745335228,
+        "narHash": "sha256-TIKR2UgtyUmHLNZp255/vLs+1I10hXe+sciMEbAGFwE=",
+        "owner": "homebrew",
+        "repo": "homebrew-bundle",
+        "rev": "a3265c84b232e13048ecbf6fc18a2eedfadbeb08",
+        "type": "github"
+      },
+      "original": {
+        "owner": "homebrew",
+        "repo": "homebrew-bundle",
+        "type": "github"
+      }
+    },
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1771974458,
-        "narHash": "sha256-Bd11aMTleNTvvv6nt0g8ZYn50KsBg9bRkqhsloGWw1o=",
+        "lastModified": 1771981083,
+        "narHash": "sha256-bc9ZXKzvBKy8OPskVclE1UjoIQF8c/7uRJjIcx27eaA=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "35e99c51e3833144cd14a04557e8cafac794a2c8",
+        "rev": "d358d9356121fdf44fc4bef732618ce6b84d9719",
         "type": "github"
       },
       "original": {
@@ -92,11 +124,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1771980567,
-        "narHash": "sha256-1JhJzsW7oOZ/SbQ1E48bNwNYQ2ZJHHXICV4EDg2z0rg=",
+        "lastModified": 1771981156,
+        "narHash": "sha256-EuOkREJ2cohafwrghG0s4OmnBPP7QBjqoc/fM6mOnII=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "c48f2203c15020860b01136f5b394bc5030cd046",
+        "rev": "e1592064b5f2bf8ff15749e45722b299207839d5",
         "type": "github"
       },
       "original": {
@@ -165,6 +197,8 @@
         "catppuccin": "catppuccin",
         "darwin-custom-icons": "darwin-custom-icons",
         "home-manager": "home-manager",
+        "homebrew-brew": "homebrew-brew",
+        "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "nix-darwin": "nix-darwin",
