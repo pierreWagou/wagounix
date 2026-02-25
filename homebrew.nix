@@ -14,6 +14,7 @@
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
       "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
       "hAIperspace/hai" = inputs.homebrew-hai;
+      "cline/homebrew-cline" = inputs.homebrew-cline;
     };
     mutableTaps = true;
   };
@@ -23,19 +24,9 @@
     greedyCasks = true;
     onActivation = {
       upgrade = true;
-      autoUpdate = true;
+      autoUpdate = false;
       cleanup = "zap";
     };
-    taps = [
-      "homebrew/homebrew-core"
-      "homebrew/homebrew-cask"
-      "Dashlane/homebrew-taps"
-      "teamookla/homebrew-speedtest"
-      {
-        name = "hAIperspace/hai";
-        clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-      }
-    ];
     brews = [
       "dashlane-cli"
       "gh"
