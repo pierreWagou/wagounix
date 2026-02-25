@@ -6,20 +6,34 @@
 
   nix-homebrew = {
     enable = true;
+
+    # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
     enableRosetta = true;
+
+    # User owning the Homebrew prefix
+    user = "yourname";
+
+    # Automatically migrate existing Homebrew installations
     autoMigrate = true;
-    user = "I544489";
-    homebrew = inputs.homebrew-brew;
     taps = {
-      "homebrew/homebrew-core" = inputs.homebrew-core;
-      "homebrew/homebrew-cask" = inputs.homebrew-cask;
-      "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
-      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
-      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
-      "hAIperspace/hai" = inputs.homebrew-hai;
-      "cline/homebrew-cline" = inputs.homebrew-cline;
+      "homebrew/homebrew-core" = homebrew-core;
+      "homebrew/homebrew-cask" = homebrew-cask;
     };
-    mutableTaps = true;
+    mutableTaps = false;
+    # enable = true;
+    # enableRosetta = true;
+    # autoMigrate = true;
+    # user = "I544489";
+    # taps = {
+    #   "homebrew/homebrew-core" = inputs.homebrew-core;
+    #   "homebrew/homebrew-cask" = inputs.homebrew-cask;
+    #   "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
+    #   "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+    #   "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
+    #   "hAIperspace/hai" = inputs.homebrew-hai;
+    #   "cline/homebrew-cline" = inputs.homebrew-cline;
+    # };
+    # mutableTaps = true;
   };
 
   homebrew = {

@@ -18,14 +18,6 @@
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
     };
-    homebrew-bundle = {
-      url = "github:homebrew/homebrew-bundle";
-      flake = false;
-    };
-    homebrew-brew = {
-      url = "github:homebrew/brew";
-      flake = false;
-    };
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,22 +33,22 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    homebrew-dashlane = {
-      url = "github:Dashlane/homebrew-tap";
-      flake = false;
-    };
-    homebrew-speedtest = {
-      url = "github:teamookla/homebrew-speedtest";
-      flake = false;
-    };
-    homebrew-hai = {
-      url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-      flake = false;
-    };
-    homebrew-cline = {
-      url = "github:cline/homebrew-cline";
-      flake = false;
-    };
+    # homebrew-dashlane = {
+    #   url = "github:Dashlane/homebrew-tap";
+    #   flake = false;
+    # };
+    # homebrew-speedtest = {
+    #   url = "github:teamookla/homebrew-speedtest";
+    #   flake = false;
+    # };
+    # homebrew-hai = {
+    #   url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+    #   flake = false;
+    # };
+    # homebrew-cline = {
+    #   url = "github:cline/homebrew-cline";
+    #   flake = false;
+    # };
   };
 
   outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, spicetify-nix, catppuccin, darwin-custom-icons, ... }: {
