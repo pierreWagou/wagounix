@@ -41,25 +41,25 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    # homebrew-dashlane = {
-    #   url = "github:Dashlane/homebrew-tap";
-    #   flake = false;
-    # };
-    # homebrew-speedtest = {
-    #   url = "github:teamookla/homebrew-speedtest";
-    #   flake = false;
-    # };
-    # homebrew-hai = {
-    #   url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-    #   flake = false;
-    # };
-    # homebrew-cline = {
-    #   url = "github:cline/homebrew-cline";
-    #   flake = false;
-    # };
+    homebrew-dashlane = {
+      url = "github:Dashlane/homebrew-tap";
+      flake = false;
+    };
+    homebrew-speedtest = {
+      url = "github:teamookla/homebrew-speedtest";
+      flake = false;
+    };
+    homebrew-hai = {
+      url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      flake = false;
+    };
+    homebrew-cline = {
+      url = "github:cline/homebrew-cline";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nix-darwin, nix-homebrew, nixpkgs, home-manager, spicetify-nix, catppuccin, darwin-custom-icons, ... }: {
+  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, nix-homebrew, spicetify-nix, catppuccin, darwin-custom-icons, ... }: {
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
