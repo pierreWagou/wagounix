@@ -6,39 +6,18 @@
 
   nix-homebrew = {
     enable = true;
-
-    # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
     enableRosetta = true;
-
-    # User owning the Homebrew prefix
     user = "I544489";
-
-    # Automatically migrate existing Homebrew installations
-    autoMigrate = true;
-
-    # Declarative homebrew installation
-    homebrew = inputs.homebrew-brew;
-
+    mutableTaps = true;
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
+      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
+      "hAIperspace/hai" = inputs.homebrew-hai;
+      "cline/homebrew-cline" = inputs.homebrew-cline;
     };
-    mutableTaps = false;
-    # enable = true;
-    # enableRosetta = true;
-    # autoMigrate = true;
-    # user = "I544489";
-    # taps = {
-    #   "homebrew/homebrew-core" = inputs.homebrew-core;
-    #   "homebrew/homebrew-cask" = inputs.homebrew-cask;
-    #   "homebrew/homebrew-bundle" = inputs.homebrew-bundle;
-    #   "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
-    #   "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
-    #   "hAIperspace/hai" = inputs.homebrew-hai;
-    #   "cline/homebrew-cline" = inputs.homebrew-cline;
-    # };
-    # mutableTaps = true;
   };
 
   homebrew = {
@@ -52,13 +31,13 @@
     taps = [
       "homebrew/homebrew-core"
       "homebrew/homebrew-cask"
-      # "Dashlane/homebrew-taps"
-      # "teamookla/homebrew-speedtest"
-      # "cline/homebrew-cline"
-      # {
-      #   name = "hAIperspace/hai";
-      #   clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-      # }
+      "Dashlane/homebrew-taps"
+      "teamookla/homebrew-speedtest"
+      "cline/homebrew-cline"
+      {
+        name = "hAIperspace/hai";
+        clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      }
     ];
     brews = [
       # "dashlane-cli"
