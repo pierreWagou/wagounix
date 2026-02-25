@@ -47,19 +47,19 @@
     taps = [
       "homebrew/homebrew-core"
       "homebrew/homebrew-cask"
-      "Dashlane/homebrew-taps"
-      "teamookla/homebrew-speedtest"
-      "cline/homebrew-cline"
-      {
-        name = "hAIperspace/hai";
-        clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-      }
+      # "Dashlane/homebrew-taps"
+      # "teamookla/homebrew-speedtest"
+      # "cline/homebrew-cline"
+      # {
+      #   name = "hAIperspace/hai";
+      #   clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      # }
     ];
     brews = [
-      "dashlane-cli"
+      # "dashlane-cli"
       "gh"
-      "hai"
-      "speedtest"
+      # "hai"
+      # "speedtest"
     ];
     casks = [
       "aerial"
