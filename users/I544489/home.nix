@@ -11,7 +11,8 @@
     ./pyenv.nix
     ./spicetify.nix
     ./spotify-player.nix
-    ./starship.nix
+    # ./starship.nix
+    ./tmux.nix
     ./zoxide.nix
     ./zsh.nix
   ];
@@ -22,6 +23,7 @@
     homeDirectory = "/Users/I544489";
     stateVersion = "24.11";
     packages = with pkgs; [
+      chezmoi
       claude-code
       cocoapods
       copier
@@ -61,7 +63,7 @@
       spotify-player
       starship
       tmux
-      tmuxinator
+      # tmuxinator
       darwin.trash
       tree
       unzip

@@ -2,9 +2,9 @@
 
   programs.tmux = {
     enable = true;
-    tmuxinator = {
-      enable = true;
-    };
+    # tmuxinator = {
+    #   enable = true;
+    # };
     extraConfig = ''
       set -g default-terminal "tmux-256color"
       set -as terminal-features ',*:RGB'

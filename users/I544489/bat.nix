@@ -1,12 +1,14 @@
 {pkgs, ...}: {
 
-  programs.bat = {
-    enable = true;
-    config = {
-      color = "always";
-      style = "numbers";
-    };
-  };
+  catppuccin.bat.enable = true;
+
+  # programs.bat = {
+  #   # enable = true;
+  #   config = {
+  #     color = "always";
+  #     style = "numbers";
+  #   };
+  # };
 
 }
 
