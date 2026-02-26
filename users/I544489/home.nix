@@ -61,6 +61,7 @@
       spotify-player
       starship
       tmux
+      tmuxinator
       darwin.trash
       tree
       unzip
