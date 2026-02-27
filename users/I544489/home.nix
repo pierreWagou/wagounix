@@ -1,20 +1,20 @@
 {pkgs, ...}: {
 
   imports = [
-    ./bat.nix
-    ./eza.nix
-    ./fzf.nix
-    ./git.nix
-    ./gpg.nix
-    ./ghostty.nix
-    ./home_manager.nix
-    ./pyenv.nix
-    ./spicetify.nix
-    ./spotify-player.nix
-    # ./starship.nix
-    ./tmux.nix
-    ./zoxide.nix
-    ./zsh.nix
+    # ./bat.nix
+    # ./eza.nix
+    # ./fzf.nix
+    # ./git.nix
+    # ./gpg.nix
+    # ./ghostty.nix
+    # ./home_manager.nix
+    # ./pyenv.nix
+    # ./spicetify.nix
+    # ./spotify-player.nix
+    # # ./starship.nix
+    # ./tmux.nix
+    # ./zoxide.nix
+    # ./zsh.nix
   ];
 
   programs.home-manager.enable = true;
@@ -23,6 +23,7 @@
     homeDirectory = "/Users/I544489";
     stateVersion = "24.11";
     packages = with pkgs; [
+      bat
       chezmoi
       claude-code
       cocoapods
@@ -30,15 +31,19 @@
       databricks-cli
       delta
       docker
+      eza
       fd
       ffmpeg
       figlet
       # flutter
+      fzf
       fortune
       gh
+      git
       git-credential-manager
       github-copilot-cli
       gnupg
+      gpg
       htop
       imagemagick
       lazygit
@@ -69,6 +74,7 @@
       unzip
       uv
       vivid
+      wget
       yt-dlp
       zip
       zoxide
@@ -79,19 +85,19 @@
       zsh-completions
       zsh-syntax-highlighting
     ];
-    shellAliases = {
-      ga = "git add .";
-      gc = "git commit -m";
-      gp = "git push";
-      gl = "git push";
-      gco = "git checkout";
-      gb = "git branch";
-      build = "sudo darwin-rebuild switch --flake ~/.config/wagounix#sap";
-      vpn = "sudo openvpn --config ~/.openvpn/home.ovpn";
-    };
+    # shellAliases = {
+    #   ga = "git add .";
+    #   gc = "git commit -m";
+    #   gp = "git push";
+    #   gl = "git push";
+    #   gco = "git checkout";
+    #   gb = "git branch";
+    #   build = "sudo darwin-rebuild switch --flake ~/.config/wagounix#sap";
+    #   vpn = "sudo openvpn --config ~/.openvpn/home.ovpn";
+    # };
   };
   
-  catppuccin.flavor = "mocha";
-  catppuccin.enable = true;
+  # catppuccin.flavor = "mocha";
+  # catppuccin.enable = true;
   
 }
