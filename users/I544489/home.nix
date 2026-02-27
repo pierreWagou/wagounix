@@ -5,7 +5,7 @@
     # ./eza.nix
     # ./fzf.nix
     # ./git.nix
-    # ./gpg.nix
+    ./gpg.nix
     # ./ghostty.nix
     # ./home_manager.nix
     # ./pyenv.nix
@@ -43,7 +43,6 @@
       git-credential-manager
       github-copilot-cli
       gnupg
-      gpg
       htop
       imagemagick
       lazygit
