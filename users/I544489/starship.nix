@@ -1,7 +1,7 @@
 {pkgs, ...}: {
 
   programs.starship = {
-    # enable = true;
+    enable = true;
     # enableZshIntegration = true;
     # settings = {
 #       format = "[](yellow)$os$username[](yellow bg:peach)$directory[](peach bg:red)$git_branch$git_status[](red)$fill$status$python[](pink bg:mauve)$time[](mauve)
