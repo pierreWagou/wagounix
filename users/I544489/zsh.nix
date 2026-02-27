@@ -1,7 +1,7 @@
 {pkgs, ...}: {
 
   programs.zsh = {
-    enable = true;
+    # enable = true;
     enableCompletion = true;
     enableVteIntegration = true;
     completionInit = "autoload -Uz compinit && compinit";
