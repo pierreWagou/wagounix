@@ -7,14 +7,6 @@
       url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    catppuccin = {
-      url = "github:catppuccin/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
     };
@@ -51,13 +43,12 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager, nix-homebrew, spicetify-nix, catppuccin, darwin-custom-icons, ... }: {
+  outputs = inputs@{ self, nixpkgs, nix-darwin, nix-homebrew, darwin-custom-icons, ... }: {
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
           ./configuration.nix
-          ./home_manager.nix
           ./homebrew.nix
           ./icons.nix
         ];
