@@ -21,6 +21,9 @@
     download-buffer-size = 524288000; # 500 MiB
   };
   nix.enable = false;
+
+  catpuccin.enable = true;
+  catpuccin.flavor = "mocha";
   
   system.stateVersion = 5;
   system.primaryUser = "I544489";
