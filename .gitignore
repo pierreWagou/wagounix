@@ -1,0 +1,23 @@
+# Nix build outputs
+result
+result-*
+
+# Direnv
+.dirlocal
+.envrc
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+
+# Flake lock file (optional - uncomment if you don't want to track it)
+# flake.lock
+
+# Editor
+.vscode/
+.idea/
+*.iml
