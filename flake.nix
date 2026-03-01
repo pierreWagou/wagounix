@@ -41,6 +41,7 @@
       url = "github:cline/homebrew-cline";
       flake = false;
     };
+    catppuccin.url = "github:catppuccin/nix";
   };
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, nix-homebrew, darwin-custom-icons, ... }: {
