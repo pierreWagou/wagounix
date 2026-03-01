@@ -103,7 +103,7 @@
       "Amazon Prime Video" = 545519333;
       "Dashlane Password Manager" = 517914548;
       "Hotspot Shield—Meilleur VPN" = 771076721;
-      kindle = 302584613;
+      # kindle = 302584613;
       "Canal+" = 694580816;
       Xcode = 497799835;
     };
