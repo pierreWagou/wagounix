@@ -86,7 +86,7 @@ cd ~/.config/wagounix
 nix-shell -p nix-darwin --run "darwin-rebuild switch --flake .#sap"
 ```
 
-### Regular operations
+### Rebuild system
 
 Once bootstrapped, you can now use the flake to rebuild the system with this command:
 
@@ -94,7 +94,7 @@ Once bootstrapped, you can now use the flake to rebuild the system with this com
 darwin-rebuild switch --flake ~/.config/wagounix#sap
 ```
 
-## 🔄 Updating Dependencies
+### Update Dependencies
 
 To update Nix flake inputs to their latest versions:
 
