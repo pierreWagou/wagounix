@@ -31,6 +31,7 @@
     lazygit
     mas
     maven
+    neomutt
     neovim
     openapi-generator-cli
     openvpn
