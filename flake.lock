@@ -35,11 +35,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1772406829,
-        "narHash": "sha256-OVGfcpS7G9JhcU8N02tndRZWVL0KLmBo0Ph9VrJcgBo=",
+        "lastModified": 1772410991,
+        "narHash": "sha256-xpYKAp0j1y97ojaupVgonwD4ODDQbtcUH0XHY/KGjzk=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "a19ab3329ebe90d35dbd3c47abcc05170dfa8be7",
+        "rev": "b846bba62d0c32aa33411c89ca092cd0c54f5680",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1772409825,
-        "narHash": "sha256-D7Hkw+vV72go+wwHcp/2ObzkesNva00EEm7/7DibGZc=",
+        "lastModified": 1772411755,
+        "narHash": "sha256-en/hGhicP6J41Kv1bScsAnryxg80zQAUID53XpRcC7o=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "ab7e94db782029cdc446d86a2044f520f918baf0",
+        "rev": "d81cbc7a2e4158c2c3b9641ca5867011ade1b47a",
         "type": "github"
       },
       "original": {
@@ -99,7 +99,7 @@
     "homebrew-hai": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-S8onjC7y072hnEixpe5ArCzgkjuC1wYt3M8a8AE35oU=",
+        "narHash": "sha256-dBuxf+WvhultjPMCOV0XzcyAk4boalv8DzQsMITtnPM=",
         "type": "file",
         "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
       },
