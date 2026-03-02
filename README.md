@@ -63,20 +63,35 @@ This repository contains a complete, reproducible macOS system configuration tha
 
 ### Prerequisites
 
-- 🍎 macOS with Nix installed
-- 🔧 nix-darwin
-- ⚡ Flake support enabled
+- 🍎 macOS (Intel or Apple Silicon)
+- 🔧 Nix (will be installed as first step)
+- 📦 nix-darwin (installed automatically)
+- ⚡ Flake support enabled (enabled during Nix setup)
 
-### Setup
+### Bootstrap on a Fresh Machine
+
+On a brand new machine where git isn't installed, follow these steps:
 
 ```bash
-# Clone the repository
-cd ~/.config
-git clone https://github.com/pierreWagou/wagounix.git
+# 1. Install Nix (if not already installed)
+curl -L https://nixos.org/nix/install | sh
+source ~/.nix-profile/etc/profile.d/nix.sh
 
-# Build and activate the configuration
+# 2. Clone the wagounix repository
+nix-shell -p git --run "git --version"
+nix-shell -p git --run "git clone https://github.com/pierreWagou/wagounix.git ~/.config/wagounix"
+
+# 3. Bootstrap nix-darwin and activate the configuration
 cd ~/.config/wagounix
-darwin-rebuild switch --flake .#sap
+nix-shell -p nix-darwin --run "darwin-rebuild switch --flake .#sap"
+```
+
+### Regular operations
+
+Once bootstrapped, you can now use the flake to rebuild the system with this command:
+
+```bash
+darwin-rebuild switch --flake ~/.config/wagounix#sap
 ```
 
 ## 🔄 Updating Dependencies
