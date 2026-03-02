@@ -1,4 +1,4 @@
-# Wagounix
+# ❄️ Wagounix
 
 A declarative macOS system configuration using [nix-darwin](https://github.com/LnL7/nix-darwin) and [Nix Flakes](https://nixos.wiki/wiki/Flakes).
 
@@ -6,68 +6,80 @@ A declarative macOS system configuration using [nix-darwin](https://github.com/L
 
 This repository contains a complete, reproducible macOS system configuration that manages:
 
-- System packages and tools
-- Homebrew packages and casks
-- macOS UI/UX settings
-- Fonts and system fonts
-- Security settings
-- User configuration
+- 📦 System packages and tools
+- 🍺 Homebrew packages and casks
+- 🖥️ macOS UI/UX settings
+- 🔤 Fonts and system fonts
+- 🔒 Security settings
+- 👤 User configuration
 
 ## Repository Structure
 
-```text
-.
-├── core.nix              # Core system configuration (nix settings, security, users)
-├── packages.nix          # System packages and fonts
-├── homebrew.nix          # Homebrew packages, casks, and taps
-├── icons.nix             # macOS custom icons
-├── flake.nix             # Flake configuration and inputs
-├── flake.lock            # Locked dependency versions (auto-generated)
-├── .gitignore            # Git ignore rules
-├── settings/             # macOS UI/UX settings
-│   ├── control-center.nix
-│   ├── dock.nix
-│   ├── finder.nix
-│   ├── global-domain.nix
-│   ├── magic-mouse.nix
-│   ├── menu-clock.nix
-│   ├── screen-capture.nix
-│   ├── screen-saver.nix
-│   ├── software-update.nix
-│   ├── spaces.nix
-│   └── trackpad.nix
-├── users/                # User-specific configurations (archived)
-└── icons/                # Custom icon sets
-```
+### Root Configuration Files
 
-## Key Features
+| 📄 File | Purpose |
+| ------ | --------- |
+| `core.nix` | System core settings, security, and user configuration |
+| `packages.nix` | System packages, CLI tools, and fonts |
+| `homebrew.nix` | Homebrew formulae, casks, and tap repositories |
+| `icons.nix` | Custom macOS icon configuration |
+| `flake.nix` | Nix Flake inputs and system outputs |
+| `flake.lock` | Locked dependency versions (auto-generated) |
+| `.gitignore` | Git ignore rules for Nix projects |
 
-- **Declarative System**: Everything is defined in Nix, ensuring reproducibility
-- **Flake-based**: Uses modern Nix Flakes for dependency management
-- **Homebrew Integration**: Manages both Nix packages and Homebrew formulae/casks
-- **macOS Settings**: Configures system UI/UX preferences
-- **Catppuccin Theme**: System theme using Catppuccin Mocha flavor
-- **Rolling Updates**: Uses `nixpkgs-unstable` for automatic latest package access
+### 🖥️ macOS System Settings (`settings/`)
 
-## Installation
+| File | Purpose |
+| ------ | --------- |
+| `control-center.nix` | Control Center preferences |
+| `dock.nix` | Dock appearance and behavior |
+| `finder.nix` | Finder preferences |
+| `global-domain.nix` | Global system defaults |
+| `magic-mouse.nix` | Magic Mouse settings |
+| `menu-clock.nix` | Menu bar clock configuration |
+| `screen-capture.nix` | Screenshot preferences |
+| `screen-saver.nix` | Screen saver settings |
+| `software-update.nix` | Software update behavior |
+| `spaces.nix` | Spaces and mission control |
+| `trackpad.nix` | Trackpad settings |
+
+### 📂 Other Directories
+
+| Directory | Purpose |
+| ----------- | --------- |
+| `icons/` | 🎨 Custom icon sets |
+| `users/` | 👤 User-specific configurations (archived) |
+
+## ✨ Key Features
+
+- 📝 **Declarative System**: Everything is defined in Nix, ensuring reproducibility
+- 🔗 **Flake-based**: Uses modern Nix Flakes for dependency management
+- 🍺 **Homebrew Integration**: Manages both Nix packages and Homebrew formulae/casks
+- 🖱️ **macOS Settings**: Configures system UI/UX preferences
+- 🎨 **Catppuccin Theme**: System theme using Catppuccin Mocha flavor
+- 🔄 **Rolling Updates**: Uses `nixpkgs-unstable` for automatic latest package access
+
+## 📦 Installation
 
 ### Prerequisites
 
-- macOS with Nix installed
-- nix-darwin
-- Flake support enabled
+- 🍎 macOS with Nix installed
+- 🔧 nix-darwin
+- ⚡ Flake support enabled
 
 ### Setup
 
 ```bash
-# Clone or navigate to your config directory
-cd ~/.config/wagounix
+# Clone the repository
+cd ~/.config
+git clone https://github.com/pierreWagou/wagounix.git
 
 # Build and activate the configuration
+cd ~/.config/wagounix
 darwin-rebuild switch --flake .#sap
 ```
 
-## Updating Dependencies
+## 🔄 Updating Dependencies
 
 To update Nix flake inputs to their latest versions:
 
@@ -77,9 +89,9 @@ nix flake update
 
 This updates `flake.lock` without requiring manual edits to `flake.nix`.
 
-## Configuration Files
+## ⚙️ Configuration Files
 
-### core.nix
+### 🔧 core.nix
 
 System core settings:
 
@@ -89,7 +101,7 @@ System core settings:
 - User definitions
 - Catppuccin theme configuration
 
-### packages.nix
+### 📦 packages.nix
 
 Package management:
 
@@ -97,7 +109,7 @@ Package management:
 - Nix package configuration
 - Fonts installation
 
-### homebrew.nix
+### 🍺 homebrew.nix
 
 Homebrew configuration:
 
@@ -106,17 +118,13 @@ Homebrew configuration:
 - Casks (GUI applications)
 - Mac App Store applications
 
-### settings
+### 🎨 settings
 
 macOS system preferences:
 
-- **dock.nix** - Dock configuration
-- **finder.nix** - Finder preferences
-- **global-domain.nix** - Global system defaults
-- **screen-capture.nix** - Screenshot preferences
-- **trackpad.nix** - Trackpad settings
+- **dock.nix** - 🚀 Dock configuration
+- **finder.nix** - 📁 Finder preferences
+- **global-domain.nix** - 🌍 Global system defaults
+- **screen-capture.nix** - 📸 Screenshot preferences
+- **trackpad.nix** - 👆 Trackpad settings
 - And more macOS-specific UI settings
-
-## Author
-
-Created for SAP macOS system management
