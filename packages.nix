@@ -31,6 +31,7 @@
     lazygit
     mas
     maven
+    mutt-wizard
     neomutt
     neovim
     openapi-generator-cli
