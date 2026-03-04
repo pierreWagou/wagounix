@@ -22,8 +22,10 @@
     };
   };
 
-  system.stateVersion = 5;
-  system.primaryUser = "I544489";
+  system = {
+    stateVersion = 5;
+    primaryUser = "I544489";
+  };
 
   security.pam.services.sudo_local.touchIdAuth = true;
 

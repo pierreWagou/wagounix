@@ -44,7 +44,8 @@
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         modules = [
-          ./core.nix
+          ./configuration.nix
+          ./packages.nix
           ./homebrew.nix
           ./icons.nix
         ];
