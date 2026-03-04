@@ -26,6 +26,7 @@
     git-credential-manager
     github-copilot-cli
     gnupg
+    gopass
     htop
     imagemagick
     lazygit
