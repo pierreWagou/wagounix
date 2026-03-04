@@ -1,6 +1,6 @@
 { ... }: {
 
-  system.defaults.magimouse = {
+  system.defaults.magicmouse = {
     MouseButtonMode = "TwoButton";
   };
 }
