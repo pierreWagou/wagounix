@@ -99,7 +99,7 @@
     "homebrew-hai": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-+lcMmk/XkUJ26/+GGrW80yWld1keCALE1+S3dmg918s=",
+        "narHash": "sha256-OFhmtdbQDgTkZh1BwXpsJMSwFUnbasD6Yrgqk/+BTDU=",
         "type": "file",
         "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
       },
