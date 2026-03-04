@@ -1,8 +1,7 @@
-{ config, lib, pkgs, catppuccin, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   imports = [
-    ./packages.nix
     ./settings/control-center.nix
     ./settings/dock.nix
     ./settings/global-domain.nix
