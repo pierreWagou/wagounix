@@ -47,7 +47,7 @@
       "docker-desktop"
       "drawio"
       "figma"
-      # "flutter"
+      "flutter"
       "ghostty"
       "google-chrome"
       "google-drive"
