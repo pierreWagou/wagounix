@@ -32,9 +32,10 @@
     lazygit
     mas
     maven
-    # mutt-wizard
+    mutt-wizard
     neomutt
     neovim
+    ookla-speedtest
     openapi-generator-cli
     openvpn
     pay-respects
@@ -46,7 +47,6 @@
     R
     ripgrep
     scala
-    sops
     spicetify-cli
     spotify-player
     starship
