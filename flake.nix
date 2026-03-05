@@ -35,10 +35,6 @@
       url = "git+https://github.tools.sap/hAIperspace/hai-homebrew.git";
       flake = false;
     };
-    homebrew-cline = {
-      url = "github:cline/homebrew-cline";
-      flake = false;
-    };
   };
 
   outputs = inputs@{ self, nixpkgs, nix-darwin, nix-homebrew, darwin-custom-icons, ... }: {
