@@ -25,7 +25,6 @@ This repository contains a complete, reproducible macOS system configuration tha
 | `icons.nix` | Custom macOS icon configuration |
 | `flake.nix` | Nix Flake inputs and system outputs |
 | `flake.lock` | Locked dependency versions (auto-generated) |
-| `.gitignore` | Git ignore rules for Nix projects |
 
 ### 🖥️ macOS System Settings (`settings/`)
 
@@ -48,7 +47,6 @@ This repository contains a complete, reproducible macOS system configuration tha
 | Directory | Purpose |
 | ----------- | --------- |
 | `icons/` | 🎨 Custom icon sets |
-| `users/` | 👤 User-specific configurations (archived) |
 
 ## ✨ Key Features
 
@@ -106,22 +104,20 @@ This updates `flake.lock` without requiring manual edits to `flake.nix`.
 
 ## ⚙️ Configuration Files
 
-### 🔧 core.nix
+### 🔧 configuration.nix
 
-System core settings:
+System core configuration:
 
 - Nix settings and experimental features
 - System version and primary user
 - Security settings (TouchID for sudo)
 - User definitions
-- Catppuccin theme configuration
 
 ### 📦 packages.nix
 
 Package management:
 
 - System packages (CLI tools, development tools, applications)
-- Nix package configuration
 - Fonts installation
 
 ### 🍺 homebrew.nix
