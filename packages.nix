@@ -47,6 +47,7 @@
     R
     ripgrep
     scala
+    sheldon
     spicetify-cli
     spotify-player
     starship
@@ -61,10 +62,5 @@
     zip
     zoxide
     zsh
-    zsh-fzf-tab
-    zsh-you-should-use
-    zsh-autosuggestions
-    zsh-completions
-    zsh-syntax-highlighting
   ];
 }
