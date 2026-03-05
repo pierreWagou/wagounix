@@ -8,7 +8,7 @@
     enable = true;
     enableRosetta = true;
     user = "I544489";
-    mutableTaps = true;
+    mutableTaps = false;
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
@@ -32,16 +32,12 @@
       "Dashlane/homebrew-taps"
       "teamookla/homebrew-speedtest"
       "cline/homebrew-cline"
-      {
-        name = "hAIperspace/hai";
-        clone_target = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
-      }
     ];
     brews = [
       # "cline"
       "dashlane-cli"
       "gh"
-      "hai"
+      # "hai"
       "speedtest"
     ];
     casks = [
@@ -60,7 +56,7 @@
       "docker-desktop"
       "drawio"
       "figma"
-      "flutter"
+      # "flutter"
       "font-jetbrains-mono-nerd-font"
       "ghostty"
       "google-chrome"

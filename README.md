@@ -74,8 +74,7 @@ On a brand new machine where git isn't installed, follow these steps:
 
 ```bash
 # 1. Install Nix (if not already installed)
-curl -L https://nixos.org/nix/install | sh
-source ~/.nix-profile/etc/profile.d/nix.sh
+curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 
 # 2. Clone the wagounix repository
 nix-shell -p git --run "git --version"
