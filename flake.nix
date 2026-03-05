@@ -2,7 +2,9 @@
   description = "SAP nix-darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixos-25.11";
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,7 +32,7 @@
       flake = false;
     };
     homebrew-hai = {
-      url = "https://github.tools.sap/hAIperspace/hai-homebrew.git";
+      url = "git+https://github.tools.sap/hAIperspace/hai-homebrew.git";
       flake = false;
     };
     homebrew-cline = {

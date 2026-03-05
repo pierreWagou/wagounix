@@ -13,9 +13,7 @@
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
-      "teamookla/homebrew-speedtest" = inputs.homebrew-speedtest;
-      "hAIperspace/hai" = inputs.homebrew-hai;
-      "cline/homebrew-cline" = inputs.homebrew-cline;
+      "haiperspace/homebrew-hai" = inputs.homebrew-hai;
     };
   };
 
@@ -24,21 +22,14 @@
     greedyCasks = true;
     onActivation = {
       upgrade = true;
-      cleanup = "zap";
+      cleanup = "uninstall";
     };
-    taps = [
-      "homebrew/homebrew-core"
-      "homebrew/homebrew-cask"
-      "Dashlane/homebrew-taps"
-      "teamookla/homebrew-speedtest"
-      "cline/homebrew-cline"
-    ];
+    taps = builtins.attrNames config.nix-homebrew.taps;
     brews = [
-      # "cline"
       "dashlane-cli"
       "gh"
-      # "hai"
-      "speedtest"
+      "hai"
+      "yarn"
     ];
     casks = [
       "aerial"
@@ -57,7 +48,6 @@
       "drawio"
       "figma"
       # "flutter"
-      "font-jetbrains-mono-nerd-font"
       "ghostty"
       "google-chrome"
       "google-drive"
