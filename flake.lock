@@ -48,22 +48,6 @@
         "type": "github"
       }
     },
-    "homebrew-cline": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1770067543,
-        "narHash": "sha256-K0HOtTigr1LJrYDprVvA9in3nyvBsDrIGGg6SftiBFI=",
-        "owner": "cline",
-        "repo": "homebrew-cline",
-        "rev": "dc8afad51026eb18904678a11997ca394301227c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "cline",
-        "repo": "homebrew-cline",
-        "type": "github"
-      }
-    },
     "homebrew-core": {
       "flake": false,
       "locked": {
@@ -187,7 +171,6 @@
       "inputs": {
         "darwin-custom-icons": "darwin-custom-icons",
         "homebrew-cask": "homebrew-cask",
-        "homebrew-cline": "homebrew-cline",
         "homebrew-core": "homebrew-core",
         "homebrew-dashlane": "homebrew-dashlane",
         "homebrew-hai": "homebrew-hai",
