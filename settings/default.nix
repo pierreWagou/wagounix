@@ -1,15 +1,15 @@
 { ... }: {
 
   imports = [
-    ./settings/control-center.nix
-    ./settings/dock.nix
-    ./settings/global-domain.nix
-    ./settings/finder.nix
-    ./settings/keyboard.nix
-    ./settings/screen-capture.nix
-    ./settings/screen-saver.nix
-    ./settings/software-update.nix
-    ./settings/spaces.nix
-    ./settings/trackpad.nix
+    ./control-center.nix
+    ./dock.nix
+    ./global-domain.nix
+    ./finder.nix
+    ./keyboard.nix
+    ./screen-capture.nix
+    ./screen-saver.nix
+    ./software-update.nix
+    ./spaces.nix
+    ./trackpad.nix
   ];
 }
