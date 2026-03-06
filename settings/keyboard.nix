@@ -1,0 +1,5 @@
+{ ... }: {
+
+  system.keyboard.remapCapsLockToEscape = true;
+  
+}
