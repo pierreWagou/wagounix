@@ -37,7 +37,7 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, nix-homebrew, darwin-custom-icons, ... }: {
+  outputs = inputs@{ self, nixpkgs, nix-darwin, ... }: {
     darwinConfigurations = {
       sap = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";

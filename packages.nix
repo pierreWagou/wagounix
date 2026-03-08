@@ -52,8 +52,9 @@
     spotify-player
     starship
     tmux
+    tmuxinator
     darwin.trash
-    tree
+    tree-sitter
     unzip
     uv
     vivid
