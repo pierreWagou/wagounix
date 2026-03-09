@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -17,6 +17,8 @@
     stateVersion = 5;
     primaryUser = "I544489";
   };
+
+  system.activationScripts.customIcons.deps = [ "homebrew" ];
 
   security.pam.services.sudo_local.touchIdAuth = true;
 
