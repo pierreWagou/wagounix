@@ -27,10 +27,6 @@
       url = "github:Dashlane/homebrew-tap";
       flake = false;
     };
-    homebrew-speedtest = {
-      url = "github:teamookla/homebrew-speedtest";
-      flake = false;
-    };
     homebrew-hai = {
       url = "git+https://github.tools.sap/hAIperspace/hai-homebrew.git";
       flake = false;
