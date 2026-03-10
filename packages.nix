@@ -47,6 +47,7 @@
     R
     ripgrep
     scala
+    sesh
     sheldon
     spicetify-cli
     spotify-player
