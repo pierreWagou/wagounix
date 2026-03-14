@@ -18,15 +18,17 @@
     eza
     fd
     ffmpeg
-    figlet
-    fzf
     fortune
+    figlet
+    fnm
+    fzf
     gh
     git
     git-credential-manager
     github-copilot-cli
     gnupg
     gopass
+    gum
     htop
     imagemagick
     lazygit
