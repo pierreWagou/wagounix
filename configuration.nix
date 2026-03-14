@@ -19,8 +19,11 @@
   };
 
   system.activationScripts.customIcons.deps = [ "homebrew" ];
-
-  security.pam.services.sudo_local.touchIdAuth = true;
+  
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    reattach = true;
+  };
 
   users.users = {
     I544489 = {
