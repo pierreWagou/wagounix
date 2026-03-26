@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ host, ... }:
 
 {
   imports = [
@@ -15,20 +15,18 @@
 
   system = {
     stateVersion = 5;
-    primaryUser = "I544489";
+    primaryUser = host.username;
   };
 
-  system.activationScripts.customIcons.deps = [ "homebrew" ];
+  users.users = {
+    ${host.username} = {
+      name = host.username;
+      home = "/Users/${host.username}";
+    };
+  };
   
   security.pam.services.sudo_local = {
     touchIdAuth = true;
     reattach = true;
-  };
-
-  users.users = {
-    I544489 = {
-      name = "I544489";
-      home = "/Users/I544489";
-    };
   };
 }
