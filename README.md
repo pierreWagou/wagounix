@@ -73,15 +73,13 @@ On a brand new machine where git isn't installed, follow these steps:
 ```bash
 # 1. Install Nix (if not already installed)
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
+. /nix/vcar/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
 # 2. Clone the wagounix repository
-nix-shell -p gh --run "gh auth login --hostname github.tools.sap"
-nix-shell -p gh git --run "gh auth setup-git --hostname github.tools.sap"
 nix-shell -p git --run "git clone https://github.com/pierreWagou/wagounix.git ~/.config/wagounix"
 
 # 3. Bootstrap nix-darwin and activate the configuration
-cd ~/.config/wagounix
-nix run nix-darwin -- switch --flake .#sap
+sudo nix run nix-darwin -- switch --flake ~/.config/wagounix#<profile>
 ```
 
 ### Rebuild system

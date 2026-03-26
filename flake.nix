@@ -55,8 +55,8 @@
           ./configuration.nix
           ./packages.nix
           ./homebrew.nix
-          ./hosts/wagou/homebrew.nix
           ./icons.nix
+          ./hosts/wagou
         ];
         specialArgs = { 
           inherit inputs;
