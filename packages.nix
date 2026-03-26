@@ -54,6 +54,7 @@
     spicetify-cli
     spotify-player
     starship
+    terraform
     tmux
     tmuxinator
     darwin.trash

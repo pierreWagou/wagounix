@@ -42,9 +42,28 @@
           ./packages.nix
           ./homebrew.nix
           ./icons.nix
+          ./hosts/sap
         ];
-        specialArgs = { inherit inputs; };
+        specialArgs = { 
+          inherit inputs;
+          host = import ./hosts/sap/variables.nix;
+        };
       };
+      wagou = nix-darwin.lib.darwinSystem {
+        system = "aarch64-darwin";
+        modules = [
+          ./configuration.nix
+          ./packages.nix
+          ./homebrew.nix
+          ./hosts/wagou/homebrew.nix
+          ./icons.nix
+        ];
+        specialArgs = { 
+          inherit inputs;
+          host = import ./hosts/wagou/variables.nix;
+        };
+      };
+
     };
   };
 }

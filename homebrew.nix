@@ -1,19 +1,14 @@
-{ inputs, config, ... }: {
-
-  imports = [
-    inputs.nix-homebrew.darwinModules.nix-homebrew
-  ];
+{ inputs, config, host, ... }: {
 
   nix-homebrew = {
     enable = true;
     enableRosetta = true;
-    user = "I544489";
+    user = host.username;
     mutableTaps = false;
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
-      "haiperspace/homebrew-hai" = inputs.homebrew-hai;
     };
   };
 
@@ -28,7 +23,6 @@
     brews = [
       "dashlane-cli"
       "gh"
-      "hai"
       "yarn"
     ];
     casks = [
@@ -42,7 +36,7 @@
       "bruno"
       {
         name = "discord";
-        args = { appdir = "~/Applications"; };
+        args = { appdir = host.restricted_applications_dir; };
       }
       "docker-desktop"
       "drawio"
@@ -72,7 +66,7 @@
       "slack"
       {
         name = "spotify";
-        args = { appdir = "~/Applications"; };
+        args = { appdir = host.restricted_applications_dir; };
       }
       "steam"
       "synology-drive"

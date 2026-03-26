@@ -35,11 +35,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1773063057,
-        "narHash": "sha256-EDBj2/vuTm0LZh3g1w6iH2ZW/dqJPicT3Fj4EvuUPQs=",
+        "lastModified": 1773864550,
+        "narHash": "sha256-rc7Aas89JcVjHt6atFrdWUz1dmMEK3JNNMDLfAxbbcQ=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "d8946bfde10950872bea074d7947412b0816d322",
+        "rev": "ee645690ab14aa61eeab99f105756797e36cda53",
         "type": "github"
       },
       "original": {
@@ -51,11 +51,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1773062308,
-        "narHash": "sha256-hyRsqNwCH7q3CmLTuMvz1E1UpraRuptAIefPFibWfYY=",
+        "lastModified": 1773865260,
+        "narHash": "sha256-Mn+7GZ3s3irAI/+IQvEfvVciRaT0WFnmQf50IacVWGo=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "29294ff60b02e5eefe7efbc1fcaffea6c68e2170",
+        "rev": "9480772f43a16ea0c34b7c5c4a0f05908debff23",
         "type": "github"
       },
       "original": {
@@ -67,11 +67,11 @@
     "homebrew-dashlane": {
       "flake": false,
       "locked": {
-        "lastModified": 1770740227,
-        "narHash": "sha256-oUruGFzwGMFbu1dRjUZvQZwjnXbExsTU9+0pyYpgeYc=",
+        "lastModified": 1773680159,
+        "narHash": "sha256-EFUP3Rv3CBT/K2jOXbkaASSuMzs56PPuBu02kt3Corg=",
         "owner": "Dashlane",
         "repo": "homebrew-tap",
-        "rev": "920f1909e0cf1277b14bcd490a28332327ef9ebb",
+        "rev": "025d567f2e63876f7afd05465e95853a1fb4feb8",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "homebrew-hai": {
       "flake": false,
       "locked": {
-        "lastModified": 1772814317,
-        "narHash": "sha256-Zs1zjd/gNkLYP5kSVY74oQQ5WCQPT8EzKe0ufes0fWY=",
+        "lastModified": 1773412533,
+        "narHash": "sha256-Ak+rkZi4zpOnmmPhCVSNJKbYDdyiV2W0HW5rxb8MVTw=",
         "ref": "refs/heads/main",
-        "rev": "1aec9681036c4c4c25481c9994f6af8bcca34cb1",
-        "revCount": 61,
+        "rev": "4d8af86385d639e255a08dcf05e04d79024b7374",
+        "revCount": 66,
         "type": "git",
         "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
       },
@@ -137,11 +137,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1772773019,
-        "narHash": "sha256-E1bxHxNKfDoQUuvriG71+f+s/NT0qWkImXsYZNFFfCs=",
+        "lastModified": 1773734432,
+        "narHash": "sha256-IF5ppUWh6gHGHYDbtVUyhwy/i7D261P7fWD1bPefOsw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "aca4d95fce4914b3892661bcb80b8087293536c6",
+        "rev": "cda48547b432e8d3b18b4180ba07473762ec8558",
         "type": "github"
       },
       "original": {
