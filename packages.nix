@@ -18,7 +18,6 @@
     eza
     fd
     ffmpeg
-    fortune
     figlet
     fnm
     fzf
@@ -27,24 +26,21 @@
     git-credential-manager
     github-copilot-cli
     gnupg
-    gopass
-    gum
     htop
     imagemagick
     lazygit
     mas
     maven
     mutt-wizard
-    neomutt
+    # neomutt
     neovim
+    nix-index
     ookla-speedtest
     openapi-generator-cli
     openvpn
     pay-respects
     pinentry_mac
-    pipx
     poetry
-    pyenv
     qrencode
     R
     ripgrep

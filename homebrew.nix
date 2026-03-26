@@ -1,5 +1,9 @@
 { inputs, config, host, ... }: {
 
+  imports = [
+    inputs.nix-homebrew.darwinModules.nix-homebrew
+  ];
+
   nix-homebrew = {
     enable = true;
     enableRosetta = true;
@@ -34,9 +38,10 @@
       "AltServer"
       "ankama"
       "bruno"
+      "claude"
       {
         name = "discord";
-        args = { appdir = host.restricted_applications_dir; };
+        args = { appdir = host.restricted_app_dir; };
       }
       "docker-desktop"
       "drawio"
@@ -66,7 +71,7 @@
       "slack"
       {
         name = "spotify";
-        args = { appdir = host.restricted_applications_dir; };
+        args = { appdir = host.restricted_app_dir; };
       }
       "steam"
       "synology-drive"
@@ -78,6 +83,7 @@
       "vlc"
       "wordpresscom-studio"
       "zen"
+      "zoom"
     ];
     masApps = {
       "Amazon Prime Video" = 545519333;

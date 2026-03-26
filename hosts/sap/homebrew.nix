@@ -9,6 +9,8 @@
   homebrew = {
     brews = [
       "hai"
+    ];
+    casks = [
       "btp"
     ];
   };
