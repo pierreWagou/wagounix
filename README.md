@@ -71,15 +71,9 @@ This repository contains a complete, reproducible macOS system configuration tha
 On a brand new machine where git isn't installed, follow these steps:
 
 ```bash
-# 1. Install Nix (if not already installed)
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 . /nix/vcar/nix/profiles/default/etc/profile.d/nix-daemon.sh
-
-# 2. Clone the wagounix repository
-nix-shell -p git --run "git clone https://github.com/pierreWagou/wagounix.git ~/.config/wagounix"
-
-# 3. Bootstrap nix-darwin and activate the configuration
-sudo nix run nix-darwin -- switch --flake ~/.config/wagounix#<profile>
+sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 ```
 
 ### Rebuild system
