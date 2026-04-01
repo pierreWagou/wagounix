@@ -67,7 +67,6 @@
       "openvpn-connect"
       "philips-hue-sync"
       "raycast"
-      "rectangle"
       "slack"
       {
         name = "spotify";
