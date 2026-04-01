@@ -8,6 +8,7 @@
   environment.systemPackages = with pkgs; [
     age
     bat
+    bottom
     chezmoi
     claude-code
     cocoapods
@@ -26,17 +27,18 @@
     git-credential-manager
     github-copilot-cli
     gnupg
-    htop
     imagemagick
     lazygit
     mas
     maven
+    mise
     mutt-wizard
     # neomutt
     neovim
     nix-index
     ookla-speedtest
     openapi-generator-cli
+    opencode
     openvpn
     pay-respects
     pinentry_mac
@@ -50,6 +52,7 @@
     spicetify-cli
     spotify-player
     starship
+    television
     terraform
     tmux
     tmuxinator
@@ -59,6 +62,7 @@
     uv
     vivid
     wget
+    worktrunk
     yt-dlp
     zip
     zoxide
