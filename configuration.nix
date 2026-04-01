@@ -5,8 +5,6 @@
     ./settings
   ];
 
-  nixpkgs.config.allowUnsupportedSystem = true;
-
   nix = {
     enable = false;
     settings = {
