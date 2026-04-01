@@ -38,7 +38,6 @@
     nix-index
     ookla-speedtest
     openapi-generator-cli
-    opencode
     openvpn
     pay-respects
     pinentry_mac
