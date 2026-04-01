@@ -35,11 +35,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1774911861,
-        "narHash": "sha256-VTfsmxz+yioabIhV9MM0lvBKAn7HxWU9tr04sC6PcDQ=",
+        "lastModified": 1775054287,
+        "narHash": "sha256-wOT3vA0tgLYlOIVLNGJ5unkkQQazO0DpHUYLvoSwbnQ=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "56e660ce69e78e1dd89f9cdd74f8d31374d4c957",
+        "rev": "94c73035ed3cb870427347007c1d5a55f18ab074",
         "type": "github"
       },
       "original": {
@@ -51,11 +51,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1774914384,
-        "narHash": "sha256-8fMlUkrMbluQnTd3OWyrVEUZt/2omR8Nkd0V6gJHgxA=",
+        "lastModified": 1775057097,
+        "narHash": "sha256-RME83rMUFvAyJssgZPkZn4hrWsRRMSletTLySk8gEVc=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "66a1d374a1c315b11f98cd7d313492a75c3910b0",
+        "rev": "799734b2b2cf2e78839847d1a98bc715fd50cad0",
         "type": "github"
       },
       "original": {
@@ -83,11 +83,11 @@
     "homebrew-hai": {
       "flake": false,
       "locked": {
-        "lastModified": 1774541763,
-        "narHash": "sha256-1SgPulscAeV6aYTG/gotsUWqCIP2gJMHMXF5X9tLPtQ=",
+        "lastModified": 1775025239,
+        "narHash": "sha256-s0U2euZUcEu9Gg6YQf7Eut2ZMja8C1taAA12PekJUAY=",
         "ref": "refs/heads/main",
-        "rev": "981df2a84d972ae12caface003682694cae9dd27",
-        "revCount": 71,
+        "rev": "822c69aa5cb73c99fcf6c42305c92cb15e19d10c",
+        "revCount": 72,
         "type": "git",
         "url": "https://github.tools.sap/hAIperspace/hai-homebrew.git"
       },
@@ -103,11 +103,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773000227,
-        "narHash": "sha256-zm3ftUQw0MPumYi91HovoGhgyZBlM4o3Zy0LhPNwzXE=",
+        "lastModified": 1775037210,
+        "narHash": "sha256-KM2WYj6EA7M/FVZVCl3rqWY+TFV5QzSyyGE2gQxeODU=",
         "owner": "nix-darwin",
         "repo": "nix-darwin",
-        "rev": "da529ac9e46f25ed5616fd634079a5f3c579135f",
+        "rev": "06648f4902343228ce2de79f291dd5a58ee12146",
         "type": "github"
       },
       "original": {

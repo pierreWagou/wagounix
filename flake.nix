@@ -50,7 +50,7 @@
         };
       };
       wagou = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
+        system = "x86_64-darwin";
         modules = [
           ./configuration.nix
           ./packages.nix
