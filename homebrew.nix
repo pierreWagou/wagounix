@@ -6,7 +6,7 @@
 
   nix-homebrew = {
     enable = true;
-    enableRosetta = true;
+    enableRosetta = host.enableRosetta;
     user = host.username;
     mutableTaps = false;
     taps = {
