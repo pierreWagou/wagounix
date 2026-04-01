@@ -5,6 +5,8 @@
     ./settings
   ];
 
+  nixpkgs.config.allowUnsupportedSystem = host.allowUnsupportedSystem;
+
   nix = {
     enable = false;
     settings = {
