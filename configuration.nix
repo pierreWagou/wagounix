@@ -1,4 +1,4 @@
-{ host, ... }:
+{ host, lib, pkgs, ... }:
 
 {
   imports = [
@@ -28,5 +28,9 @@
   security.pam.services.sudo_local = {
     touchIdAuth = true;
     reattach = true;
+    # text = lib.mkForce (lib.concatLines [
+    #   "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so"
+    #   "auth       sufficient     pam_tid.so.2"
+    # ]);
   };
 }
