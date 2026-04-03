@@ -43,7 +43,6 @@
         name = "discord";
         args = { appdir = host.restricted_app_dir; };
       }
-      "docker-desktop"
       "drawio"
       "figma"
       "flutter"
