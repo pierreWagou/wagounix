@@ -13,7 +13,6 @@
     claude-code
     cocoapods
     copier
-    databricks-cli
     delta
     docker
     eza
@@ -33,6 +32,7 @@
     maven
     mise
     mutt-wizard
+    mprocs
     # neomutt
     neovim
     nix-index
