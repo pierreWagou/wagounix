@@ -12,6 +12,8 @@
     ];
     casks = [
       "btp"
+      "docker-desktop"
+      "microsoft"
       "microsoft-azure-storage-explorer"
     ];
   };
