@@ -12,6 +12,7 @@
     ];
     casks = [
       "btp"
+      "microsoft-azure-storage-explorer"
     ];
   };
 }
