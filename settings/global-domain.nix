@@ -1,5 +1,5 @@
-{ ... }: {
-  
+_: {
+
   system.defaults.NSGlobalDomain = {
     "com.apple.keyboard.fnState" = false;
     "com.apple.mouse.tapBehavior" = 1;

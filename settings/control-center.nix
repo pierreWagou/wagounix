@@ -1,5 +1,5 @@
-{ ... }: {
-  
+_: {
+
   system.defaults.controlcenter = {
     AirDrop = true;
     BatteryShowPercentage = true;

@@ -2,9 +2,15 @@
 result
 result-*
 
+# Logs
+mprocs.log
+
 # Direnv
 .dirlocal
 .envrc
+
+# git-hooks.nix (auto-generated)
+.pre-commit-config.yaml
 
 # macOS
 .DS_Store

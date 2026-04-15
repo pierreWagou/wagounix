@@ -1,4 +1,5 @@
-{ inputs, ... }: {
+{ inputs, ... }:
+{
 
   nix-homebrew = {
     taps = {
@@ -8,13 +9,18 @@
 
   homebrew = {
     brews = [
+      "gh"
       "hai"
     ];
     casks = [
       "btp"
       "docker-desktop"
-      "microsoft"
+      "drawio"
+      "figma"
       "microsoft-azure-storage-explorer"
     ];
+    masApps = {
+      Xcode = 497799835;
+    };
   };
 }
