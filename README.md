@@ -1,133 +1,133 @@
-# ❄️ Wagounix
+# Wagounix
 
-A declarative macOS system configuration using [nix-darwin](https://github.com/LnL7/nix-darwin) and [Nix Flakes](https://nixos.wiki/wiki/Flakes).
+A declarative macOS system configuration using [nix-darwin](https://github.com/nix-darwin/nix-darwin) and [Nix Flakes](https://nixos.wiki/wiki/Flakes).
 
 ## Overview
 
-This repository contains a complete, reproducible macOS system configuration that manages:
+This repository manages multiple macOS machines through a layered, reproducible configuration:
 
-- 📦 System packages and tools
-- 🍺 Homebrew packages and casks
-- 🖥️ macOS UI/UX settings
-- 🔤 Fonts and system fonts
-- 🔒 Security settings
-- 👤 User configuration
+- Common packages and settings shared across all machines
+- Role-based layers (personal / work) for apps and dock layout
+- Per-host overrides for machine-specific needs
+- macOS UI/UX settings configured declaratively
+- Homebrew casks and Mac App Store apps
+- Custom application icons
+- Pre-commit hooks via [git-hooks.nix](https://github.com/cachix/git-hooks.nix)
 
 ## Repository Structure
 
-### Root Configuration Files
+```
+wagounix/
+├── flake.nix              # Inputs, darwinConfigurations, checks, devShell
+├── flake.lock             # Pinned dependency versions
+├── configuration.nix      # Core system config (users, PAM, settings import)
+├── packages.nix           # Common nix packages (CLI tools, dev tools)
+├── homebrew.nix           # Common Homebrew brews and casks
+├── fonts.nix              # Fonts (Nerd Fonts)
+├── icons.nix              # Custom macOS app icons
+├── icons/                 # .icns icon files
+├── settings/              # macOS system defaults
+│   ├── default.nix        # Imports all settings modules
+│   ├── dock.nix           # Dock behavior (autohide, persistent-others)
+│   ├── finder.nix         # Finder preferences
+│   ├── global-domain.nix  # Global defaults (dark mode, key repeat, etc.)
+│   ├── keyboard.nix       # Key mapping, shortcut overrides
+│   └── ...                # control-center, trackpad, menu-clock, etc.
+└── hosts/
+    ├── personal/           # Personal machine layer
+    │   ├── default.nix     # Imports dock, packages, homebrew
+    │   ├── dock.nix        # Personal dock apps
+    │   ├── packages.nix    # Personal nix packages (android-tools, mas)
+    │   ├── homebrew.nix    # Personal casks (Steam, Ankama, etc.) + masApps
+    │   ├── wagou/          # New personal Mac (aarch64-darwin)
+    │   │   ├── default.nix
+    │   │   ├── variables.nix
+    │   │   └── packages.nix
+    │   └── wagou-old/      # Old Intel Mac (x86_64-darwin)
+    │       ├── default.nix
+    │       └── variables.nix
+    └── work/               # Work machine layer
+        ├── default.nix     # Imports dock, packages, homebrew
+        ├── dock.nix        # Work dock apps (Outlook, Teams, etc.)
+        ├── packages.nix    # Work nix packages (opencode)
+        ├── homebrew.nix    # Work casks (placeholder)
+        ├── sap/            # SAP Mac — legacy, remove when returned
+        │   ├── default.nix
+        │   ├── variables.nix
+        │   ├── packages.nix
+        │   └── homebrew.nix
+        └── pro/            # New work Mac (aarch64-darwin)
+            ├── default.nix
+            └── variables.nix
+```
 
-| 📄 File | Purpose |
-| ------ | --------- |
-| `core.nix` | System core settings, security, and user configuration |
-| `packages.nix` | System packages, CLI tools, and fonts |
-| `homebrew.nix` | Homebrew formulae, casks, and tap repositories |
-| `icons.nix` | Custom macOS icon configuration |
-| `flake.nix` | Nix Flake inputs and system outputs |
-| `flake.lock` | Locked dependency versions (auto-generated) |
+## Host Profiles
 
-### 🖥️ macOS System Settings (`settings/`)
+Each `darwinConfiguration` in `flake.nix` loads:
 
-| File | Purpose |
-| ------ | --------- |
-| `control-center.nix` | Control Center preferences |
-| `dock.nix` | Dock appearance and behavior |
-| `finder.nix` | Finder preferences |
-| `global-domain.nix` | Global system defaults |
-| `magic-mouse.nix` | Magic Mouse settings |
-| `menu-clock.nix` | Menu bar clock configuration |
-| `screen-capture.nix` | Screenshot preferences |
-| `screen-saver.nix` | Screen saver settings |
-| `software-update.nix` | Software update behavior |
-| `spaces.nix` | Spaces and mission control |
-| `trackpad.nix` | Trackpad settings |
+1. **Common** — `configuration.nix`, `packages.nix`, `homebrew.nix`, `fonts.nix`, `icons.nix`
+2. **Layer** — `hosts/personal` or `hosts/work` (role-specific packages, casks, dock)
+3. **Host** — `hosts/<layer>/<host>` (machine-specific overrides)
 
-### 📂 Other Directories
+| Profile | System | Layer | Description |
+|---------|--------|-------|-------------|
+| `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
+| `wagou-old` | x86_64-darwin | personal | Old Intel Mac |
+| `wagou` | aarch64-darwin | personal | New personal Mac |
+| `pro` | aarch64-darwin | work | New work Mac |
 
-| Directory | Purpose |
-| ----------- | --------- |
-| `icons/` | 🎨 Custom icon sets |
+Each host provides a `variables.nix` with `username`, `restricted_app_dir`, and `enableRosetta`.
 
-## ✨ Key Features
-
-- 📝 **Declarative System**: Everything is defined in Nix, ensuring reproducibility
-- 🔗 **Flake-based**: Uses modern Nix Flakes for dependency management
-- 🍺 **Homebrew Integration**: Manages both Nix packages and Homebrew formulae/casks
-- 🖱️ **macOS Settings**: Configures system UI/UX preferences
-- 🎨 **Catppuccin Theme**: System theme using Catppuccin Mocha flavor
-- 🔄 **Rolling Updates**: Uses `nixpkgs-unstable` for automatic latest package access
-
-## 📦 Installation
-
-### Prerequisites
-
-- 🍎 macOS (Intel or Apple Silicon)
-- 🔧 Nix (will be installed as first step)
-- 📦 nix-darwin (installed automatically)
-- ⚡ Flake support enabled (enabled during Nix setup)
+## Installation
 
 ### Bootstrap on a Fresh Machine
 
-On a brand new machine where git isn't installed, follow these steps:
-
 ```bash
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
-. /nix/vcar/nix/profiles/default/etc/profile.d/nix-daemon.sh
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 ```
 
-### Rebuild system
-
-Once bootstrapped, you can now use the flake to rebuild the system with this command:
+### Rebuild
 
 ```bash
-darwin-rebuild switch --flake ~/.config/wagounix#sap
+darwin-rebuild switch --flake ~/.config/wagounix#<profile>
 ```
 
 ### Update Dependencies
-
-To update Nix flake inputs to their latest versions:
 
 ```bash
 nix flake update
 ```
 
-This updates `flake.lock` without requiring manual edits to `flake.nix`.
+## Development
 
-## ⚙️ Configuration Files
+### Dev Shell
 
-### 🔧 configuration.nix
+Enter the dev shell to get linting tools and auto-install git hooks:
 
-System core configuration:
+```bash
+nix develop
+```
 
-- Nix settings and experimental features
-- System version and primary user
-- Security settings (TouchID for sudo)
-- User definitions
+This provides `nixfmt`, `statix`, and `deadnix`, and installs pre-commit hooks automatically.
 
-### 📦 packages.nix
+### Pre-commit Hooks
 
-Package management:
+Managed by [git-hooks.nix](https://github.com/cachix/git-hooks.nix). On every commit:
 
-- System packages (CLI tools, development tools, applications)
-- Fonts installation
+- **nixfmt** — verifies Nix formatting
+- **statix** — lints for anti-patterns
+- **deadnix** — catches unused code
 
-### 🍺 homebrew.nix
+On push:
 
-Homebrew configuration:
+- **darwin-build** — builds all 4 profiles to verify correctness
 
-- Homebrew taps (repositories)
-- Formulae (command-line tools)
-- Casks (GUI applications)
-- Mac App Store applications
+### Flake Checks
 
-### 🎨 settings
+```bash
+nix flake check
+```
 
-macOS system preferences:
-
-- **dock.nix** - 🚀 Dock configuration
-- **finder.nix** - 📁 Finder preferences
-- **global-domain.nix** - 🌍 Global system defaults
-- **screen-capture.nix** - 📸 Screenshot preferences
-- **trackpad.nix** - 👆 Trackpad settings
-- And more macOS-specific UI settings
+Runs all the above checks plus builds all `darwinConfigurations`.

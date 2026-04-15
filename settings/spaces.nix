@@ -1,6 +1,6 @@
-{ ... }: {
+_: {
 
-    system.defaults.spaces = {
-      spans-displays = false;
-    };
+  system.defaults.spaces = {
+    spans-displays = false;
+  };
 }

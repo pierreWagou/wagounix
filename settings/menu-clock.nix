@@ -1,4 +1,4 @@
-{ ... }: {
+_: {
 
   system.defaults.menuExtraClock = {
     FlashDateSeparators = true;

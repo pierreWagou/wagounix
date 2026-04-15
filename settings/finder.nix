@@ -1,5 +1,5 @@
-{ ... }: {
-  
+_: {
+
   system.defaults.finder = {
     _FXShowPosixPathInTitle = false;
     _FXSortFoldersFirst = true;

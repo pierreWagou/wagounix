@@ -1,6 +1,6 @@
-{ ... }: {
+_: {
 
-    system.defaults.SoftwareUpdate = {
-      AutomaticallyInstallMacOSUpdates = true;
-    };
+  system.defaults.SoftwareUpdate = {
+    AutomaticallyInstallMacOSUpdates = true;
+  };
 }

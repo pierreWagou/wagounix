@@ -1,17 +1,13 @@
-{ host, lib, pkgs, ... }:
+{ host, ... }:
 
 {
   imports = [
     ./settings
   ];
 
-  nix = {
-    enable = false;
-    settings = {
-      experimental-features = [ "nix-command" "flakes" ];
-      download-buffer-size = 524288000;
-    };
-  };
+  # Nix daemon is managed externally by Lix installer.
+  # Settings are in /etc/nix/nix.conf (managed by Lix, not nix-darwin).
+  nix.enable = false;
 
   system = {
     stateVersion = 5;
@@ -24,13 +20,9 @@
       home = "/Users/${host.username}";
     };
   };
-  
+
   security.pam.services.sudo_local = {
     touchIdAuth = true;
     reattach = true;
-    # text = lib.mkForce (lib.concatLines [
-    #   "auth       optional       ${pkgs.pam-reattach}/lib/pam/pam_reattach.so"
-    #   "auth       sufficient     pam_tid.so.2"
-    # ]);
   };
 }
