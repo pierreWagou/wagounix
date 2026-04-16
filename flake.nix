@@ -1,5 +1,5 @@
 {
-  description = "Wagounix nix-darwin system flake";
+  description = "Wagounix — declarative system configuration for macOS and NixOS";
 
   inputs = {
     nixpkgs = {
@@ -50,98 +50,99 @@
       systems = [
         "aarch64-darwin"
         "x86_64-darwin"
+        "x86_64-linux"
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+
+      # Common modules shared across all platforms
+      commonModules = [
+        ./packages.nix
+        ./fonts.nix
+        ./users.nix
+      ];
     in
     {
+      # -----------------------------------------------------------------------
+      # macOS configurations
+      # -----------------------------------------------------------------------
       darwinConfigurations = {
 
-        # -----------------------------------------------------------------------
-        # SAP work Mac (legacy — remove when returned)
-        # -----------------------------------------------------------------------
         sap = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = [
-            ./configuration.nix
-            ./packages.nix
-            ./homebrew.nix
-            ./fonts.nix
-            ./icons.nix
-            ./hosts/work
-            ./hosts/work/sap
+          modules = commonModules ++ [
+            ./hosts/darwin
+            ./hosts/darwin/work
+            ./hosts/darwin/work/sap
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/work/sap/variables.nix;
+            host = import ./hosts/darwin/work/sap/variables.nix;
           };
         };
 
-        # -----------------------------------------------------------------------
-        # Old personal Mac (Intel x86_64)
-        # -----------------------------------------------------------------------
         wagou-old = nix-darwin.lib.darwinSystem {
           system = "x86_64-darwin";
-          modules = [
-            ./configuration.nix
-            ./packages.nix
-            ./homebrew.nix
-            ./fonts.nix
-            ./icons.nix
-            ./hosts/personal
-            ./hosts/personal/wagou-old
+          modules = commonModules ++ [
+            ./hosts/darwin
+            ./hosts/darwin/personal
+            ./hosts/darwin/personal/wagou-old
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/personal/wagou-old/variables.nix;
+            host = import ./hosts/darwin/personal/wagou-old/variables.nix;
           };
         };
 
-        # -----------------------------------------------------------------------
-        # New personal Mac (Apple Silicon)
-        # -----------------------------------------------------------------------
         wagou = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = [
-            ./configuration.nix
-            ./packages.nix
-            ./homebrew.nix
-            ./fonts.nix
-            ./icons.nix
-            ./hosts/personal
-            ./hosts/personal/wagou
+          modules = commonModules ++ [
+            ./hosts/darwin
+            ./hosts/darwin/personal
+            ./hosts/darwin/personal/wagou
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/personal/wagou/variables.nix;
+            host = import ./hosts/darwin/personal/wagou/variables.nix;
           };
         };
 
-        # -----------------------------------------------------------------------
-        # New work Mac (Apple Silicon)
-        # -----------------------------------------------------------------------
         pro = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = [
-            ./configuration.nix
-            ./packages.nix
-            ./homebrew.nix
-            ./fonts.nix
-            ./icons.nix
-            ./hosts/work
-            ./hosts/work/pro
+          modules = commonModules ++ [
+            ./hosts/darwin
+            ./hosts/darwin/work
+            ./hosts/darwin/work/pro
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/work/pro/variables.nix;
+            host = import ./hosts/darwin/work/pro/variables.nix;
           };
         };
 
       };
 
-      # -------------------------------------------------------------------------
+      # -----------------------------------------------------------------------
+      # NixOS configurations
+      # -----------------------------------------------------------------------
+      nixosConfigurations = {
+
+        homeserver = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = commonModules ++ [
+            ./hosts/nixos
+            ./hosts/nixos/homeserver
+          ];
+          specialArgs = {
+            inherit inputs;
+            host = import ./hosts/nixos/homeserver/variables.nix;
+          };
+        };
+
+      };
+
+      # -----------------------------------------------------------------------
       # Checks — run with `nix flake check`
-      # Includes git-hooks + darwin configuration builds
-      # -------------------------------------------------------------------------
+      # -----------------------------------------------------------------------
       checks = forAllSystems (
         system:
         let
@@ -170,6 +171,8 @@
         in
         {
           inherit pre-commit-check;
+        }
+        // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
           sap = self.darwinConfigurations.sap.system;
           wagou = self.darwinConfigurations.wagou.system;
           pro = self.darwinConfigurations.pro.system;
@@ -177,12 +180,15 @@
         // nixpkgs.lib.optionalAttrs (system == "x86_64-darwin") {
           wagou-old = self.darwinConfigurations.wagou-old.system;
         }
+        // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
+          homeserver = self.nixosConfigurations.homeserver.config.system.build.toplevel;
+        }
       );
 
-      # -------------------------------------------------------------------------
-      # Dev shell — enter with `nix develop` or automatically via direnv
+      # -----------------------------------------------------------------------
+      # Dev shell — enter with `nix develop` or automatically via mise
       # Auto-installs git hooks on entry
-      # -------------------------------------------------------------------------
+      # -----------------------------------------------------------------------
       devShells = forAllSystems (
         system:
         let

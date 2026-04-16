@@ -14,7 +14,6 @@
     ];
     casks = [
       "btp"
-      "docker-desktop"
       "drawio"
       "figma"
       "microsoft-azure-storage-explorer"

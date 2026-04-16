@@ -1,0 +1,2 @@
+[hooks]
+enter = "nix develop --command true 2>/dev/null"

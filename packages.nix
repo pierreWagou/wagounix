@@ -8,9 +8,7 @@
     bat
     bottom
     chezmoi
-    cocoapods
     copier
-    darwin.trash
     delta
     docker
     eza
@@ -20,7 +18,6 @@
     fzf
     gh
     git
-    git-credential-manager
     gnupg
     imagemagick
     lazygit
@@ -33,15 +30,12 @@
     openapi-generator-cli
     openvpn
     pay-respects
-    pinentry_mac
     poetry
     R
     ripgrep
     scala
     sesh
     sheldon
-    spicetify-cli
-    spotify-player
     starship
     television
     terraform
