@@ -5,7 +5,7 @@
     autohide = true;
     show-recents = false;
     persistent-others = [
-      "/Users/${host.username}/Downloads"
+      "${host.homeDir}/Downloads"
     ];
   };
 }

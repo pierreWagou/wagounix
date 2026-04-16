@@ -1,73 +1,67 @@
 # Wagounix
 
-A declarative macOS system configuration using [nix-darwin](https://github.com/nix-darwin/nix-darwin) and [Nix Flakes](https://nixos.wiki/wiki/Flakes).
+Declarative system configuration for macOS and NixOS using [nix-darwin](https://github.com/nix-darwin/nix-darwin), [NixOS](https://nixos.org/), and [Nix Flakes](https://nixos.wiki/wiki/Flakes).
 
 ## Overview
 
-This repository manages multiple macOS machines through a layered, reproducible configuration:
+This repository manages multiple machines across macOS and NixOS through a layered, reproducible configuration:
 
-- Common packages and settings shared across all machines
-- Role-based layers (personal / work) for apps and dock layout
-- Per-host overrides for machine-specific needs
-- macOS UI/UX settings configured declaratively
-- Homebrew casks and Mac App Store apps
-- Custom application icons
-- Pre-commit hooks via [git-hooks.nix](https://github.com/cachix/git-hooks.nix)
+- **Cross-platform** — common packages and user config shared across macOS and NixOS
+- **Platform modules** — darwin-specific (Homebrew, macOS settings, icons) and NixOS-specific (systemd, bootloader, services)
+- **Role-based layers** — personal / work layers for macOS machines
+- **Per-host overrides** — machine-specific config for each host
+- **Pre-commit hooks** via [git-hooks.nix](https://github.com/cachix/git-hooks.nix)
+- **CI** via GitHub Actions (lint + build all profiles)
 
 ## Repository Structure
 
 ```
 wagounix/
-├── flake.nix              # Inputs, darwinConfigurations, checks, devShell
-├── flake.lock             # Pinned dependency versions
-├── configuration.nix      # Core system config (users, PAM, settings import)
-├── packages.nix           # Common nix packages (CLI tools, dev tools)
-├── homebrew.nix           # Common Homebrew brews and casks
-├── fonts.nix              # Fonts (Nerd Fonts)
-├── icons.nix              # Custom macOS app icons
-├── icons/                 # .icns icon files
-├── settings/              # macOS system defaults
-│   ├── default.nix        # Imports all settings modules
-│   ├── dock.nix           # Dock behavior (autohide, persistent-others)
-│   ├── finder.nix         # Finder preferences
-│   ├── global-domain.nix  # Global defaults (dark mode, key repeat, etc.)
-│   ├── keyboard.nix       # Key mapping, shortcut overrides
-│   └── ...                # control-center, trackpad, menu-clock, etc.
-└── hosts/
-    ├── personal/           # Personal machine layer
-    │   ├── default.nix     # Imports dock, packages, homebrew
-    │   ├── dock.nix        # Personal dock apps
-    │   ├── packages.nix    # Personal nix packages (android-tools, mas)
-    │   ├── homebrew.nix    # Personal casks (Steam, Ankama, etc.) + masApps
-    │   ├── wagou/          # New personal Mac (aarch64-darwin)
-    │   │   ├── default.nix
-    │   │   ├── variables.nix
-    │   │   └── packages.nix
-    │   └── wagou-old/      # Old Intel Mac (x86_64-darwin)
-    │       ├── default.nix
-    │       └── variables.nix
-    └── work/               # Work machine layer
-        ├── default.nix     # Imports dock, packages, homebrew
-        ├── dock.nix        # Work dock apps (Outlook, Teams, etc.)
-        ├── packages.nix    # Work nix packages (opencode)
-        ├── homebrew.nix    # Work casks (placeholder)
-        ├── sap/            # SAP Mac — legacy, remove when returned
-        │   ├── default.nix
-        │   ├── variables.nix
-        │   ├── packages.nix
-        │   └── homebrew.nix
-        └── pro/            # New work Mac (aarch64-darwin)
-            ├── default.nix
-            └── variables.nix
+├── flake.nix                # Inputs, darwinConfigurations, nixosConfigurations, checks, devShell
+├── flake.lock               # Pinned dependency versions
+├── packages.nix             # Common nix packages (all platforms)
+├── fonts.nix                # Common fonts (all platforms)
+├── users.nix                # Common user config (all platforms)
+│
+├── darwin/                  # macOS-specific modules
+│   ├── default.nix          # Imports configuration, homebrew, icons, settings
+│   ├── configuration.nix    # nix-darwin system config (stateVersion, PAM)
+│   ├── homebrew.nix         # Homebrew brews, casks, taps
+│   ├── icons.nix            # Custom macOS app icons
+│   └── settings/            # macOS system defaults
+│       ├── default.nix
+│       ├── dock.nix
+│       ├── finder.nix
+│       └── ...
+│
+├── nixos/                   # NixOS-specific modules
+│   ├── default.nix          # Imports configuration
+│   └── configuration.nix    # NixOS system config (bootloader, networking, docker)
+│
+├── hosts/
+│   ├── darwin/              # macOS hosts
+│   │   ├── personal/        # Personal layer (dock, packages, homebrew)
+│   │   │   ├── wagou/       # New personal Mac (aarch64-darwin)
+│   │   │   └── wagou-old/   # Old Intel Mac (x86_64-darwin)
+│   │   └── work/            # Work layer (dock, packages, homebrew)
+│   │       ├── sap/         # SAP Mac — legacy, remove when returned
+│   │       └── pro/         # New work Mac (aarch64-darwin)
+│   └── nixos/               # NixOS hosts
+│       └── homeserver/      # Home server (x86_64-linux)
+│
+└── icons/                   # .icns icon files
 ```
 
 ## Host Profiles
 
-Each `darwinConfiguration` in `flake.nix` loads:
+Each configuration loads modules in layers:
 
-1. **Common** — `configuration.nix`, `packages.nix`, `homebrew.nix`, `fonts.nix`, `icons.nix`
-2. **Layer** — `hosts/personal` or `hosts/work` (role-specific packages, casks, dock)
-3. **Host** — `hosts/<layer>/<host>` (machine-specific overrides)
+1. **Common** — `packages.nix`, `fonts.nix`, `users.nix` (cross-platform)
+2. **Platform** — `darwin/` or `nixos/` (platform-specific)
+3. **Layer** — `hosts/darwin/personal` or `hosts/darwin/work` (role-specific, macOS only)
+4. **Host** — `hosts/<platform>/<layer>/<host>` (machine-specific)
+
+### macOS (darwinConfigurations)
 
 | Profile | System | Layer | Description |
 |---------|--------|-------|-------------|
@@ -76,11 +70,15 @@ Each `darwinConfiguration` in `flake.nix` loads:
 | `wagou` | aarch64-darwin | personal | New personal Mac |
 | `pro` | aarch64-darwin | work | New work Mac |
 
-Each host provides a `variables.nix` with `username`, `restricted_app_dir`, and `enableRosetta`.
+### NixOS (nixosConfigurations)
+
+| Profile | System | Description |
+|---------|--------|-------------|
+| `homeserver` | x86_64-linux | Home server (Docker, services) |
 
 ## Installation
 
-### Bootstrap on a Fresh Machine
+### macOS — Bootstrap on a Fresh Machine
 
 ```bash
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
@@ -88,10 +86,16 @@ curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 ```
 
-### Rebuild
+### macOS — Rebuild
 
 ```bash
 darwin-rebuild switch --flake ~/.config/wagounix#<profile>
+```
+
+### NixOS — Rebuild
+
+```bash
+sudo nixos-rebuild switch --flake ~/.config/wagounix#<profile>
 ```
 
 ### Update Dependencies
@@ -104,7 +108,7 @@ nix flake update
 
 ### Dev Shell
 
-Enter the dev shell to get linting tools and auto-install git hooks:
+Git hooks auto-install when entering the project directory (via mise), or manually:
 
 ```bash
 nix develop
@@ -122,7 +126,15 @@ Managed by [git-hooks.nix](https://github.com/cachix/git-hooks.nix). On every co
 
 On push:
 
-- **darwin-build** — builds all 4 profiles to verify correctness
+- **darwin-build** — builds all darwin profiles to verify correctness
+
+### CI
+
+GitHub Actions runs on every push to `main` and on PRs:
+
+- **Lint** — nixfmt, statix, deadnix (macos-15)
+- **Build darwin** — sap, wagou, pro (macos-15, parallel)
+- **Build NixOS** — homeserver (ubuntu-latest)
 
 ### Flake Checks
 
@@ -130,4 +142,4 @@ On push:
 nix flake check
 ```
 
-Runs all the above checks plus builds all `darwinConfigurations`.
+Runs all checks plus builds all configurations.
