@@ -1,6 +1,6 @@
 <div align="center">
 
-![header](assets/banner.svg)
+![header](https://capsule-render.vercel.app/api?type=waving&height=220&color=0:302b63,50:7eb5e6,100:e0b0ff&text=Wagounix&fontSize=60&fontColor=ffffff&desc=declare%20everything%2C%20regret%20nothing&descSize=18&descAlignY=62&descAlign=50&fontAlignY=38&animation=fadeIn&fontAlign=50)
 
 [![Check](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml/badge.svg)](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
