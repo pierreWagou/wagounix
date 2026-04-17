@@ -46,21 +46,6 @@
       git-hooks,
       ...
     }:
-    let
-      systems = [
-        "aarch64-darwin"
-        "x86_64-darwin"
-        "x86_64-linux"
-      ];
-      forAllSystems = nixpkgs.lib.genAttrs systems;
-
-      # Common modules shared across all platforms
-      commonModules = [
-        ./packages.nix
-        ./fonts.nix
-        ./users.nix
-      ];
-    in
     {
       # -----------------------------------------------------------------------
       # macOS configurations
@@ -69,7 +54,8 @@
 
         sap = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = commonModules ++ [
+          modules = [
+            ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/work
             ./hosts/darwin/work/sap
@@ -82,7 +68,8 @@
 
         wagou-old = nix-darwin.lib.darwinSystem {
           system = "x86_64-darwin";
-          modules = commonModules ++ [
+          modules = [
+            ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
             ./hosts/darwin/personal/wagou-old
@@ -95,7 +82,8 @@
 
         wagou = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = commonModules ++ [
+          modules = [
+            ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
             ./hosts/darwin/personal/wagou
@@ -108,7 +96,8 @@
 
         pro = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
-          modules = commonModules ++ [
+          modules = [
+            ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/work
             ./hosts/darwin/work/pro
@@ -128,7 +117,8 @@
 
         homeserver = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = commonModules ++ [
+          modules = [
+            ./hosts/common
             ./hosts/nixos
             ./hosts/nixos/homeserver
           ];
@@ -143,64 +133,64 @@
       # -----------------------------------------------------------------------
       # Checks — run with `nix flake check`
       # -----------------------------------------------------------------------
-      checks = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          pre-commit-check = git-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixfmt-rfc-style.enable = true;
-              statix.enable = true;
-              deadnix.enable = true;
-
-              darwin-build = {
-                enable = true;
-                name = "darwin-build";
-                entry = "${pkgs.writeShellScript "check-darwin-builds" ''
-                  ${pkgs.nix}/bin/nix build path:.#darwinConfigurations.sap.system --no-link 2>&1
-                  ${pkgs.nix}/bin/nix build path:.#darwinConfigurations.wagou.system --no-link 2>&1
-                  ${pkgs.nix}/bin/nix build path:.#darwinConfigurations.pro.system --no-link 2>&1
-                  ${pkgs.nix}/bin/nix build path:.#darwinConfigurations.wagou-old.system --no-link 2>&1
-                ''}";
-                pass_filenames = false;
-                stages = [ "pre-push" ];
+      checks =
+        nixpkgs.lib.genAttrs
+          [
+            "aarch64-darwin"
+            "x86_64-darwin"
+            "x86_64-linux"
+          ]
+          (
+            system:
+            let
+              pre-commit-check = git-hooks.lib.${system}.run {
+                src = ./.;
+                hooks = {
+                  nixfmt-rfc-style.enable = true;
+                  statix.enable = true;
+                  deadnix.enable = true;
+                };
               };
-            };
-          };
-        in
-        {
-          inherit pre-commit-check;
-        }
-        // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
-          sap = self.darwinConfigurations.sap.system;
-          wagou = self.darwinConfigurations.wagou.system;
-          pro = self.darwinConfigurations.pro.system;
-        }
-        // nixpkgs.lib.optionalAttrs (system == "x86_64-darwin") {
-          wagou-old = self.darwinConfigurations.wagou-old.system;
-        }
-        // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
-          homeserver = self.nixosConfigurations.homeserver.config.system.build.toplevel;
-        }
-      );
+            in
+            {
+              inherit pre-commit-check;
+            }
+            // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
+              sap = self.darwinConfigurations.sap.system;
+              wagou = self.darwinConfigurations.wagou.system;
+              pro = self.darwinConfigurations.pro.system;
+            }
+            // nixpkgs.lib.optionalAttrs (system == "x86_64-darwin") {
+              wagou-old = self.darwinConfigurations.wagou-old.system;
+            }
+            // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
+              homeserver = self.nixosConfigurations.homeserver.config.system.build.toplevel;
+            }
+          );
 
       # -----------------------------------------------------------------------
       # Dev shell — enter with `nix develop` or automatically via mise
       # Auto-installs git hooks on entry
       # -----------------------------------------------------------------------
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          inherit (self.checks.${system}.pre-commit-check) shellHook enabledPackages;
-        in
-        {
-          default = pkgs.mkShell {
-            inherit shellHook;
-            buildInputs = enabledPackages;
-          };
-        }
-      );
+      devShells =
+        nixpkgs.lib.genAttrs
+          [
+            "aarch64-darwin"
+            "x86_64-darwin"
+            "x86_64-linux"
+          ]
+          (
+            system:
+            let
+              pkgs = nixpkgs.legacyPackages.${system};
+              inherit (self.checks.${system}.pre-commit-check) shellHook enabledPackages;
+            in
+            {
+              default = pkgs.mkShell {
+                inherit shellHook;
+                buildInputs = enabledPackages;
+              };
+            }
+          );
     };
 }
