@@ -1,6 +1,6 @@
 <div align="center">
 
-![header](https://capsule-render.vercel.app/api?type=waving&color=0:232741,100:5277C3&height=180&text=Wagounix&fontSize=50&fontColor=ffffff&desc=Declarative%20system%20config%20for%20macOS%20and%20NixOS&descSize=16&descAlignY=75&animation=fadeIn)
+![header](assets/banner.svg)
 
 [![Check](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml/badge.svg)](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
