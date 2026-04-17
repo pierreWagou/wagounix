@@ -1,6 +1,6 @@
 <div align="center">
 
-![header](https://capsule-render.vercel.app/api?type=waving&color=0:232741,100:5277C3&height=180&text=Wagounix&fontSize=50&fontColor=ffffff&desc=Declarative%20system%20config%20for%20macOS%20%26%20NixOS&descSize=16&descAlignY=75&animation=fadeIn)
+![header](https://capsule-render.vercel.app/api?type=waving&color=0:232741,100:5277C3&height=180&text=Wagounix&fontSize=50&fontColor=ffffff&desc=Declarative%20system%20config%20for%20macOS%20and%20NixOS&descSize=16&descAlignY=75&animation=fadeIn)
 
 [![Check](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml/badge.svg)](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -27,16 +27,16 @@ Each configuration is assembled from layered modules — common packages are sha
 ```
  ┌─────────────────────────────────────────────────────────┐
  │                       flake.nix                         │
- ├──────────────┬────────────────┬─────────────────────────┤
- │ packages.nix │   fonts.nix    │       users.nix         │  common
- ├──────────────┴────────────────┴─────────────────────────┤
- │       hosts/darwin/             hosts/nixos/             │  platform
- ├──────────────────┬──────────────┬───────────────────────┤
- │     personal/    │    work/     │     homeserver/        │  layer / host
- ├────────┬─────────┼───────┬──────┤                       │
- │ wagou  │ wagou-  │  sap  │ pro  │                       │
- │        │ old     │       │      │                       │
- └────────┴─────────┴───────┴──────┴───────────────────────┘
+ ├─────────────────────────────────────────────────────────┤
+ │                    hosts/common/                        │  common
+ │              packages · fonts · users                   │
+ ├──────────────────────────┬──────────────────────────────┤
+ │       hosts/darwin/      │        hosts/nixos/          │  platform
+ ├─────────────┬────────────┼──────────────────────────────┤
+ │  personal/  │   work/    │       homeserver/            │  layer / host
+ ├───────┬─────┼──────┬─────┤                              │
+ │ wagou │ old │ sap  │ pro │                              │
+ └───────┴─────┴──────┴─────┴──────────────────────────────┘
 ```
 
 ## Structure
@@ -44,10 +44,8 @@ Each configuration is assembled from layered modules — common packages are sha
 ```
 wagounix/
 ├── flake.nix          # Entrypoint — all configurations, checks, devShell
-├── packages.nix       # Cross-platform CLI packages
-├── fonts.nix          # Cross-platform fonts
-├── users.nix          # Cross-platform user config
 └── hosts/
+    ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
     │   ├── personal/  # Personal Macs (wagou, wagou-old)
     │   └── work/      # Work Macs (sap, pro)
@@ -62,14 +60,16 @@ wagounix/
 wagounix/
 ├── flake.nix
 ├── flake.lock
-├── packages.nix
-├── fonts.nix
-├── users.nix
 ├── LICENSE
 ├── .mise.toml
 ├── .github/workflows/check.yml
 │
 └── hosts/
+    ├── common/
+    │   ├── default.nix
+    │   ├── packages.nix
+    │   ├── fonts.nix
+    │   └── users.nix
     ├── darwin/
     │   ├── default.nix
     │   ├── configuration.nix
@@ -182,7 +182,6 @@ Managed by [git-hooks.nix](https://github.com/cachix/git-hooks.nix):
 | commit | **nixfmt** | Formatting |
 | commit | **statix** | Anti-pattern linting |
 | commit | **deadnix** | Unused code detection |
-| push | **darwin-build** | Builds all darwin profiles |
 
 ### CI
 

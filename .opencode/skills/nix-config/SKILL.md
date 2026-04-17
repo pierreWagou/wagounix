@@ -9,12 +9,14 @@ description: Full reference for the wagounix flake — repo structure, module wi
 wagounix/
 ├── flake.nix              # All inputs, darwinConfigurations, nixosConfigurations, checks, devShell
 ├── flake.lock             # Pinned dependency versions
-├── packages.nix           # Cross-platform CLI packages (all machines)
-├── fonts.nix              # Cross-platform fonts (all machines)
-├── users.nix              # Cross-platform user config (all machines)
 ├── .mise.toml             # Auto-activates nix develop on cd (installs git hooks)
 │
 ├── hosts/
+│   ├── common/                    # Cross-platform modules
+│   │   ├── default.nix            # Imports packages, fonts, users
+│   │   ├── packages.nix           # Cross-platform CLI packages (all machines)
+│   │   ├── fonts.nix              # Cross-platform fonts (all machines)
+│   │   └── users.nix              # Cross-platform user config (all machines)
 │   ├── darwin/                    # macOS platform base
 │   │   ├── default.nix            # Imports configuration, homebrew, icons, packages, settings
 │   │   ├── configuration.nix      # nix-darwin system config (stateVersion, PAM Touch ID)
@@ -72,7 +74,7 @@ wagounix/
 
 Each configuration loads modules in order:
 
-1. **Common** (cross-platform) — `packages.nix`, `fonts.nix`, `users.nix`
+1. **Common** (cross-platform) — `hosts/common` (packages, fonts, users)
 2. **Platform** — `hosts/darwin` or `hosts/nixos`
 3. **Layer** (darwin only) — `hosts/darwin/personal` or `hosts/darwin/work`
 4. **Host** — `hosts/<platform>/<layer>/<host>`
@@ -80,11 +82,12 @@ Each configuration loads modules in order:
 In `flake.nix`, this is expressed as:
 
 ```nix
-commonModules = [ ./packages.nix ./fonts.nix ./users.nix ];
+commonModules = [ ./hosts/common ];
 
 # Darwin host
 sap = nix-darwin.lib.darwinSystem {
-  modules = commonModules ++ [
+  modules = [
+    ./hosts/common              # common
     ./hosts/darwin              # platform
     ./hosts/darwin/work         # layer
     ./hosts/darwin/work/sap     # host
@@ -94,7 +97,8 @@ sap = nix-darwin.lib.darwinSystem {
 
 # NixOS host
 homeserver = nixpkgs.lib.nixosSystem {
-  modules = commonModules ++ [
+  modules = [
+    ./hosts/common              # common
     ./hosts/nixos               # platform
     ./hosts/nixos/homeserver    # host
   ];
@@ -124,7 +128,7 @@ These are passed via `specialArgs` and available in all modules as `{ host, ... 
 
 ### Cross-platform CLI tool (all machines)
 
-Edit `packages.nix` (root):
+Edit `hosts/common/packages.nix`:
 ```nix
 environment.systemPackages = with pkgs; [ ... new-package ... ];
 ```
@@ -281,8 +285,7 @@ Hooks auto-install when entering the dev shell. On every commit:
 - **statix** — lint for anti-patterns
 - **deadnix** — find unused code
 
-On push:
-- **darwin-build** — builds all darwin profiles
+Full builds are verified by CI after push.
 
 ### Dev shell
 
