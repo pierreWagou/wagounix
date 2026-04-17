@@ -59,9 +59,6 @@
   </clipPath>
   <circle cx="400" cy="140" r="40" fill="url(#sun)" opacity="0.3" clip-path="url(#horizon)" />
 
-  <!-- Horizon line -->
-  <line x1="0" y1="140" x2="800" y2="140" stroke="#ff6ec7" stroke-width="0.8" opacity="0.4" />
-
   <!-- Synthwave perspective grid -->
   <g opacity="0.2" stroke="url(#gridfade)" stroke-width="0.6" fill="none">
     <!-- Horizontal grid lines (converging to horizon) -->
