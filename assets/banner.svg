@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <!-- Synthwave gradient: deep purple to hot pink to nix blue -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0c29" />
+      <stop offset="40%" style="stop-color:#302b63" />
+      <stop offset="100%" style="stop-color:#24243e" />
+    </linearGradient>
+
+    <!-- Neon glow for title -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Subtle glow for snowflakes -->
+    <filter id="snowglow">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Grid gradient (fades out toward top) -->
+    <linearGradient id="gridfade" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6ec7;stop-opacity:0.25" />
+      <stop offset="100%" style="stop-color:#ff6ec7;stop-opacity:0" />
+    </linearGradient>
+
+    <!-- Sun gradient -->
+    <linearGradient id="sun" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6ec7" />
+      <stop offset="100%" style="stop-color:#f9a825" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="200" fill="url(#bg)" />
+
+  <!-- Stars -->
+  <circle cx="50" cy="20" r="1" fill="#ffffff" opacity="0.6" />
+  <circle cx="150" cy="45" r="0.8" fill="#ffffff" opacity="0.4" />
+  <circle cx="280" cy="15" r="1.2" fill="#ffffff" opacity="0.5" />
+  <circle cx="420" cy="30" r="0.7" fill="#ffffff" opacity="0.3" />
+  <circle cx="550" cy="12" r="1" fill="#ffffff" opacity="0.5" />
+  <circle cx="650" cy="40" r="0.9" fill="#ffffff" opacity="0.4" />
+  <circle cx="720" cy="18" r="1.1" fill="#ffffff" opacity="0.6" />
+  <circle cx="100" cy="55" r="0.6" fill="#ffffff" opacity="0.3" />
+  <circle cx="370" cy="50" r="0.8" fill="#ffffff" opacity="0.4" />
+  <circle cx="760" cy="55" r="0.7" fill="#ffffff" opacity="0.3" />
+
+  <!-- Setting sun (half circle at horizon) -->
+  <clipPath id="horizon">
+    <rect x="330" y="100" width="140" height="70" />
+  </clipPath>
+  <circle cx="400" cy="140" r="40" fill="url(#sun)" opacity="0.3" clip-path="url(#horizon)" />
+
+  <!-- Horizon line -->
+  <line x1="0" y1="140" x2="800" y2="140" stroke="#ff6ec7" stroke-width="0.8" opacity="0.4" />
+
+  <!-- Synthwave perspective grid -->
+  <g opacity="0.2" stroke="url(#gridfade)" stroke-width="0.6" fill="none">
+    <!-- Horizontal grid lines (converging to horizon) -->
+    <line x1="0" y1="150" x2="800" y2="150" />
+    <line x1="0" y1="162" x2="800" y2="162" />
+    <line x1="0" y1="176" x2="800" y2="176" />
+    <line x1="0" y1="192" x2="800" y2="192" />
+
+    <!-- Vertical grid lines (converging to vanishing point at 400,140) -->
+    <line x1="400" y1="140" x2="0" y2="200" />
+    <line x1="400" y1="140" x2="100" y2="200" />
+    <line x1="400" y1="140" x2="200" y2="200" />
+    <line x1="400" y1="140" x2="300" y2="200" />
+    <line x1="400" y1="140" x2="400" y2="200" />
+    <line x1="400" y1="140" x2="500" y2="200" />
+    <line x1="400" y1="140" x2="600" y2="200" />
+    <line x1="400" y1="140" x2="700" y2="200" />
+    <line x1="400" y1="140" x2="800" y2="200" />
+  </g>
+
+  <!-- Nix snowflake left -->
+  <g transform="translate(160, 85) scale(1.8)" fill="#7eb5e6" opacity="0.25" filter="url(#snowglow)">
+    <!-- Proper 6-arm Nix lambda/snowflake -->
+    <rect x="-2" y="-18" width="4" height="36" rx="1" />
+    <rect x="-2" y="-18" width="4" height="36" rx="1" transform="rotate(60)" />
+    <rect x="-2" y="-18" width="4" height="36" rx="1" transform="rotate(-60)" />
+    <circle cx="0" cy="0" r="5" />
+  </g>
+
+  <!-- Nix snowflake right -->
+  <g transform="translate(640, 85) scale(1.8)" fill="#7eb5e6" opacity="0.25" filter="url(#snowglow)">
+    <rect x="-2" y="-18" width="4" height="36" rx="1" />
+    <rect x="-2" y="-18" width="4" height="36" rx="1" transform="rotate(60)" />
+    <rect x="-2" y="-18" width="4" height="36" rx="1" transform="rotate(-60)" />
+    <circle cx="0" cy="0" r="5" />
+  </g>
+
+  <!-- Title with neon glow -->
+  <text x="400" y="82" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff" letter-spacing="4" filter="url(#glow)">
+    Wagounix
+  </text>
+
+  <!-- Subtitle in synthwave pink -->
+  <text x="400" y="118" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#e0b0ff" letter-spacing="3">
+    DECLARATIVE SYSTEM CONFIG FOR macOS AND NixOS
+  </text>
+</svg>
