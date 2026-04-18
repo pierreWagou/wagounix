@@ -18,6 +18,7 @@
     fzf
     gh
     git
+    git-lfs
     gnupg
     imagemagick
     lazygit
