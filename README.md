@@ -1,6 +1,6 @@
 <div align="center">
 
-![header](https://capsule-render.vercel.app/api?type=waving&height=220&color=0:cba6f7,25:b4befe,50:89dceb,75:f5c2e7,100:f38ba8&text=Wagounix&fontSize=60&fontColor=11111b&desc=declare%20everything%2C%20regret%20nothing&descSize=18&descAlignY=62&descAlign=50&fontAlignY=38&animation=fadeIn&fontAlign=50)
+![header](https://capsule-render.vercel.app/api?type=waving&height=220&color=0:cba6f7,25:b4befe,50:89dceb,75:f5c2e7,100:f38ba8&text=Wagounix&fontSize=60&fontColor=11111b&desc=one%20flake%20to%20rule%20them%20all&descSize=18&descAlignY=62&descAlign=50&fontAlignY=38&animation=fadeIn&fontAlign=50)
 
 [![Check](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml/badge.svg)](https://github.com/pierreWagou/wagounix/actions/workflows/check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
