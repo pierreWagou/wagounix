@@ -94,19 +94,20 @@
           };
         };
 
-        pro = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          modules = [
-            ./hosts/common
-            ./hosts/darwin
-            ./hosts/darwin/work
-            ./hosts/darwin/work/pro
-          ];
-          specialArgs = {
-            inherit inputs;
-            host = import ./hosts/darwin/work/pro/variables.nix;
-          };
-        };
+        # pro — disabled (host files kept in hosts/darwin/work/pro/)
+        # pro = nix-darwin.lib.darwinSystem {
+        #   system = "aarch64-darwin";
+        #   modules = [
+        #     ./hosts/common
+        #     ./hosts/darwin
+        #     ./hosts/darwin/work
+        #     ./hosts/darwin/work/pro
+        #   ];
+        #   specialArgs = {
+        #     inherit inputs;
+        #     host = import ./hosts/darwin/work/pro/variables.nix;
+        #   };
+        # };
 
       };
 
@@ -133,64 +134,12 @@
       # -----------------------------------------------------------------------
       # Checks — run with `nix flake check`
       # -----------------------------------------------------------------------
-      checks =
-        nixpkgs.lib.genAttrs
-          [
-            "aarch64-darwin"
-            "x86_64-darwin"
-            "x86_64-linux"
-          ]
-          (
-            system:
-            let
-              pre-commit-check = git-hooks.lib.${system}.run {
-                src = ./.;
-                hooks = {
-                  nixfmt-rfc-style.enable = true;
-                  statix.enable = true;
-                  deadnix.enable = true;
-                };
-              };
-            in
-            {
-              inherit pre-commit-check;
-            }
-            // nixpkgs.lib.optionalAttrs (system == "aarch64-darwin") {
-              sap = self.darwinConfigurations.sap.system;
-              wagou = self.darwinConfigurations.wagou.system;
-              pro = self.darwinConfigurations.pro.system;
-            }
-            // nixpkgs.lib.optionalAttrs (system == "x86_64-darwin") {
-              wagou-old = self.darwinConfigurations.wagou-old.system;
-            }
-            // nixpkgs.lib.optionalAttrs (system == "x86_64-linux") {
-              homeserver = self.nixosConfigurations.homeserver.config.system.build.toplevel;
-            }
-          );
+      checks = import ./lib/checks.nix { inherit self nixpkgs git-hooks; };
 
       # -----------------------------------------------------------------------
       # Dev shell — enter with `nix develop` or automatically via mise
       # Auto-installs git hooks on entry
       # -----------------------------------------------------------------------
-      devShells =
-        nixpkgs.lib.genAttrs
-          [
-            "aarch64-darwin"
-            "x86_64-darwin"
-            "x86_64-linux"
-          ]
-          (
-            system:
-            let
-              pkgs = nixpkgs.legacyPackages.${system};
-              inherit (self.checks.${system}.pre-commit-check) shellHook enabledPackages;
-            in
-            {
-              default = pkgs.mkShell {
-                inherit shellHook;
-                buildInputs = enabledPackages;
-              };
-            }
-          );
+      devShells = import ./lib/devshell.nix { inherit self nixpkgs; };
     };
 }
