@@ -37,7 +37,6 @@
     scala
     sesh
     sheldon
-    smug
     starship
     television
     terraform
