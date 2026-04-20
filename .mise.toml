@@ -1,2 +1,2 @@
 [hooks]
-enter = "nix develop --command true 2>/dev/null"
+enter = "test -f .git/hooks/pre-commit || nix develop --command true 2>/dev/null"
