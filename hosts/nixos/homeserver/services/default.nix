@@ -12,6 +12,7 @@
     ./adguardhome.nix
     ./cloudflared.nix
     ./immich.nix
+    ./opencloud.nix
     ./firewall.nix
   ];
 }
