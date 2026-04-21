@@ -22,7 +22,7 @@ All devices on the network use the Beelink as their DNS server. AdGuard Home res
 
 | Service | Purpose | Access | Port |
 |---|---|---|---|
-| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` (remote), `http://vault.wagou.fr` (local) | 8222 (localhost) |
+| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` (everywhere), `http://vault.home.lan` (local shortcut) | 8222 (localhost) |
 | **Caddy** | Reverse proxy | Routes traffic to services | 80 |
 | **AdGuard Home** | DNS server + ad blocker | `http://192.168.68.65:3000` (local only) | 53 (DNS), 3000 (web UI) |
 | **Cloudflare Tunnel** | Secure remote access | Outbound connection to Cloudflare | None (outbound only) |
@@ -61,8 +61,8 @@ The Beelink serves as the DNS server for the entire home network via AdGuard Hom
 
 | Query | Resolution |
 |---|---|
-| `vault.wagou.fr` (local) | AdGuard Home rewrite -> `192.168.68.65` (direct) |
-| `vault.wagou.fr` (remote) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `vault.wagou.fr` (local & remote) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `vault.home.lan` (local shortcut) | AdGuard Home rewrite -> `192.168.68.65` (direct) |
 | `ads.tracker.com` | AdGuard Home -> blocked (`0.0.0.0`) |
 | `google.com` | AdGuard Home -> Cloudflare/Google DoH -> Internet |
 
@@ -136,8 +136,7 @@ The token is obtained from the Cloudflare Zero Trust dashboard under Networks > 
 | View tunnel logs | `journalctl -u cloudflared-tunnel --no-pager -f` |
 | View Caddy logs | `journalctl -u caddy --no-pager -f` |
 | AdGuard Home dashboard | `http://192.168.68.65:3000` |
-| Vaultwarden (local) | `http://vault.wagou.fr` |
-| Vaultwarden (remote) | `https://vault.wagou.fr` |
+| Vaultwarden | `https://vault.wagou.fr` |
 
 ## Planned services
 
