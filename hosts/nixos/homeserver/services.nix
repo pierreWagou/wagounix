@@ -31,8 +31,7 @@ in
     # Caddy — reverse proxy
     caddy = {
       enable = true;
-      virtualHosts."vault.wagou.fr".extraConfig = ''
-        tls internal
+      virtualHosts."http://vault.wagou.fr".extraConfig = ''
         reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
           header_up X-Real-IP {remote_host}
         }
@@ -129,7 +128,7 @@ in
 
   networking.firewall = {
     allowedTCPPorts = [
-      443
+      80
       53
     ];
     allowedUDPPorts = [ 53 ];
