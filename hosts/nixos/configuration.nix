@@ -16,13 +16,22 @@
 
   networking = {
     hostName = host.hostname;
-    firewall.enable = true;
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [ 22 ];
+    };
+  };
+
+  services.openssh = {
+    enable = true;
+    settings.PermitRootLogin = "yes";
   };
 
   virtualisation.docker.enable = true;
 
   users.users.${host.username} = {
     isNormalUser = true;
+    initialPassword = "changeme";
     extraGroups = [
       "wheel"
       "docker"
