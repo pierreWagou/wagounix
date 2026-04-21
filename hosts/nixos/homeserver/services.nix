@@ -70,11 +70,6 @@ in
 
           rewrites = [
             {
-              domain = "vault.wagou.fr";
-              answer = serverIP;
-              enabled = true;
-            }
-            {
               domain = "vault.home.lan";
               answer = serverIP;
               enabled = true;
