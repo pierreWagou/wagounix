@@ -19,7 +19,7 @@ in
       dbBackend = "sqlite";
       backupDir = "/var/backup/vaultwarden";
       config = {
-        DOMAIN = "http://vault.home.local";
+        DOMAIN = "http://vault.home.lan";
         SIGNUPS_ALLOWED = true;
         ROCKET_ADDRESS = "127.0.0.1";
         ROCKET_PORT = 8222;
@@ -30,7 +30,7 @@ in
     # Caddy — reverse proxy
     caddy = {
       enable = true;
-      virtualHosts."http://vault.home.local".extraConfig = ''
+      virtualHosts."http://vault.home.lan".extraConfig = ''
         reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
           header_up X-Real-IP {remote_host}
         }
@@ -69,7 +69,7 @@ in
 
           rewrites = [
             {
-              domain = "vault.home.local";
+              domain = "vault.home.lan";
               answer = serverIP;
               enabled = true;
             }
