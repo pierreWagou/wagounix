@@ -48,7 +48,10 @@ in
 
       settings = {
         dns = {
-          bind_hosts = [ "0.0.0.0" ];
+          bind_hosts = [
+            "0.0.0.0"
+            "::"
+          ];
           port = 53;
 
           bootstrap_dns = [
