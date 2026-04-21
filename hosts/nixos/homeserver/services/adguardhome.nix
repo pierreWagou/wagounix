@@ -47,6 +47,11 @@ in
             answer = serverIP;
             enabled = true;
           }
+          {
+            domain = "cloud.home.lan";
+            answer = serverIP;
+            enabled = true;
+          }
         ];
       };
 
