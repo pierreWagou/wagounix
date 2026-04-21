@@ -14,4 +14,12 @@
     touchIdAuth = true;
     reattach = true;
   };
+
+  # Homeserver local DNS resolution
+  environment.etc.hosts.text = ''
+    127.0.0.1       localhost
+    255.255.255.255 broadcasthost
+    ::1             localhost
+    192.168.68.65   vault.home.local
+  '';
 }
