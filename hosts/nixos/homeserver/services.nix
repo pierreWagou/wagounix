@@ -120,11 +120,9 @@ in
       "multi-user.target"
     ];
     serviceConfig = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token @/var/lib/cloudflared/tunnel-token";
+      ExecStart = "/bin/sh -c '${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token $(cat /var/lib/cloudflared/tunnel-token)'";
       Restart = "on-failure";
       RestartSec = 5;
-      DynamicUser = true;
-      StateDirectory = "cloudflared";
     };
   };
 
