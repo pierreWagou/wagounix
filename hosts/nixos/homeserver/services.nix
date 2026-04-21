@@ -19,8 +19,8 @@ in
       dbBackend = "sqlite";
       backupDir = "/var/backup/vaultwarden";
       config = {
-        DOMAIN = "https://vault.home.lan";
-        SIGNUPS_ALLOWED = true;
+        DOMAIN = "https://vault.wagou.fr";
+        SIGNUPS_ALLOWED = false;
         ROCKET_ADDRESS = "127.0.0.1";
         ROCKET_PORT = 8222;
         IP_HEADER = "X-Real-IP";
@@ -30,7 +30,7 @@ in
     # Caddy — reverse proxy
     caddy = {
       enable = true;
-      virtualHosts."vault.home.lan".extraConfig = ''
+      virtualHosts."vault.wagou.fr".extraConfig = ''
         tls internal
         reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
           header_up X-Real-IP {remote_host}
@@ -70,6 +70,11 @@ in
 
           rewrites = [
             {
+              domain = "vault.wagou.fr";
+              answer = serverIP;
+              enabled = true;
+            }
+            {
               domain = "vault.home.lan";
               answer = serverIP;
               enabled = true;
@@ -98,6 +103,28 @@ in
           }
         ];
       };
+    };
+  };
+
+  # Cloudflare Tunnel — secure remote access without opening ports
+  # Token is stored at /var/lib/cloudflared/tunnel-token on the server
+  systemd.services.cloudflared-tunnel = {
+    description = "Cloudflare Tunnel";
+    after = [
+      "network-online.target"
+    ];
+    wants = [
+      "network-online.target"
+    ];
+    wantedBy = [
+      "multi-user.target"
+    ];
+    serviceConfig = {
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token @/var/lib/cloudflared/tunnel-token";
+      Restart = "on-failure";
+      RestartSec = 5;
+      DynamicUser = true;
+      StateDirectory = "cloudflared";
     };
   };
 
