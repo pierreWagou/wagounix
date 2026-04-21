@@ -80,11 +80,6 @@ in
           ];
         };
 
-        user_rules = [
-          "@@||captive.apple.com^"
-          "@@||connectivity-check.apple.com^"
-        ];
-
         filters = [
           {
             enabled = true;
