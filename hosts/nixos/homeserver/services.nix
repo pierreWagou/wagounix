@@ -71,6 +71,7 @@ in
             {
               domain = "vault.home.local";
               answer = serverIP;
+              enabled = true;
             }
           ];
         };
