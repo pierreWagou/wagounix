@@ -60,6 +60,20 @@ in
 
     customCSS = ''
       :root {
+        /* Override Homepage's Tailwind theme variables with Catppuccin Mocha */
+        /* These RGB triplets drive all text-theme-*, bg-theme-*, border-theme-* classes */
+        --color-theme-50:  205 214 244;  /* text */
+        --color-theme-100: 186 194 222;  /* subtext1 */
+        --color-theme-200: 166 173 200;  /* subtext0 */
+        --color-theme-300: 108 112 134;  /* overlay0 */
+        --color-theme-400: 88 91 112;    /* surface2 */
+        --color-theme-500: 69 71 90;     /* surface1 */
+        --color-theme-600: 49 50 68;     /* surface0 */
+        --color-theme-700: 30 30 46;     /* base */
+        --color-theme-800: 24 24 37;     /* mantle */
+        --color-theme-900: 17 17 27;     /* crust */
+        --bg-color: 17 17 27;            /* crust for background overlay */
+
         --ctp-base:      #1e1e2e;
         --ctp-mantle:    #181825;
         --ctp-crust:     #11111b;
@@ -78,10 +92,6 @@ in
         --ctp-peach:     #fab387;
         --ctp-blue:      #89b4fa;
         --ctp-teal:      #94e2d5;
-
-        --card-bg:       rgba(30, 30, 46, 0.7);
-        --card-border:   rgba(69, 71, 90, 0.5);
-        --card-hover:    rgba(49, 50, 68, 0.8);
       }
 
       body {
@@ -89,8 +99,8 @@ in
       }
 
       .service-card {
-        background: var(--card-bg) !important;
-        border: 1px solid var(--card-border) !important;
+        background: rgba(30, 30, 46, 0.7) !important;
+        border: 1px solid rgba(69, 71, 90, 0.5) !important;
         border-radius: 12px !important;
         backdrop-filter: blur(16px) saturate(120%);
         -webkit-backdrop-filter: blur(16px) saturate(120%);
@@ -98,7 +108,7 @@ in
       }
 
       .service-card:hover {
-        background: var(--card-hover) !important;
+        background: rgba(49, 50, 68, 0.8) !important;
         border-color: var(--ctp-lavender) !important;
         transform: translateY(-1px);
       }
@@ -106,12 +116,10 @@ in
       .service-name, .service-title {
         color: var(--ctp-text) !important;
         font-weight: 500 !important;
-        font-size: 14px !important;
       }
 
       .service-description {
         color: var(--ctp-subtext0) !important;
-        font-size: 12px !important;
       }
 
       .service-block, .bg-theme-200\/50 {
@@ -140,8 +148,8 @@ in
         border-color: var(--ctp-surface0) !important;
       }
 
-      #information-widgets * {
-        color: var(--ctp-subtext1) !important;
+      .resource-icon {
+        color: var(--ctp-lavender) !important;
       }
 
       .resource-usage {
@@ -153,7 +161,7 @@ in
         background: var(--ctp-mauve) !important;
       }
 
-      .information-widget-greeting span {
+      .information-widget-datetime span {
         color: var(--ctp-text) !important;
       }
 
