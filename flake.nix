@@ -50,6 +50,13 @@
       git-hooks,
       ...
     }:
+    let
+      systems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "x86_64-linux"
+      ];
+    in
     {
       # -----------------------------------------------------------------------
       # macOS configurations
@@ -139,12 +146,19 @@
       # -----------------------------------------------------------------------
       # Checks — run with `nix flake check`
       # -----------------------------------------------------------------------
-      checks = import ./lib/checks.nix { inherit self nixpkgs git-hooks; };
+      checks = import ./lib/checks.nix {
+        inherit
+          self
+          nixpkgs
+          git-hooks
+          systems
+          ;
+      };
 
       # -----------------------------------------------------------------------
       # Dev shell — enter with `nix develop` or automatically via mise
       # Auto-installs git hooks on entry
       # -----------------------------------------------------------------------
-      devShells = import ./lib/devshell.nix { inherit self nixpkgs; };
+      devShells = import ./lib/devshell.nix { inherit self nixpkgs systems; };
     };
 }

@@ -1,4 +1,4 @@
-{ host, ... }:
+{ config, host, ... }:
 
 {
   nix.settings = {
@@ -35,15 +35,19 @@
 
   system.autoUpgrade = {
     enable = true;
-    flake = "github:pierreWagou/wagounix#homeserver";
+    flake = "github:pierreWagou/wagounix#${host.hostname}";
     flags = [ "--refresh" ];
     dates = "04:00";
     allowReboot = false;
   };
 
+  users.users.root = {
+    hashedPasswordFile = config.sops.secrets.root-password-hash.path;
+  };
+
   users.users.${host.username} = {
     isNormalUser = true;
-    initialPassword = "changeme";
+    hashedPasswordFile = config.sops.secrets.wagou-password-hash.path;
     extraGroups = [
       "wheel"
       "docker"

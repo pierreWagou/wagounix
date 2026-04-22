@@ -5,6 +5,7 @@
     cocoapods
     darwin.trash
     git-credential-manager
+    opencode
     pinentry_mac
     spicetify-cli
     spotify-player

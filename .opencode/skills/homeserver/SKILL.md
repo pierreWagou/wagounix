@@ -82,7 +82,7 @@ IMPORTANT: Do NOT add AdGuard Home DNS rewrites for `*.wagou.fr` domains — let
 |---|---|
 | **SSH** | Key-only auth, password disabled, root login disabled (`hosts/nixos/configuration.nix`) |
 | **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour (`services/fail2ban.nix`) |
-| **Firewall** | Only ports 22 (SSH), 53 (DNS), 80 (HTTP) open |
+| **Firewall** | Only ports 22 (SSH), 53 (DNS), 80 (HTTP), 3000 (AdGuard web UI) open |
 | **Service binding** | All services on `127.0.0.1` only, behind Caddy reverse proxy |
 | **Secrets** | sops-nix with age encryption, decrypted to tmpfs (`/run/secrets/`) |
 | **Vaultwarden** | Signups disabled, admin panel protected with sops-managed token |
@@ -123,7 +123,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 
 ### Adding a new secret
 
-1. Edit `secrets/homeserver.yaml` with `sops` — add a new key-value pair
+1. Edit `hosts/nixos/homeserver/secrets.yaml` with `sops` — add a new key-value pair
 2. Declare it in `services/secrets.nix` under `sops.secrets`
 3. If the service needs `KEY=VALUE` env format, create a `sops.templates` entry:
    ```nix

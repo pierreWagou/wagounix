@@ -87,7 +87,7 @@ Platform-level config at `hosts/nixos/`:
 | **TLS** | Cloudflare handles HTTPS with valid certificates |
 | **SSH** | Key-only authentication, password auth disabled, root login disabled |
 | **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour |
-| **Firewall** | Only ports 80 (HTTP), 53 (DNS), 22 (SSH) open |
+| **Firewall** | Only ports 80 (HTTP), 53 (DNS), 22 (SSH), 3000 (AdGuard web UI) open |
 | **DNS** | AdGuard Home with DNS-over-HTTPS upstream (Cloudflare + Google) |
 | **Secrets** | sops-nix with age encryption, decrypted to RAM only (`/run/secrets/`) |
 | **Vaultwarden** | Signups disabled, admin panel protected with token |

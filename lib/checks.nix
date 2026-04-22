@@ -2,14 +2,8 @@
   self,
   nixpkgs,
   git-hooks,
+  systems,
 }:
-let
-  systems = [
-    "aarch64-darwin"
-    "x86_64-darwin"
-    "x86_64-linux"
-  ];
-in
 nixpkgs.lib.genAttrs systems (
   system:
   let

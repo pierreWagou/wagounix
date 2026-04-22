@@ -1,7 +1,7 @@
-_:
+{ host, ... }:
 
 let
-  serverIP = "192.168.68.65";
+  inherit (host) serverIP;
 in
 {
   services.adguardhome = {

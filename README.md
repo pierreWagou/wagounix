@@ -60,9 +60,13 @@ wagounix/
 wagounix/
 ├── flake.nix
 ├── flake.lock
+├── .sops.yaml
 ├── LICENSE
 ├── .mise.toml
 ├── .github/workflows/check.yml
+├── lib/
+│   ├── checks.nix
+│   └── devshell.nix
 │
 └── hosts/
     ├── common/
@@ -117,7 +121,18 @@ wagounix/
             ├── default.nix
             ├── variables.nix
             ├── hardware.nix
-            └── services.nix
+            ├── secrets.yaml
+            └── services/
+                ├── default.nix
+                ├── secrets.nix
+                ├── vaultwarden.nix
+                ├── opencloud.nix
+                ├── immich.nix
+                ├── caddy.nix
+                ├── adguardhome.nix
+                ├── cloudflared.nix
+                ├── fail2ban.nix
+                └── firewall.nix
 ```
 
 </details>
@@ -190,7 +205,7 @@ GitHub Actions runs on push to `main` and on PRs:
 | Job | Runner | Profiles |
 |-----|--------|----------|
 | Lint | macos-15 | nixfmt, statix, deadnix |
-| Build darwin | macos-15 | sap, wagou, pro (parallel) |
+| Build darwin | macos-15 | sap, wagou (parallel) |
 | Build NixOS | ubuntu-latest | homeserver |
 
 ## Quick Reference

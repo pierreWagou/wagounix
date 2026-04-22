@@ -18,7 +18,7 @@
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
-      "Dashlane/homebrew-taps" = inputs.homebrew-dashlane;
+      "Dashlane/homebrew-tap" = inputs.homebrew-dashlane;
     };
   };
 

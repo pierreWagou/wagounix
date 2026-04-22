@@ -1,4 +1,6 @@
-_: {
+{ host, ... }:
+
+{
   services.immich = {
     enable = true;
     host = "127.0.0.1";
@@ -11,7 +13,7 @@ _: {
     machine-learning.enable = true;
 
     settings = {
-      server.externalDomain = "https://pixel.wagou.fr";
+      server.externalDomain = "https://pixel.${host.domain}";
       newVersionCheck.enabled = false;
     };
 

@@ -29,10 +29,6 @@
         icon = ./icons/microsoft_excel.icns;
       }
       {
-        path = "/Applications/Microsoft OneNote.app";
-        icon = ./icons/microsoft_onenote.icns;
-      }
-      {
         path = "/Applications/Microsoft Outlook.app";
         icon = ./icons/microsoft_outlook.icns;
       }
