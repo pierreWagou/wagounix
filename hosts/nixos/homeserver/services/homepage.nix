@@ -137,7 +137,7 @@ in
       }
 
       .service-group-name {
-        color: var(--ctp-lavender) !important;
+        color: var(--ctp-mauve) !important;
         font-weight: 600 !important;
         text-transform: uppercase;
         letter-spacing: 1.5px;
@@ -148,21 +148,40 @@ in
         border-color: var(--ctp-surface0) !important;
       }
 
-      .resource-icon {
+      /* Resource icons — each a different color */
+      .information-widget-resource:nth-child(1) .resource-icon {
+        color: var(--ctp-blue) !important;
+      }
+      .information-widget-resource:nth-child(2) .resource-icon {
+        color: var(--ctp-mauve) !important;
+      }
+      .information-widget-resource:nth-child(3) .resource-icon {
+        color: var(--ctp-peach) !important;
+      }
+
+      /* Resource labels */
+      .information-widget-resource .text-xs {
         color: var(--ctp-lavender) !important;
       }
 
+      /* Resource progress bars — match icon colors */
       .resource-usage {
         background: var(--ctp-surface0) !important;
         border-radius: 4px;
       }
-
-      .resource-usage > div {
+      .information-widget-resource:nth-child(1) .resource-usage > div {
+        background: var(--ctp-blue) !important;
+      }
+      .information-widget-resource:nth-child(2) .resource-usage > div {
         background: var(--ctp-mauve) !important;
       }
+      .information-widget-resource:nth-child(3) .resource-usage > div {
+        background: var(--ctp-peach) !important;
+      }
 
+      /* Date/time */
       .information-widget-datetime span {
-        color: var(--ctp-text) !important;
+        color: var(--ctp-lavender) !important;
       }
 
       .ping-up, [class*="bg-emerald"] {
