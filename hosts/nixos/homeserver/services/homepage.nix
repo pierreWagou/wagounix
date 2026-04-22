@@ -31,7 +31,7 @@ in
       cardBlur = "sm";
       background = {
         image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
-        blur = "sm";
+        blur = "xl";
         brightness = 75;
         opacity = 75;
       };
@@ -60,17 +60,32 @@ in
 
     customCSS = ''
       :root {
-        --card-bg:     rgba(15, 15, 20, 0.6);
-        --card-border: rgba(255, 255, 255, 0.08);
-        --card-hover:  rgba(255, 255, 255, 0.04);
-        --text:        #e4e4e7;
-        --text-muted:  #a1a1aa;
-        --accent:      #a78bfa;
-        --accent-soft: rgba(167, 139, 250, 0.15);
+        --ctp-base:      #1e1e2e;
+        --ctp-mantle:    #181825;
+        --ctp-crust:     #11111b;
+        --ctp-surface0:  #313244;
+        --ctp-surface1:  #45475a;
+        --ctp-surface2:  #585b70;
+        --ctp-overlay0:  #6c7086;
+        --ctp-text:      #cdd6f4;
+        --ctp-subtext0:  #a6adc8;
+        --ctp-subtext1:  #bac2de;
+        --ctp-lavender:  #b4befe;
+        --ctp-mauve:     #cba6f7;
+        --ctp-pink:      #f5c2e7;
+        --ctp-green:     #a6e3a1;
+        --ctp-red:       #f38ba8;
+        --ctp-peach:     #fab387;
+        --ctp-blue:      #89b4fa;
+        --ctp-teal:      #94e2d5;
+
+        --card-bg:       rgba(30, 30, 46, 0.7);
+        --card-border:   rgba(69, 71, 90, 0.5);
+        --card-hover:    rgba(49, 50, 68, 0.8);
       }
 
       body {
-        background: #0a0a0c !important;
+        background: var(--ctp-crust) !important;
       }
 
       .service-card {
@@ -84,37 +99,37 @@ in
 
       .service-card:hover {
         background: var(--card-hover) !important;
-        border-color: rgba(255, 255, 255, 0.15) !important;
+        border-color: var(--ctp-lavender) !important;
         transform: translateY(-1px);
       }
 
       .service-name, .service-title {
-        color: var(--text) !important;
+        color: var(--ctp-text) !important;
         font-weight: 500 !important;
         font-size: 14px !important;
       }
 
       .service-description {
-        color: var(--text-muted) !important;
+        color: var(--ctp-subtext0) !important;
         font-size: 12px !important;
       }
 
       .service-block, .bg-theme-200\/50 {
-        background: var(--accent-soft) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        background: rgba(203, 166, 247, 0.1) !important;
+        border: 1px solid rgba(69, 71, 90, 0.4) !important;
         border-radius: 8px !important;
       }
 
       .service-block .uppercase {
-        color: var(--accent) !important;
+        color: var(--ctp-mauve) !important;
       }
 
       .service-block .font-thin {
-        color: var(--text) !important;
+        color: var(--ctp-text) !important;
       }
 
       .service-group-name {
-        color: var(--text) !important;
+        color: var(--ctp-lavender) !important;
         font-weight: 600 !important;
         text-transform: uppercase;
         letter-spacing: 1.5px;
@@ -122,46 +137,46 @@ in
       }
 
       #information-widgets {
-        border-color: var(--card-border) !important;
+        border-color: var(--ctp-surface0) !important;
       }
 
       #information-widgets * {
-        color: var(--text-muted) !important;
+        color: var(--ctp-subtext1) !important;
       }
 
       .resource-usage {
-        background: rgba(255, 255, 255, 0.06) !important;
+        background: var(--ctp-surface0) !important;
         border-radius: 4px;
       }
 
       .resource-usage > div {
-        background: var(--accent) !important;
+        background: var(--ctp-mauve) !important;
       }
 
       .information-widget-greeting span {
-        color: var(--text) !important;
+        color: var(--ctp-text) !important;
       }
 
       .ping-up, [class*="bg-emerald"] {
-        background-color: #34d399 !important;
+        background-color: var(--ctp-green) !important;
       }
 
       .ping-down, [class*="bg-rose"] {
-        background-color: #fb7185 !important;
+        background-color: var(--ctp-red) !important;
       }
 
       ::-webkit-scrollbar { width: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15);
+        background: var(--ctp-surface1);
         border-radius: 3px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.25);
+        background: var(--ctp-surface2);
       }
 
       #footer svg {
-        color: var(--text-muted) !important;
+        color: var(--ctp-overlay0) !important;
       }
     '';
 
