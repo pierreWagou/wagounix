@@ -26,6 +26,9 @@
       immich-api-key = {
         mode = "0400";
       };
+      adguard-password = {
+        mode = "0400";
+      };
     };
 
     templates = {
@@ -40,7 +43,11 @@
       };
 
       "homepage.env" = {
-        content = "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}\n";
+        content = builtins.concatStringsSep "\n" [
+          "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
+          "HOMEPAGE_VAR_ADGUARD_USER=admin"
+          "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
+        ];
       };
     };
   };

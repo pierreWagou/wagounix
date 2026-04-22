@@ -1,4 +1,10 @@
-{ host, ... }:
+{
+  host,
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   inherit (host) serverIP;
@@ -12,6 +18,13 @@ in
     openFirewall = true;
 
     settings = {
+      users = [
+        {
+          name = "admin";
+          password = "ADGUARD_PASSWORD_PLACEHOLDER";
+        }
+      ];
+
       dns = {
         bind_hosts = [
           "0.0.0.0"
@@ -81,5 +94,17 @@ in
         }
       ];
     };
+  };
+
+  # Replace password placeholder with bcrypt hash derived from sops secret at runtime
+  systemd.services.adguardhome = {
+    after = [ "sops-nix.service" ];
+    wants = [ "sops-nix.service" ];
+    preStart = lib.mkAfter ''
+      HASH=$(${pkgs.mkpasswd}/bin/mkpasswd --method=bcrypt --rounds=10 \
+        "$(cat ${config.sops.secrets.adguard-password.path})")
+      ${pkgs.gnused}/bin/sed -i "s|ADGUARD_PASSWORD_PLACEHOLDER|$HASH|g" \
+        /var/lib/AdGuardHome/AdGuardHome.yaml
+    '';
   };
 }
