@@ -8,6 +8,8 @@
     secrets = {
       cloudflared-token = {
         mode = "0400";
+        owner = "cloudflared";
+        group = "cloudflared";
       };
       opencloud-admin-password = {
         mode = "0400";
