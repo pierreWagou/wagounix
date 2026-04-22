@@ -16,7 +16,9 @@
       '';
 
       "http://cloud.wagou.fr".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.opencloud.port}
+        reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
+          header_up X-Forwarded-Proto https
+        }
       '';
     };
   };
