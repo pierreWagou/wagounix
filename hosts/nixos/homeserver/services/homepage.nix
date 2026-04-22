@@ -31,9 +31,9 @@ in
       cardBlur = "sm";
       background = {
         image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
-        blur = "md";
+        blur = "sm";
         brightness = 75;
-        opacity = 50;
+        opacity = 75;
       };
       layout = {
         Services = {
@@ -52,7 +52,7 @@ in
       // Images are served by Caddy from hosts/nixos/homeserver/services/homepage-images/
       const images = [${imageListJS}];
       const pick = images[Math.floor(Math.random() * images.length)];
-      const bgEl = document.querySelector("#page_container > div:first-child");
+      const bgEl = document.getElementById("background");
       if (bgEl) {
         bgEl.style.backgroundImage = "url('/bg/" + pick + "')";
       }
