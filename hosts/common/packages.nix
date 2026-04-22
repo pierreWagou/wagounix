@@ -38,6 +38,7 @@
     sesh
     sheldon
     sops
+    ssh-to-age
     starship
     television
     terraform
