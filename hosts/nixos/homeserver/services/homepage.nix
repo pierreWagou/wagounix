@@ -86,16 +86,6 @@ in
         background: var(--synth-bg-deep) !important;
       }
 
-      body::after {
-        content: "";
-        position: fixed;
-        inset: 0;
-        backdrop-filter: blur(4px);
-        -webkit-backdrop-filter: blur(4px);
-        pointer-events: none;
-        z-index: 9999;
-      }
-
       .service-card {
         background: var(--synth-card-bg) !important;
         border: 1px solid var(--synth-card-border) !important;
