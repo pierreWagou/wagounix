@@ -59,6 +59,7 @@ hosts/nixos/homeserver/
 ├── default.nix              # Imports hardware.nix and services/
 ├── variables.nix            # Host variables (username, homeDir, hostname)
 ├── hardware.nix             # Auto-generated hardware config (boot, filesystems, kernel modules)
+├── secrets.yaml             # sops-encrypted secrets (age encryption)
 └── services/
     ├── default.nix          # Imports all service modules + system packages
     ├── secrets.nix          # sops-nix secret declarations and templates
@@ -96,7 +97,7 @@ Platform-level config at `hosts/nixos/`:
 
 ## Secrets (sops-nix)
 
-Secrets are encrypted with age in `secrets/homeserver.yaml` and decrypted at activation time on the Beelink.
+Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) and decrypted at activation time on the Beelink.
 
 | Secret | Used by | Runtime path |
 |---|---|---|
@@ -107,18 +108,18 @@ Secrets are encrypted with age in `secrets/homeserver.yaml` and decrypted at act
 ### Editing secrets
 
 ```bash
-sops secrets/homeserver.yaml
+sops hosts/nixos/homeserver/secrets.yaml
 ```
 
 Or in Neovim (sops.nvim auto-decrypts):
 
 ```bash
-nvim secrets/homeserver.yaml
+nvim hosts/nixos/homeserver/secrets.yaml
 ```
 
 ### Adding a new secret
 
-1. Edit `secrets/homeserver.yaml` with `sops` — add a new key-value pair
+1. Edit `secrets.yaml` with `sops` — add a new key-value pair
 2. Declare it in `services/secrets.nix` under `sops.secrets`
 3. If it needs `KEY=VALUE` format, create a `sops.templates` entry
 4. Reference `config.sops.secrets.<name>.path` or `config.sops.templates.<name>.path` in the service config
@@ -193,7 +194,7 @@ nvim secrets/homeserver.yaml
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
-| Edit secrets | `sops secrets/homeserver.yaml` |
+| Edit secrets | `sops hosts/nixos/homeserver/secrets.yaml` |
 | Test build locally | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
 | AdGuard Home dashboard | `http://192.168.68.65:3000` |
 | Vaultwarden | `https://vault.wagou.fr` |

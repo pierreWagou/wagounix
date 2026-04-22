@@ -64,11 +64,11 @@ IMPORTANT: Do NOT add AdGuard Home DNS rewrites for `*.wagou.fr` domains — let
 | `default.nix` | Imports configuration.nix |
 | `configuration.nix` | SSH (hardened, key-only), Docker, user account, timezone, locale, auto-updates, firewall base (port 22) |
 
-### Secrets: `secrets/`
+### Secrets: `hosts/nixos/homeserver/`
 
 | File | Purpose |
 |---|---|
-| `homeserver.yaml` | sops-encrypted secrets (age encryption, keys readable, values encrypted) |
+| `secrets.yaml` | sops-encrypted secrets (age encryption, keys readable, values encrypted) |
 
 ### Config: repo root
 
@@ -94,7 +94,7 @@ IMPORTANT: Do NOT add AdGuard Home DNS rewrites for `*.wagou.fr` domains — let
 
 ## Secrets management (sops-nix)
 
-Secrets are encrypted with age in `secrets/homeserver.yaml` and committed to Git. They are decrypted at NixOS activation time on the Beelink using its SSH host key.
+Secrets are encrypted with age in `hosts/nixos/homeserver/secrets.yaml` (colocated with the host config) and committed to Git. They are decrypted at NixOS activation time on the Beelink using its SSH host key.
 
 ### Current secrets
 
@@ -116,9 +116,9 @@ Secrets are encrypted with age in `secrets/homeserver.yaml` and committed to Git
 
 ```bash
 # From the wagounix directory:
-sops secrets/homeserver.yaml
+sops hosts/nixos/homeserver/secrets.yaml
 # Or in Neovim (sops.nvim auto-decrypts):
-nvim secrets/homeserver.yaml
+nvim hosts/nixos/homeserver/secrets.yaml
 ```
 
 ### Adding a new secret
@@ -139,7 +139,7 @@ nvim secrets/homeserver.yaml
 ### Important notes about sops
 
 - The admin age private key (`~/.config/sops/age/keys.txt`) is NOT in Git or chezmoi — it lives only on the Mac
-- If you lose it, generate a new key with `age-keygen`, update `.sops.yaml` with the new public key, and re-encrypt all secrets with `sops updatekeys secrets/homeserver.yaml`
+- If you lose it, generate a new key with `age-keygen`, update `.sops.yaml` with the new public key, and re-encrypt all secrets with `sops updatekeys hosts/nixos/homeserver/secrets.yaml`
 - The standalone age key was used instead of SSH-derived key because the SSH key is passphrase-protected (ssh-to-age can't handle passphrase-protected keys)
 
 ## Network configuration
@@ -278,7 +278,7 @@ sops.templates."newservice.env" = {
 };
 ```
 
-Then edit `secrets/homeserver.yaml` with `sops` to add the secret value.
+Then edit `hosts/nixos/homeserver/secrets.yaml` with `sops` to add the secret value.
 
 ### Step 6 — Add Cloudflare Tunnel route
 
@@ -341,7 +341,7 @@ If IPv6 is enabled on the Deco and the Beelink's IPv6 DNS is configured, this sh
 
 ### Can't decrypt sops secrets (on Mac)
 
-Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. If not, regenerate with `age-keygen -o ~/.config/sops/age/keys.txt` and update the public key in `.sops.yaml`, then re-encrypt with `sops updatekeys secrets/homeserver.yaml`.
+Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. If not, regenerate with `age-keygen -o ~/.config/sops/age/keys.txt` and update the public key in `.sops.yaml`, then re-encrypt with `sops updatekeys hosts/nixos/homeserver/secrets.yaml`.
 
 ## Key commands
 
@@ -352,13 +352,13 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
-| Edit secrets | `sops secrets/homeserver.yaml` |
+| Edit secrets | `sops hosts/nixos/homeserver/secrets.yaml` |
 | Test build | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
 
 ## Important rules
 
 - Each service gets its own file in `services/` — one service per file
-- Secrets go in `secrets/homeserver.yaml` (encrypted with sops) — NEVER as plain files on the server
+- Secrets go in `hosts/nixos/homeserver/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
 - AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
 - Caddy serves HTTP only — Cloudflare handles public HTTPS
 - Cloudflare Tunnel routes must use `HTTP` type with `localhost:80` — not HTTPS
