@@ -23,7 +23,7 @@ in
     settings = {
       title = "wagou://home";
       theme = "dark";
-      color = "fuchsia";
+      color = "slate";
       headerStyle = "clean";
       statusStyle = "dot";
       iconStyle = "theme";
@@ -32,7 +32,7 @@ in
       background = {
         image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
         blur = "md";
-        brightness = 50;
+        brightness = 75;
         opacity = 50;
       };
       layout = {
@@ -59,163 +59,109 @@ in
     '';
 
     customCSS = ''
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-
       :root {
-        --synth-bg-deep:     #0d0221;
-        --synth-bg-mid:      #1a1a2e;
-        --synth-neon-pink:   #ff00ff;
-        --synth-neon-cyan:   #00ffff;
-        --synth-hot-purple:  #7209b7;
-        --synth-magenta:     #b5179e;
-        --synth-soft-pink:   #ff6b9d;
-        --synth-blue:        #4cc9f0;
-        --synth-card-bg:     rgba(13, 2, 33, 0.65);
-        --synth-card-border: rgba(255, 0, 255, 0.2);
-        --synth-card-hover:  rgba(114, 9, 183, 0.25);
-        --synth-text:        #e0d0ff;
-        --synth-text-muted:  #9d8cbf;
-      }
-
-      * {
-        font-family: 'Rajdhani', 'Orbitron', sans-serif !important;
-        -webkit-font-smoothing: antialiased;
+        --card-bg:     rgba(15, 15, 20, 0.6);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --card-hover:  rgba(255, 255, 255, 0.04);
+        --text:        #e4e4e7;
+        --text-muted:  #a1a1aa;
+        --accent:      #a78bfa;
+        --accent-soft: rgba(167, 139, 250, 0.15);
       }
 
       body {
-        background: var(--synth-bg-deep) !important;
+        background: #0a0a0c !important;
       }
 
       .service-card {
-        background: var(--synth-card-bg) !important;
-        border: 1px solid var(--synth-card-border) !important;
-        border-radius: 8px !important;
-        box-shadow: 0 0 10px rgba(255, 0, 255, 0.4), 0 0 30px rgba(255, 0, 255, 0.1) !important;
-        backdrop-filter: blur(12px) saturate(150%);
-        -webkit-backdrop-filter: blur(12px) saturate(150%);
-        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+        background: var(--card-bg) !important;
+        border: 1px solid var(--card-border) !important;
+        border-radius: 12px !important;
+        backdrop-filter: blur(16px) saturate(120%);
+        -webkit-backdrop-filter: blur(16px) saturate(120%);
+        transition: all 0.2s ease !important;
       }
 
       .service-card:hover {
-        background: var(--synth-card-hover) !important;
-        border-color: var(--synth-neon-pink) !important;
-        box-shadow:
-          0 0 15px rgba(255, 0, 255, 0.5),
-          0 0 45px rgba(255, 0, 255, 0.15),
-          inset 0 1px 0 rgba(255, 0, 255, 0.1) !important;
-        transform: translateY(-2px);
+        background: var(--card-hover) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        transform: translateY(-1px);
       }
 
       .service-name, .service-title {
-        color: var(--synth-neon-cyan) !important;
-        font-family: 'Orbitron', monospace !important;
-        font-weight: 600 !important;
+        color: var(--text) !important;
+        font-weight: 500 !important;
         font-size: 14px !important;
-        letter-spacing: 0.5px;
-        text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
       }
 
       .service-description {
-        color: var(--synth-text-muted) !important;
+        color: var(--text-muted) !important;
         font-size: 12px !important;
       }
 
       .service-block, .bg-theme-200\/50 {
-        background: rgba(114, 9, 183, 0.15) !important;
-        border: 1px solid rgba(255, 0, 255, 0.15) !important;
-        border-radius: 6px !important;
+        background: var(--accent-soft) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 8px !important;
       }
 
       .service-block .uppercase {
-        color: var(--synth-neon-pink) !important;
-        font-family: 'Orbitron', monospace !important;
-        text-shadow: 0 0 6px rgba(255, 0, 255, 0.4);
+        color: var(--accent) !important;
       }
 
       .service-block .font-thin {
-        color: var(--synth-text) !important;
+        color: var(--text) !important;
       }
 
       .service-group-name {
-        color: var(--synth-neon-pink) !important;
-        font-family: 'Orbitron', sans-serif !important;
-        font-weight: 700 !important;
+        color: var(--text) !important;
+        font-weight: 600 !important;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        text-shadow:
-          0 0 10px rgba(255, 0, 255, 0.6),
-          0 0 30px rgba(255, 0, 255, 0.2);
-        animation: neonPulse 3s ease-in-out infinite;
-      }
-
-      .service-group-icon > div {
-        background: var(--synth-hot-purple) !important;
-        box-shadow: 0 0 8px rgba(114, 9, 183, 0.5);
+        letter-spacing: 1.5px;
+        font-size: 12px !important;
       }
 
       #information-widgets {
-        border-color: rgba(255, 0, 255, 0.2) !important;
+        border-color: var(--card-border) !important;
       }
 
       #information-widgets * {
-        color: var(--synth-neon-cyan) !important;
+        color: var(--text-muted) !important;
       }
 
       .resource-usage {
-        background: rgba(13, 2, 33, 0.5) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
         border-radius: 4px;
       }
 
       .resource-usage > div {
-        background: linear-gradient(90deg, var(--synth-neon-pink), var(--synth-neon-cyan)) !important;
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+        background: var(--accent) !important;
       }
 
       .information-widget-greeting span {
-        font-family: 'Orbitron', sans-serif !important;
-        color: var(--synth-neon-cyan) !important;
-        text-shadow:
-          0 0 10px rgba(0, 255, 255, 0.6),
-          0 0 40px rgba(0, 255, 255, 0.2);
+        color: var(--text) !important;
       }
 
       .ping-up, [class*="bg-emerald"] {
-        background-color: var(--synth-neon-cyan) !important;
-        box-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+        background-color: #34d399 !important;
       }
 
       .ping-down, [class*="bg-rose"] {
-        background-color: var(--synth-neon-pink) !important;
-        box-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+        background-color: #fb7185 !important;
       }
 
-      ::-webkit-scrollbar { width: 8px; }
-      ::-webkit-scrollbar-track { background: var(--synth-bg-deep); }
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
       ::-webkit-scrollbar-thumb {
-        background: linear-gradient(180deg, var(--synth-neon-pink), var(--synth-hot-purple));
-        border-radius: 4px;
-        box-shadow: 0 0 6px rgba(255, 0, 255, 0.3);
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 3px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: linear-gradient(180deg, var(--synth-neon-cyan), var(--synth-neon-pink));
-      }
-
-      @keyframes neonPulse {
-        0%, 100% {
-          text-shadow:
-            0 0 5px rgba(255, 0, 255, 0.4),
-            0 0 15px rgba(255, 0, 255, 0.2);
-        }
-        50% {
-          text-shadow:
-            0 0 10px rgba(255, 0, 255, 0.7),
-            0 0 30px rgba(255, 0, 255, 0.3),
-            0 0 50px rgba(255, 0, 255, 0.1);
-        }
+        background: rgba(255, 255, 255, 0.25);
       }
 
       #footer svg {
-        color: var(--synth-hot-purple) !important;
+        color: var(--text-muted) !important;
       }
     '';
 
