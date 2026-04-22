@@ -18,4 +18,10 @@
       proxy.enable_basic_auth = true;
     };
   };
+
+  # Ensure sops secrets are decrypted before OpenCloud starts
+  systemd.services.opencloud = {
+    after = [ "sops-nix.service" ];
+    requires = [ "sops-nix.service" ];
+  };
 }
