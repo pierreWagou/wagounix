@@ -9,7 +9,11 @@ description: Full reference for the wagounix flake — repo structure, module wi
 wagounix/
 ├── flake.nix              # All inputs, darwinConfigurations, nixosConfigurations, checks, devShell
 ├── flake.lock             # Pinned dependency versions
+├── .sops.yaml             # sops-nix encryption rules (age public keys)
 ├── .mise.toml             # Auto-activates nix develop on cd (installs git hooks)
+├── lib/
+│   ├── checks.nix         # Flake checks (lint + build all configs)
+│   └── devshell.nix       # Dev shell definition (sops, ssh-to-age, git hooks)
 │
 ├── hosts/
 │   ├── common/                    # Cross-platform modules
@@ -22,7 +26,7 @@ wagounix/
 │   │   ├── configuration.nix      # nix-darwin system config (stateVersion, PAM Touch ID)
 │   │   ├── homebrew.nix           # Common Homebrew brews, casks, taps
 │   │   ├── icons.nix              # Custom macOS app icons
-│   │   ├── packages.nix           # Darwin-only nix packages (cocoapods, pinentry_mac, etc.)
+│   │   ├── packages.nix           # Darwin-only nix packages (cocoapods, opencode, etc.)
 │   │   ├── icons/                 # .icns icon files
 │   │   ├── settings/              # macOS system defaults
 │   │   │   ├── default.nix        # Imports all settings modules
@@ -38,7 +42,7 @@ wagounix/
 │   │   │   ├── wagou/             # New personal Mac (aarch64-darwin)
 │   │   │   │   ├── default.nix
 │   │   │   │   ├── variables.nix
-│   │   │   │   ├── packages.nix   # opencode
+│   │   │   │   ├── packages.nix
 │   │   │   │   └── homebrew.nix   # docker-desktop
 │   │   │   └── wagou-old/         # Old Intel Mac (x86_64-darwin)
 │   │   │       ├── default.nix
@@ -46,7 +50,7 @@ wagounix/
 │   │   └── work/                  # Work Mac layer
 │   │       ├── default.nix        # Imports dock, packages, homebrew
 │   │       ├── dock.nix           # Work dock apps (Outlook, Teams, etc.)
-│   │       ├── packages.nix       # Work nix packages (opencode)
+│   │       ├── packages.nix       # Work nix packages
 │   │       ├── homebrew.nix       # Work casks (docker-desktop)
 │   │       ├── sap/               # SAP Mac (legacy — remove when returned)
 │   │       │   ├── default.nix
@@ -58,12 +62,23 @@ wagounix/
 │   │           └── variables.nix
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration
-│       ├── configuration.nix      # NixOS system config (bootloader, networking, docker)
+│       ├── configuration.nix      # NixOS system config (SSH, Docker, auto-updates, users)
 │       └── homeserver/            # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
-│           ├── hardware.nix       # Auto-generated (replace with real one from server)
-│           └── services.nix       # Server services
+│           ├── hardware.nix       # Auto-generated hardware config (nixos-generate-config)
+│           ├── secrets.yaml       # sops-encrypted secrets (age)
+│           └── services/          # Service modules (one file per service)
+│               ├── default.nix
+│               ├── secrets.nix
+│               ├── vaultwarden.nix
+│               ├── opencloud.nix
+│               ├── immich.nix
+│               ├── caddy.nix
+│               ├── adguardhome.nix
+│               ├── cloudflared.nix
+│               ├── fail2ban.nix
+│               └── firewall.nix
 │
 └── .github/workflows/check.yml   # CI: lint + build darwin + build NixOS
 ```
@@ -201,7 +216,7 @@ masApps = { "App Name" = 123456789; };
    ```
 2. Create `hosts/nixos/<hostname>/default.nix` with imports for hardware and services
 3. Create `hosts/nixos/<hostname>/hardware.nix` (from `nixos-generate-config` on the target machine)
-4. Create `hosts/nixos/<hostname>/services.nix` for host-specific services
+4. Create `hosts/nixos/<hostname>/services/` directory for host-specific services (one file per service)
 5. Add a `nixosConfigurations.<hostname>` entry in `flake.nix`
 
 ## Adding macOS settings
@@ -303,7 +318,7 @@ nix flake check      # runs all checks + builds
 ### CI (GitHub Actions)
 
 - **lint** — nixfmt, statix, deadnix (macos-15)
-- **build-darwin** — sap, wagou, pro (macos-15, parallel)
+- **build-darwin** — sap, wagou (macos-15, parallel)
 - **build-nixos** — homeserver (ubuntu-latest)
 
 ## Key commands

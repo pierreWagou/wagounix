@@ -10,7 +10,6 @@
     chezmoi
     copier
     delta
-    docker
     eza
     fd
     ffmpeg
@@ -38,7 +37,6 @@
     sesh
     sheldon
     sops
-    ssh-to-age
     starship
     television
     terraform

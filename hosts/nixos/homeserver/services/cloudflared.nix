@@ -17,10 +17,18 @@
     wantedBy = [
       "multi-user.target"
     ];
+    restartTriggers = [
+      config.sops.secrets.cloudflared-token.path
+    ];
     serviceConfig = {
-      ExecStart = "/bin/sh -c '${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token $(cat ${config.sops.secrets.cloudflared-token.path})'";
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token-file ${config.sops.secrets.cloudflared-token.path}";
       Restart = "on-failure";
       RestartSec = 5;
+      DynamicUser = true;
+      NoNewPrivileges = true;
+      ProtectSystem = "strict";
+      ProtectHome = true;
+      PrivateTmp = true;
     };
   };
 }

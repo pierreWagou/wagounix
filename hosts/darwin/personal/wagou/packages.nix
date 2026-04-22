@@ -1,7 +1,3 @@
-{ pkgs, ... }:
-
-{
-  environment.systemPackages = with pkgs; [
-    opencode
-  ];
+_: {
+  environment.systemPackages = [ ];
 }

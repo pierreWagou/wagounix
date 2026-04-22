@@ -15,6 +15,12 @@
       vaultwarden-admin-token = {
         mode = "0400";
       };
+      wagou-password-hash = {
+        neededForUsers = true;
+      };
+      root-password-hash = {
+        neededForUsers = true;
+      };
     };
 
     templates."opencloud.env" = {
