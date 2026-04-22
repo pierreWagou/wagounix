@@ -269,6 +269,12 @@ in
               href = "http://${host.serverIP}:3000";
               description = "DNS & ad blocking";
               siteMonitor = "http://localhost:3000";
+              widget = {
+                type = "adguard";
+                url = "http://localhost:3000";
+                username = "{{HOMEPAGE_VAR_ADGUARD_USER}}";
+                password = "{{HOMEPAGE_VAR_ADGUARD_PASS}}";
+              };
             };
           }
           {
