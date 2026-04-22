@@ -1,8 +1,11 @@
-_: {
+{ config, ... }:
+
+{
   services.vaultwarden = {
     enable = true;
     dbBackend = "sqlite";
     backupDir = "/var/backup/vaultwarden";
+    environmentFile = config.sops.templates."vaultwarden.env".path;
     config = {
       DOMAIN = "https://vault.wagou.fr";
       SIGNUPS_ALLOWED = false;
