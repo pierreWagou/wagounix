@@ -14,6 +14,7 @@
     ./cloudflared.nix
     ./immich.nix
     ./opencloud.nix
+    ./fail2ban.nix
     ./firewall.nix
   ];
 }

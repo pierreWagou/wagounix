@@ -12,11 +12,19 @@
       opencloud-admin-password = {
         mode = "0400";
       };
+      vaultwarden-admin-token = {
+        mode = "0400";
+      };
     };
 
     templates."opencloud.env" = {
       owner = "opencloud";
       content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
+    };
+
+    templates."vaultwarden.env" = {
+      owner = "vaultwarden";
+      content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
     };
   };
 }

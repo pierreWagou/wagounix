@@ -33,6 +33,14 @@
 
   virtualisation.docker.enable = true;
 
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:pierreWagou/wagounix#homeserver";
+    flags = [ "--refresh" ];
+    dates = "04:00";
+    allowReboot = false;
+  };
+
   users.users.${host.username} = {
     isNormalUser = true;
     initialPassword = "changeme";
