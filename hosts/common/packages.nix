@@ -37,6 +37,7 @@
     scala
     sesh
     sheldon
+    sops
     starship
     television
     terraform
