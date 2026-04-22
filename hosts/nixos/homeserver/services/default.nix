@@ -13,6 +13,7 @@
     ./cloudflared.nix
     ./immich.nix
     ./opencloud.nix
+    ./homepage.nix
     ./fail2ban.nix
     ./firewall.nix
   ];
