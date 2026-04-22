@@ -28,6 +28,7 @@
     neovim
     nix-index
     openapi-generator-cli
+    openssl
     openvpn
     pay-respects
     poetry
