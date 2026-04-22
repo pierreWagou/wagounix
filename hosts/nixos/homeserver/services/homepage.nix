@@ -281,6 +281,12 @@ in
             "Cloudflare Tunnel" = {
               icon = "cloudflare.svg";
               description = "Secure remote access";
+              widget = {
+                type = "cloudflared";
+                accountid = "65b2dca00576549f065820b1cd5c76c9";
+                tunnelid = "5b461ccf-54c8-4247-9a5c-f738da35d1ba";
+                key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
+              };
             };
           }
         ];
