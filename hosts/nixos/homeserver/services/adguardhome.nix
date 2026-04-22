@@ -100,13 +100,17 @@ in
     after = [ "sops-nix.service" ];
     wants = [ "sops-nix.service" ];
     serviceConfig = {
-      # preStart needs to read sops secret and run sed/mkpasswd
+      # preStart needs to read sops secret and run sed/mkpasswd as root
       ExecStartPre = [
         "+${pkgs.writeShellScript "adguard-inject-password" ''
+          CONFIG=/var/lib/AdGuardHome/AdGuardHome.yaml
           HASH=$(${pkgs.mkpasswd}/bin/mkpasswd --method=bcrypt --rounds=10 \
             "$(cat ${config.sops.secrets.adguard-password.path})")
-          ${pkgs.gnused}/bin/sed -i "s|ADGUARD_PASSWORD_PLACEHOLDER|$HASH|g" \
-            /var/lib/AdGuardHome/AdGuardHome.yaml
+          # Use printf %s to write the hash safely without sed escaping issues
+          PLACEHOLDER="ADGUARD_PASSWORD_PLACEHOLDER"
+          CONTENT=$(cat "$CONFIG")
+          printf '%s' "''${CONTENT//$PLACEHOLDER/$HASH}" > "$CONFIG"
+          chmod 600 "$CONFIG"
         ''}"
       ];
     };
