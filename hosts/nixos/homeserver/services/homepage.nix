@@ -1,5 +1,14 @@
 { config, host, ... }:
 
+let
+  # Place your photos in this directory (jpg, jpeg, png supported).
+  # They are served by Caddy at /bg/* — no homepage-dashboard rebuild needed.
+  imagesSrc = ./homepage-images;
+  imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
+    builtins.attrNames (builtins.readDir imagesSrc)
+  );
+  imageListJS = builtins.concatStringsSep ", " (map (f: ''"${f}"'') imageFiles);
+in
 {
   services.homepage-dashboard = {
     enable = true;
@@ -21,7 +30,7 @@
       hideVersion = true;
       cardBlur = "sm";
       background = {
-        image = "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?auto=format&fit=crop&w=2560&q=80";
+        image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
         blur = "sm";
         brightness = 25;
         opacity = 30;
@@ -37,6 +46,17 @@
         };
       };
     };
+
+    customJS = ''
+      // Randomly pick a background image on each page load.
+      // Images are served by Caddy from hosts/nixos/homeserver/services/homepage-images/
+      const images = [${imageListJS}];
+      const pick = images[Math.floor(Math.random() * images.length)];
+      const bgEl = document.querySelector("#page_container > div:first-child");
+      if (bgEl) {
+        bgEl.style.backgroundImage = "url('/bg/" + pick + "')";
+      }
+    '';
 
     customCSS = ''
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
