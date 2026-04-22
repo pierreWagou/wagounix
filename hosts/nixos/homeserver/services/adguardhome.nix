@@ -1,9 +1,4 @@
-{
-  host,
-  config,
-  pkgs,
-  ...
-}:
+{ host, ... }:
 
 let
   inherit (host) serverIP;
@@ -20,7 +15,7 @@ in
       users = [
         {
           name = "admin";
-          password = "ADGUARD_PASSWORD_PLACEHOLDER";
+          password = "$2b$10$LfP7aLjTiZ6C4nNe86PeK.FuOpOlg9ASthR29l602SEet2eO8Jbey";
         }
       ];
 
@@ -91,27 +86,6 @@ in
           name = "Malicious URL Blocklist";
           url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt";
         }
-      ];
-    };
-  };
-
-  # Replace password placeholder with bcrypt hash derived from sops secret at runtime
-  systemd.services.adguardhome = {
-    after = [ "sops-nix.service" ];
-    wants = [ "sops-nix.service" ];
-    serviceConfig = {
-      # preStart needs to read sops secret and run sed/mkpasswd as root
-      ExecStartPre = [
-        "+${pkgs.writeShellScript "adguard-inject-password" ''
-          CONFIG=/var/lib/AdGuardHome/AdGuardHome.yaml
-          HASH=$(${pkgs.mkpasswd}/bin/mkpasswd --method=bcrypt --rounds=10 \
-            "$(cat ${config.sops.secrets.adguard-password.path})")
-          # Use printf %s to write the hash safely without sed escaping issues
-          PLACEHOLDER="ADGUARD_PASSWORD_PLACEHOLDER"
-          CONTENT=$(cat "$CONFIG")
-          printf '%s' "''${CONTENT//$PLACEHOLDER/$HASH}" > "$CONFIG"
-          chmod 600 "$CONFIG"
-        ''}"
       ];
     };
   };
