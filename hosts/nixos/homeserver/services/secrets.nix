@@ -29,6 +29,9 @@
       adguard-password = {
         mode = "0400";
       };
+      cloudflare-api-token = {
+        mode = "0400";
+      };
     };
 
     templates = {
@@ -47,6 +50,7 @@
           "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
           "HOMEPAGE_VAR_ADGUARD_USER=admin"
           "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
+          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-api-token}"
         ];
       };
     };
