@@ -1,6 +1,6 @@
 ---
 name: homeserver
-description: Manage the NixOS homeserver — add services, configure DNS rewrites, Cloudflare Tunnel routes, Caddy reverse proxy, and troubleshoot the Beelink EQI13.
+description: Manage the NixOS homeserver — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Caddy reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
 ---
 
 ## Overview
@@ -13,229 +13,358 @@ Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
 ```
 Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Caddy (HTTP :80) -> Service
-Local access:   Browser -> AdGuard Home (DNS rewrite to 192.168.68.65) -> Caddy (HTTP :80) -> Service
+Local access:   Browser -> AdGuard Home (*.home.lan -> 192.168.68.65) -> Caddy (HTTP :80) -> Service
 ```
 
 Caddy serves HTTP only. Cloudflare handles public-facing HTTPS with valid certificates. Internal traffic between the tunnel and Caddy is plain HTTP on localhost — no TLS needed.
 
+IMPORTANT: Do NOT add AdGuard Home DNS rewrites for `*.wagou.fr` domains — let them resolve via Cloudflare so HTTPS works consistently everywhere. Only use `.home.lan` rewrites for direct local HTTP shortcuts.
+
 ## Current services
 
-| Service | NixOS module | Port | Local URL | Remote URL |
+| Service | NixOS config | Port | Remote URL | Local shortcut |
 |---|---|---|---|---|
-| Vaultwarden | `services.vaultwarden` | 8222 (localhost) | `http://vault.wagou.fr` | `https://vault.wagou.fr` |
-| Caddy | `services.caddy` | 80 | - | - |
-| AdGuard Home | `services.adguardhome` | 53 (DNS), 3000 (web UI) | `http://192.168.68.65:3000` | Not exposed |
-| Cloudflare Tunnel | `systemd.services.cloudflared-tunnel` | Outbound only | - | - |
-| Docker | `virtualisation.docker` | - | - | - |
+| Vaultwarden | `services/vaultwarden.nix` | 8222 (localhost) | `https://vault.wagou.fr` | `http://vault.home.lan` |
+| OpenCloud | `services/opencloud.nix` | 9200 (localhost) | `https://cloud.wagou.fr` | `http://cloud.home.lan` |
+| Immich | `services/immich.nix` | 2283 (localhost) | `https://pixel.wagou.fr` | `http://pixel.home.lan` |
+| Caddy | `services/caddy.nix` | 80 | - | - |
+| AdGuard Home | `services/adguardhome.nix` | 53 (DNS), 3000 (web UI) | Not exposed | `http://192.168.68.65:3000` |
+| Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - | - |
+| Fail2ban | `services/fail2ban.nix` | - | - | - |
 
 ## Files
 
-All homeserver config is in `hosts/nixos/homeserver/`:
+### Host-level config: `hosts/nixos/homeserver/`
 
 | File | Purpose |
 |---|---|
-| `default.nix` | Imports hardware.nix and services.nix |
+| `default.nix` | Imports `hardware.nix` and `services/` |
 | `variables.nix` | Host variables: `username = "wagou"`, `hostname = "homeserver"` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
-| `services.nix` | All services, firewall rules, and the cloudflared systemd unit |
 
-Platform-level NixOS config is in `hosts/nixos/`:
+### Services: `hosts/nixos/homeserver/services/`
+
+| File | Purpose |
+|---|---|
+| `default.nix` | Imports all service modules + system packages (docker-compose, ghostty.terminfo) |
+| `secrets.nix` | sops-nix secret declarations and templates |
+| `vaultwarden.nix` | Password manager config |
+| `opencloud.nix` | File sync & sharing config |
+| `immich.nix` | Photo management config (PostgreSQL, Redis, ML auto-configured) |
+| `caddy.nix` | Reverse proxy with all virtual hosts |
+| `adguardhome.nix` | DNS server, ad blocking, blocklists, local DNS rewrites |
+| `cloudflared.nix` | Cloudflare Tunnel systemd service |
+| `fail2ban.nix` | Brute force protection |
+| `firewall.nix` | Firewall rules (ports 80, 53) |
+
+### Platform-level NixOS config: `hosts/nixos/`
 
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports configuration.nix |
-| `configuration.nix` | System config: SSH, Docker, user account, timezone, locale, firewall base |
+| `configuration.nix` | SSH (hardened, key-only), Docker, user account, timezone, locale, auto-updates, firewall base (port 22) |
 
-## Adding a new service
+### Secrets: `secrets/`
 
-### Step 1 — Add the NixOS service to `services.nix`
+| File | Purpose |
+|---|---|
+| `homeserver.yaml` | sops-encrypted secrets (age encryption, keys readable, values encrypted) |
 
-Add the service under the `services` block:
+### Config: repo root
 
-```nix
-services = {
-  # ... existing services ...
+| File | Purpose |
+|---|---|
+| `.sops.yaml` | Defines age public keys and encryption rules for sops |
 
-  newservice = {
-    enable = true;
-    # service-specific options
-  };
-};
-```
+## Security
 
-### Step 2 — Add a Caddy reverse proxy entry
+| Layer | Implementation |
+|---|---|
+| **SSH** | Key-only auth, password disabled, root login disabled (`hosts/nixos/configuration.nix`) |
+| **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour (`services/fail2ban.nix`) |
+| **Firewall** | Only ports 22 (SSH), 53 (DNS), 80 (HTTP) open |
+| **Service binding** | All services on `127.0.0.1` only, behind Caddy reverse proxy |
+| **Secrets** | sops-nix with age encryption, decrypted to tmpfs (`/run/secrets/`) |
+| **Vaultwarden** | Signups disabled, admin panel protected with sops-managed token |
+| **Network** | No open ports on router, all external traffic through Cloudflare Tunnel |
+| **TLS** | Cloudflare manages public HTTPS certificates |
+| **DNS** | AdGuard Home with DNS-over-HTTPS upstream |
+| **Rate limiting** | Cloudflare WAF rate limiting on `*.wagou.fr` |
+| **Auto-updates** | Daily rebuild at 4:00 AM from flake (`system.autoUpgrade`) |
 
-```nix
-caddy.virtualHosts."http://newservice.wagou.fr".extraConfig = ''
-  reverse_proxy 127.0.0.1:<SERVICE_PORT> {
-    header_up X-Real-IP {remote_host}
-  }
-'';
-```
+## Secrets management (sops-nix)
 
-### Step 3 — Add a DNS rewrite in AdGuard Home
+Secrets are encrypted with age in `secrets/homeserver.yaml` and committed to Git. They are decrypted at NixOS activation time on the Beelink using its SSH host key.
 
-Add to the `filtering.rewrites` list:
+### Current secrets
 
-```nix
-{
-  domain = "newservice.wagou.fr";
-  answer = serverIP;
-  enabled = true;
-}
-```
+| Secret key | Used by | Mechanism |
+|---|---|---|
+| `cloudflared-token` | `cloudflared.nix` | Read directly via `config.sops.secrets.cloudflared-token.path` |
+| `opencloud-admin-password` | `opencloud.nix` | Via sops template `opencloud.env` (`IDM_ADMIN_PASSWORD=<value>`) |
+| `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` (`ADMIN_TOKEN=<value>`) |
 
-IMPORTANT: The `enabled = true` field is required — AdGuard Home defaults to `false` if omitted.
+### Encryption keys
 
-### Step 4 — Open firewall ports (if needed)
+| Key | Purpose |
+|---|---|
+| Admin age key (`.sops.yaml`) | Public key for encrypting. Generated with `age-keygen`, standalone (not SSH-derived) |
+| Admin age private key (`~/.config/sops/age/keys.txt`) | Private key on Mac for decrypting/editing secrets |
+| Homeserver SSH host key (`/etc/ssh/ssh_host_ed25519_key`) | Private key on Beelink for decrypting at activation (converted to age internally by sops-nix) |
 
-If the service needs additional ports beyond 80 (HTTP) and 53 (DNS), add them:
-
-```nix
-networking.firewall = {
-  allowedTCPPorts = [ 80 53 <new-port> ];
-  allowedUDPPorts = [ 53 ];
-};
-```
-
-### Step 5 — Add a Cloudflare Tunnel route (for remote access)
-
-In the Cloudflare Zero Trust dashboard:
-1. Go to **Networks > Tunnels** > click your tunnel
-2. Under the **Route** tab, add a **Published Application**:
-   - Subdomain: `newservice`
-   - Domain: `wagou.fr`
-   - Type: `HTTP`
-   - URL: `localhost:80`
-
-### Step 6 — Deploy
+### Editing secrets
 
 ```bash
-# Push changes
-git add -A && git commit -m "feat: add newservice" && git push
-
-# Rebuild on the Beelink
-sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh
+# From the wagounix directory:
+sops secrets/homeserver.yaml
+# Or in Neovim (sops.nvim auto-decrypts):
+nvim secrets/homeserver.yaml
 ```
 
-## Secrets management
+### Adding a new secret
 
-The Cloudflare Tunnel token is stored at `/var/lib/cloudflared/tunnel-token` on the server. It is NOT in the Git repository.
+1. Edit `secrets/homeserver.yaml` with `sops` — add a new key-value pair
+2. Declare it in `services/secrets.nix` under `sops.secrets`
+3. If the service needs `KEY=VALUE` env format, create a `sops.templates` entry:
+   ```nix
+   sops.templates."myservice.env" = {
+     owner = "myservice";
+     content = "SECRET_KEY=${config.sops.placeholder.my-secret}\n";
+   };
+   ```
+4. Reference in the service config:
+   - Raw secret: `config.sops.secrets.<name>.path` (resolves to `/run/secrets/<name>`)
+   - Template: `config.sops.templates.<name>.path` (resolves to `/run/secrets/rendered/<name>`)
 
-### Placing the tunnel token (one-time)
+### Important notes about sops
 
-```bash
-ssh wagou@192.168.68.65
-sudo mkdir -p /var/lib/cloudflared
-echo -n 'TOKEN' | sudo tee /var/lib/cloudflared/tunnel-token > /dev/null
-sudo chmod 600 /var/lib/cloudflared/tunnel-token
-```
-
-The token is obtained from Cloudflare Zero Trust > Networks > Tunnels > your tunnel.
+- The admin age private key (`~/.config/sops/age/keys.txt`) is NOT in Git or chezmoi — it lives only on the Mac
+- If you lose it, generate a new key with `age-keygen`, update `.sops.yaml` with the new public key, and re-encrypt all secrets with `sops updatekeys secrets/homeserver.yaml`
+- The standalone age key was used instead of SSH-derived key because the SSH key is passphrase-protected (ssh-to-age can't handle passphrase-protected keys)
 
 ## Network configuration
 
 ### Router (TP-Link Deco)
 
-| Setting | Value | Notes |
-|---|---|---|
-| DHCP DNS server | `192.168.68.65` | All devices use the Beelink for DNS |
-| IPv6 | Disabled | Forces IPv4 DNS through the Beelink |
-| DHCP reservation | `192.168.68.65` for Beelink MAC | Ensures stable IP |
-
-### Why IPv6 is disabled
-
-macOS and iOS prefer IPv6 DNS servers. The Deco advertises itself as the IPv6 DNS server via Router Advertisement, and there's no way to change this on the Deco. Disabling IPv6 forces all devices to use the Beelink's IPv4 DNS.
-
-### Domain setup
-
-| Component | Provider | Notes |
-|---|---|---|
-| Domain registrar | OVH | `wagou.fr` |
-| DNS | Cloudflare | OVH nameservers changed to Cloudflare's |
-| TLS certificates | Cloudflare | Auto-provisioned for public access |
-| Email | OVH Zimbra | MX records in Cloudflare point to OVH mail servers |
+| Setting | Value |
+|---|---|
+| DHCP DNS server (IPv4) | `192.168.68.65` (Beelink) |
+| Internet Connection DNS (IPv4) | `192.168.68.65` (primary), `1.1.1.1` (fallback) |
+| Internet Connection DNS (IPv6) | Beelink's IPv6 (primary), `2606:4700:4700::1111` (fallback) |
+| IPv6 | Enabled |
+| DHCP reservation | Beelink MAC -> `192.168.68.65` |
 
 ### DNS behavior
 
 | Scenario | Resolution path |
 |---|---|
-| Any device queries `vault.wagou.fr` | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS everywhere, consistent) |
-| Local device queries `vault.home.lan` | AdGuard Home rewrite -> `192.168.68.65` (direct HTTP shortcut) |
-| Any device queries `ads.tracker.com` | AdGuard Home -> blocked (`0.0.0.0`) |
-| Any device queries `google.com` | AdGuard Home -> upstream DoH (Cloudflare/Google) -> Internet |
+| `*.wagou.fr` (all devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
+| `*.home.lan` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTP) |
+| Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
+| Everything else | AdGuard Home -> upstream DoH (Cloudflare/Google) -> Internet |
+
+### Domain setup
+
+| Component | Provider |
+|---|---|
+| Domain registrar | OVH (`wagou.fr`) |
+| DNS | Cloudflare (OVH nameservers pointed to Cloudflare) |
+| TLS certificates | Cloudflare (auto-provisioned) |
+| Email | OVH Zimbra (MX records in Cloudflare) |
 
 ## AdGuard Home configuration
 
-AdGuard Home runs with `mutableSettings = false` — the config is fully declarative and reset on every rebuild. Web UI changes are lost on restart.
+Runs with `mutableSettings = false` — fully declarative, config reset on every rebuild. Web UI changes are lost.
 
 ### Upstream DNS
-
-Uses DNS-over-HTTPS for encrypted upstream queries:
-- `https://dns.cloudflare.com/dns-query`
-- `https://dns.google/dns-query`
+- `https://dns.cloudflare.com/dns-query` (DNS-over-HTTPS)
+- `https://dns.google/dns-query` (DNS-over-HTTPS)
 
 ### Blocklists
 
-| ID | Name | URL |
+| Name | URL |
+|---|---|
+| AdGuard DNS filter | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt` |
+| Steven Black's Unified Hosts | `https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts` |
+| Malicious URL Blocklist | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt` |
+
+## Caddy virtual hosts
+
+Each service gets an `http://` virtual host. Caddy routes by hostname:
+
+| Virtual host | Proxies to | Special headers |
 |---|---|---|
-| 1 | AdGuard DNS filter | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt` |
-| 2 | Steven Black's Unified Hosts | `https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts` |
-| 3 | Malicious URL Blocklist | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt` |
+| `http://vault.wagou.fr` | `127.0.0.1:8222` | `X-Real-IP` (client IP for audit logs) |
+| `http://pixel.wagou.fr` | `127.0.0.1:2283` | - |
+| `http://cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
+
+OpenCloud requires the `X-Forwarded-Proto: https` header because its configured URL is `https://cloud.wagou.fr` and it would otherwise redirect HTTP to HTTPS in a loop.
+
+## SSH access
+
+SSH is hardened — key-only authentication, no passwords, no root login.
+
+### SSH config on Mac (`~/.ssh/config`, managed by chezmoi)
+
+```
+Host homeserver
+    HostName 192.168.68.65
+    User wagou
+    IdentityFile ~/.ssh/id_ed25519_homeserver
+    AddKeysToAgent yes
+    UseKeychain yes
+```
+
+Connect with: `ssh homeserver`
+
+### Authorized key
+
+The homeserver SSH public key is declared in `hosts/nixos/configuration.nix` under `users.users.wagou.openssh.authorizedKeys.keys`. This is the `id_ed25519_homeserver` key (separate from the SAP work SSH key for identity separation).
+
+## Adding a new service
+
+### Step 1 — Create the service file
+
+Create `services/<newservice>.nix`:
+
+```nix
+_: {
+  services.newservice = {
+    enable = true;
+    # service-specific options
+  };
+}
+```
+
+### Step 2 — Import it
+
+Add `./newservice.nix` to the imports in `services/default.nix`.
+
+### Step 3 — Add Caddy virtual host
+
+In `services/caddy.nix`, add to the `virtualHosts` block:
+
+```nix
+"http://newservice.wagou.fr".extraConfig = ''
+  reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
+'';
+```
+
+If the service needs `X-Forwarded-Proto` (because its URL is configured as https), add `header_up X-Forwarded-Proto https`.
+
+### Step 4 — Add local DNS shortcut
+
+In `services/adguardhome.nix`, add to the `rewrites` list:
+
+```nix
+{ domain = "newservice.home.lan"; answer = serverIP; enabled = true; }
+```
+
+IMPORTANT: `enabled = true` is required — AdGuard Home defaults to `false`.
+
+Do NOT add a rewrite for `newservice.wagou.fr` — let it resolve via Cloudflare for consistent HTTPS.
+
+### Step 5 — Add secrets (if needed)
+
+In `services/secrets.nix`:
+
+```nix
+sops.secrets.newservice-secret = { mode = "0400"; };
+
+# If the service needs KEY=VALUE env format:
+sops.templates."newservice.env" = {
+  owner = "newservice";
+  content = "SECRET=${config.sops.placeholder.newservice-secret}\n";
+};
+```
+
+Then edit `secrets/homeserver.yaml` with `sops` to add the secret value.
+
+### Step 6 — Add Cloudflare Tunnel route
+
+In the Cloudflare Zero Trust dashboard:
+1. Go to **Networks > Tunnels** > click your tunnel
+2. Under **Route**, add a **Published Application**:
+   - Subdomain: `newservice`
+   - Domain: `wagou.fr`
+   - Type: `HTTP`
+   - URL: `localhost:80`
+
+### Step 7 — Deploy
+
+```bash
+git add -A && git commit -m "feat: add newservice" && git push
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh
+```
 
 ## Troubleshooting
 
-### "Internet not available" notification on macOS
+### OpenCloud "Permanent Redirect" loop
 
-This is a false alarm caused by disabling IPv6 on the Deco. macOS's connectivity check may partially fail without IPv6. Internet works fine over IPv4. If AdGuard Home is blocking `captive.apple.com`, add it to the allowlist.
+OpenCloud redirects HTTP to HTTPS because its URL is configured as `https://cloud.wagou.fr`. The fix is the `X-Forwarded-Proto: https` header in Caddy's reverse proxy for OpenCloud.
+
+### OpenCloud fails to start ("Failed to load environment files")
+
+sops-nix decrypts secrets during the NixOS activation script (before services start). If OpenCloud still can't find its environment file, check:
+1. `sudo ls -la /run/secrets/rendered/opencloud.env` — should exist
+2. `journalctl -u opencloud --no-pager | tail -20` — check for specific error
+3. sops-nix does NOT use a systemd service — do NOT add `after = [ "sops-nix.service" ]`
 
 ### Ghostty terminal error when SSHing
 
-If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` package is already installed on the server. If it happens again, run `export TERM=xterm-256color` as a workaround.
+If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` package is installed on the server. If it happens again, run `export TERM=xterm-256color` as a workaround.
 
 ### Cloudflare Tunnel not connecting
 
-1. Check the service: `systemctl status cloudflared-tunnel`
-2. Check logs: `journalctl -u cloudflared-tunnel --no-pager -f`
-3. Verify the token file exists: `ls -la /var/lib/cloudflared/tunnel-token`
-4. Common errors:
-   - "Provided Tunnel token is not valid" — token file has extra whitespace or newline. Recreate with `echo -n`
-   - Service crash-looping — check logs for the specific error
+1. `systemctl status cloudflared-tunnel`
+2. `journalctl -u cloudflared-tunnel --no-pager -f`
+3. Common error: "Provided Tunnel token is not valid" — check sops secret is set correctly
 
 ### 502 Bad Gateway from Cloudflare
 
-The tunnel is connected but the local service isn't responding correctly. Check:
+Tunnel connected but service not responding:
 1. Is Caddy running? `systemctl status caddy`
-2. Is the target service running? `systemctl status vaultwarden`
-3. Test locally: `curl -H "Host: vault.wagou.fr" http://localhost:80`
-4. Ensure the Cloudflare Tunnel route uses `HTTP` (not `HTTPS`) with URL `localhost:80`
+2. Is the service running? `systemctl status <service>`
+3. Test locally: `curl -H "Host: service.wagou.fr" http://localhost:80`
+4. Ensure tunnel route uses `HTTP` (not HTTPS) with `localhost:80`
 
 ### DNS not resolving locally
 
-1. Check your Mac's DNS: `scutil --dns | grep nameserver`
-2. Should show `192.168.68.65`
-3. If not, force DHCP renewal: `sudo ipconfig set en0 DHCP`
-4. Test DNS directly: `nslookup vault.wagou.fr 192.168.68.65`
-5. Do NOT use `.local` domains — macOS intercepts them for mDNS (Bonjour). Use `.lan`, `.home.arpa`, or a real domain.
+1. `scutil --dns | grep nameserver` — should show `192.168.68.65`
+2. Force DHCP renewal: `sudo ipconfig set en0 DHCP`
+3. Test directly: `nslookup vault.wagou.fr 192.168.68.65`
+4. Do NOT use `.local` domains — macOS intercepts them for mDNS. Use `.home.lan` or a real domain.
+
+### "Internet not available" on macOS
+
+If IPv6 is enabled on the Deco and the Beelink's IPv6 DNS is configured, this should not happen. If it does, check if `captive.apple.com` is being blocked in AdGuard Home query log. If so, add an allowlist rule.
+
+### Can't decrypt sops secrets (on Mac)
+
+Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. If not, regenerate with `age-keygen -o ~/.config/sops/age/keys.txt` and update the public key in `.sops.yaml`, then re-encrypt with `sops updatekeys secrets/homeserver.yaml`.
 
 ## Key commands
 
 | Action | Command |
 |---|---|
+| SSH into server | `ssh homeserver` |
 | Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh` |
-| SSH into server | `ssh wagou@192.168.68.65` |
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
-| AdGuard Home dashboard | `http://192.168.68.65:3000` |
+| Stop/start a service | `sudo systemctl stop/start <service>` |
+| Edit secrets | `sops secrets/homeserver.yaml` |
+| Test build | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
 
 ## Important rules
 
-- All service config goes in `hosts/nixos/homeserver/services.nix` — keep everything in one file
-- Secrets (tokens, API keys) go in files on the server, NOT in the Git repo
-- AdGuard Home DNS rewrites need `enabled = true` — it defaults to `false`
+- Each service gets its own file in `services/` — one service per file
+- Secrets go in `secrets/homeserver.yaml` (encrypted with sops) — NEVER as plain files on the server
+- AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
 - Caddy serves HTTP only — Cloudflare handles public HTTPS
 - Cloudflare Tunnel routes must use `HTTP` type with `localhost:80` — not HTTPS
+- Do NOT add DNS rewrites for `*.wagou.fr` — let them resolve via Cloudflare for consistent HTTPS
+- Only add `.home.lan` rewrites for direct local HTTP shortcuts
 - `system.stateVersion = "25.05"` — never change this
 - `hardware.nix` was generated by `nixos-generate-config` — only regenerate if hardware changes
-- Do NOT add AdGuard Home DNS rewrites for `*.wagou.fr` domains — let them resolve via Cloudflare so HTTPS works consistently everywhere. Only use `.home.lan` rewrites for direct local HTTP shortcuts.
 - Always test builds before pushing: `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath`
+- SSH uses a dedicated key (`id_ed25519_homeserver`), separate from work SSH key

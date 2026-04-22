@@ -6,27 +6,32 @@ NixOS on a Beelink EQI13 (x86_64-linux, 32 GB RAM, 512 GB NVMe) running self-hos
 
 ```
 Remote (phone/laptop outside home)
-  ── https://vault.wagou.fr ──▶ Cloudflare (valid TLS) ──▶ Tunnel (encrypted)
-                                                                │
-Local (home network)                                            │
-  ── http://vault.wagou.fr ──▶ AdGuard Home (DNS) ─────────────┤
-                                                                ▼
-                                                          Caddy (HTTP :80)
-                                                                │
-                                                          Vaultwarden (:8222)
+  ── https://*.wagou.fr ──▶ Cloudflare (valid TLS) ──▶ Tunnel (encrypted)
+                                                             │
+Local (home network)                                         │
+  ── http://*.home.lan ──▶ AdGuard Home (DNS) ───────────────┤
+                                                             ▼
+                                                       Caddy (HTTP :80)
+                                                             │
+                                              ┌──────────────┼──────────────┐
+                                              ▼              ▼              ▼
+                                        Vaultwarden    OpenCloud        Immich
+                                         (:8222)        (:9200)        (:2283)
 ```
 
-All devices on the network use the Beelink as their DNS server. AdGuard Home resolves service hostnames locally and blocks ads network-wide. Cloudflare Tunnel provides secure remote access without opening any ports on the router.
+All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere). Local `.home.lan` shortcuts resolve directly to the Beelink via AdGuard Home. Caddy serves HTTP only — Cloudflare handles public TLS.
 
 ## Services
 
-| Service | Purpose | Access | Port |
-|---|---|---|---|
-| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` (everywhere), `http://vault.home.lan` (local shortcut) | 8222 (localhost) |
-| **Caddy** | Reverse proxy | Routes traffic to services | 80 |
-| **AdGuard Home** | DNS server + ad blocker | `http://192.168.68.65:3000` (local only) | 53 (DNS), 3000 (web UI) |
-| **Cloudflare Tunnel** | Secure remote access | Outbound connection to Cloudflare | None (outbound only) |
-| **Docker** | Container runtime (for future services) | - | - |
+| Service | Purpose | Remote URL | Local shortcut | Port |
+|---|---|---|---|---|
+| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` | `http://vault.home.lan` | 8222 |
+| **OpenCloud** | File sync & sharing (ownCloud-compatible) | `https://cloud.wagou.fr` | `http://cloud.home.lan` | 9200 |
+| **Immich** | Photo management (Google Photos replacement) | `https://pixel.wagou.fr` | `http://pixel.home.lan` | 2283 |
+| **Caddy** | Reverse proxy | - | - | 80 |
+| **AdGuard Home** | DNS server + ad blocker | - | `http://192.168.68.65:3000` | 53, 3000 |
+| **Cloudflare Tunnel** | Secure remote access | - | - | Outbound only |
+| **Fail2ban** | Brute force protection | - | - | - |
 
 ## Hardware
 
@@ -47,80 +52,135 @@ All devices on the network use the Beelink as their DNS server. AdGuard Home res
 | `nvme0n1p2` | Swap | 8 GB | swap |
 | `nvme0n1p3` | ext4 | ~457 GB | `/` |
 
-## Network setup
+## Files
 
-The Beelink serves as the DNS server for the entire home network via AdGuard Home.
+```
+hosts/nixos/homeserver/
+├── default.nix              # Imports hardware.nix and services/
+├── variables.nix            # Host variables (username, homeDir, hostname)
+├── hardware.nix             # Auto-generated hardware config (boot, filesystems, kernel modules)
+└── services/
+    ├── default.nix          # Imports all service modules + system packages
+    ├── secrets.nix          # sops-nix secret declarations and templates
+    ├── vaultwarden.nix      # Password manager
+    ├── opencloud.nix        # File sync & sharing
+    ├── immich.nix           # Photo management
+    ├── caddy.nix            # Reverse proxy (all virtual hosts)
+    ├── adguardhome.nix      # DNS server + ad blocker
+    ├── cloudflared.nix      # Cloudflare Tunnel
+    ├── fail2ban.nix         # Brute force protection
+    └── firewall.nix         # Firewall rules
+```
+
+Platform-level config at `hosts/nixos/`:
+
+| File | Purpose |
+|---|---|
+| `configuration.nix` | SSH (hardened), Docker, user account, timezone, auto-updates, firewall base |
+
+## Security
+
+| Layer | Protection |
+|---|---|
+| **Network** | No open ports on router, all traffic through Cloudflare Tunnel |
+| **TLS** | Cloudflare handles HTTPS with valid certificates |
+| **SSH** | Key-only authentication, password auth disabled, root login disabled |
+| **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour |
+| **Firewall** | Only ports 80 (HTTP), 53 (DNS), 22 (SSH) open |
+| **DNS** | AdGuard Home with DNS-over-HTTPS upstream (Cloudflare + Google) |
+| **Secrets** | sops-nix with age encryption, decrypted to RAM only (`/run/secrets/`) |
+| **Vaultwarden** | Signups disabled, admin panel protected with token |
+| **Rate limiting** | Cloudflare WAF rate limiting on all `*.wagou.fr` |
+| **Auto-updates** | Daily rebuild at 4:00 AM from flake |
+| **Service binding** | All services on `127.0.0.1` (localhost only), behind Caddy |
+
+## Secrets (sops-nix)
+
+Secrets are encrypted with age in `secrets/homeserver.yaml` and decrypted at activation time on the Beelink.
+
+| Secret | Used by | Runtime path |
+|---|---|---|
+| `cloudflared-token` | Cloudflare Tunnel | `/run/secrets/cloudflared-token` |
+| `opencloud-admin-password` | OpenCloud (via sops template) | `/run/secrets/rendered/opencloud.env` |
+| `vaultwarden-admin-token` | Vaultwarden (via sops template) | `/run/secrets/rendered/vaultwarden.env` |
+
+### Editing secrets
+
+```bash
+sops secrets/homeserver.yaml
+```
+
+Or in Neovim (sops.nvim auto-decrypts):
+
+```bash
+nvim secrets/homeserver.yaml
+```
+
+### Adding a new secret
+
+1. Edit `secrets/homeserver.yaml` with `sops` — add a new key-value pair
+2. Declare it in `services/secrets.nix` under `sops.secrets`
+3. If it needs `KEY=VALUE` format, create a `sops.templates` entry
+4. Reference `config.sops.secrets.<name>.path` or `config.sops.templates.<name>.path` in the service config
+
+### Encryption keys
+
+| Key | Purpose | Location |
+|---|---|---|
+| Admin age key (public) | Encrypt secrets from your Mac | `.sops.yaml` |
+| Admin age key (private) | Decrypt secrets for editing | `~/.config/sops/age/keys.txt` (Mac only) |
+| Homeserver SSH host key | Decrypt secrets at activation | `/etc/ssh/ssh_host_ed25519_key` (Beelink) |
+
+## Network setup
 
 ### Router configuration (TP-Link Deco)
 
-- **DHCP DNS server**: `192.168.68.65` (the Beelink)
-- **IPv6**: Disabled (forces all devices to use the Beelink for IPv4 DNS)
-- **DHCP reservation**: Set for the Beelink to always get `192.168.68.65`
+| Setting | Value |
+|---|---|
+| DHCP DNS server (IPv4) | `192.168.68.65` (Beelink) |
+| Internet Connection DNS (IPv4) | `192.168.68.65` (primary), `1.1.1.1` (fallback) |
+| Internet Connection DNS (IPv6) | Beelink's IPv6 (primary), `2606:4700:4700::1111` (fallback) |
+| IPv6 | Enabled |
+| DHCP reservation | Beelink MAC -> `192.168.68.65` |
 
 ### DNS resolution flow
 
 | Query | Resolution |
 |---|---|
-| `vault.wagou.fr` (local & remote) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
-| `vault.home.lan` (local shortcut) | AdGuard Home rewrite -> `192.168.68.65` (direct) |
-| `ads.tracker.com` | AdGuard Home -> blocked (`0.0.0.0`) |
-| `google.com` | AdGuard Home -> Cloudflare/Google DoH -> Internet |
+| `*.wagou.fr` (all devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `*.home.lan` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct) |
+| Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
+| Everything else | AdGuard Home -> Cloudflare/Google DoH -> Internet |
 
 ### Domain
 
-- **Registrar**: OVH (`wagou.fr`)
-- **DNS**: Cloudflare (nameservers pointed from OVH to Cloudflare)
-- **TLS**: Cloudflare manages public HTTPS certificates
-- **Tunnel**: Cloudflare Zero Trust tunnel for remote access without open ports
-
-## Files
-
-```
-hosts/nixos/homeserver/
-├── default.nix      # Imports hardware.nix and services.nix
-├── variables.nix    # Host variables (username, homeDir, hostname)
-├── hardware.nix     # Auto-generated hardware config (boot, filesystems, kernel modules)
-└── services.nix     # All services (Vaultwarden, Caddy, AdGuard Home, Cloudflare Tunnel)
-```
-
-## Secrets
-
-The Cloudflare Tunnel token is stored on the server at `/var/lib/cloudflared/tunnel-token`. It is **not** in the Git repository.
-
-### Placing the tunnel token (one-time setup)
-
-```bash
-ssh wagou@192.168.68.65
-sudo mkdir -p /var/lib/cloudflared
-echo -n 'YOUR_TUNNEL_TOKEN' | sudo tee /var/lib/cloudflared/tunnel-token > /dev/null
-sudo chmod 600 /var/lib/cloudflared/tunnel-token
-```
-
-The token is obtained from the Cloudflare Zero Trust dashboard under Networks > Tunnels.
+| Component | Provider |
+|---|---|
+| Registrar | OVH (`wagou.fr`) |
+| DNS | Cloudflare (nameservers pointed from OVH) |
+| TLS certificates | Cloudflare (auto-provisioned) |
+| Email | OVH Zimbra (MX records in Cloudflare) |
+| Tunnel | Cloudflare Zero Trust |
 
 ## Adding a new service
 
-1. Add the NixOS service config to `services.nix` under the `services` block
-2. Add a Caddy virtual host for the new service:
+1. **Create** `services/<newservice>.nix` with the NixOS service config
+2. **Import** it in `services/default.nix`
+3. **Add Caddy virtual host** in `services/caddy.nix`:
    ```nix
-   caddy.virtualHosts."http://newservice.wagou.fr".extraConfig = ''
-     reverse_proxy 127.0.0.1:<port> {
-       header_up X-Real-IP {remote_host}
-     }
+   "http://newservice.wagou.fr".extraConfig = ''
+     reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
    '';
    ```
-3. Add a DNS rewrite in AdGuard Home settings:
+4. **Add DNS rewrite** in `services/adguardhome.nix` (only for `.home.lan` shortcut):
    ```nix
-   { domain = "newservice.wagou.fr"; answer = serverIP; enabled = true; }
+   { domain = "newservice.home.lan"; answer = serverIP; enabled = true; }
    ```
-4. Add a public hostname in the Cloudflare Tunnel dashboard (Zero Trust > Networks > Tunnels > Configure):
-   - Subdomain: `newservice`
-   - Domain: `wagou.fr`
-   - Type: `HTTP`
-   - URL: `localhost:80`
-5. Open any additional firewall ports if needed
-6. Push and rebuild:
+5. **Add secrets** if needed in `services/secrets.nix`
+6. **Add Cloudflare Tunnel route** in dashboard: subdomain `newservice`, domain `wagou.fr`, type `HTTP`, URL `localhost:80`
+7. **Push and rebuild**:
    ```bash
+   git add -A && git commit -m "feat: add newservice" && git push
    sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh
    ```
 
@@ -128,21 +188,23 @@ The token is obtained from the Cloudflare Zero Trust dashboard under Networks > 
 
 | Action | Command |
 |---|---|
+| SSH into server | `ssh homeserver` |
 | Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh` |
-| Rebuild locally | `sudo nixos-rebuild switch --flake /path/to/wagounix#homeserver` |
-| SSH into server | `ssh wagou@192.168.68.65` |
 | Check service status | `systemctl status <service>` |
-| Check tunnel status | `systemctl status cloudflared-tunnel` |
-| View tunnel logs | `journalctl -u cloudflared-tunnel --no-pager -f` |
-| View Caddy logs | `journalctl -u caddy --no-pager -f` |
+| View service logs | `journalctl -u <service> --no-pager -f` |
+| Stop/start a service | `sudo systemctl stop/start <service>` |
+| Edit secrets | `sops secrets/homeserver.yaml` |
+| Test build locally | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
 | AdGuard Home dashboard | `http://192.168.68.65:3000` |
 | Vaultwarden | `https://vault.wagou.fr` |
+| OpenCloud | `https://cloud.wagou.fr` |
+| Immich | `https://pixel.wagou.fr` |
 
 ## Planned services
 
 | Service | Purpose | Status |
 |---|---|---|
-| Nextcloud | Private cloud / file sync | Planned |
-| Jellyfin | Media server | Planned |
-| Home Assistant | Home automation (Docker) | Planned |
+| Home Assistant | Home automation (Docker via `oci-containers`) | Planned |
 | Ollama | Local LLM inference | Planned |
+| Backups | borgbackup/restic to external drive or cloud | Planned |
+| Monitoring | Uptime Kuma or similar | Planned |
