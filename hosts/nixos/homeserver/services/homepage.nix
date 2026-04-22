@@ -90,13 +90,8 @@ in
         content: "";
         position: fixed;
         inset: 0;
-        background: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 2px,
-        rgba(0, 0, 0, 0.03) 2px,
-        rgba(0, 0, 0, 0.03) 4px
-        );
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
         pointer-events: none;
         z-index: 9999;
       }
