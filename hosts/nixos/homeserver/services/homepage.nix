@@ -31,9 +31,9 @@ in
       cardBlur = "sm";
       background = {
         image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
-        blur = "sm";
-        brightness = 25;
-        opacity = 30;
+        blur = "md";
+        brightness = 50;
+        opacity = 50;
       };
       layout = {
         Services = {
@@ -225,12 +225,6 @@ in
           cpu = true;
           memory = true;
           disk = "/";
-        };
-      }
-      {
-        search = {
-          provider = "duckduckgo";
-          target = "_blank";
         };
       }
       {
