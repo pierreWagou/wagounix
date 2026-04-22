@@ -52,6 +52,11 @@ in
             answer = serverIP;
             enabled = true;
           }
+          {
+            domain = "home.home.lan";
+            answer = serverIP;
+            enabled = true;
+          }
         ];
       };
 

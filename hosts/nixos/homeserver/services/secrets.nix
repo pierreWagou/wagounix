@@ -23,16 +23,25 @@
       root-password-hash = {
         neededForUsers = true;
       };
+      immich-api-key = {
+        mode = "0400";
+      };
     };
 
-    templates."opencloud.env" = {
-      owner = "opencloud";
-      content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
-    };
+    templates = {
+      "opencloud.env" = {
+        owner = "opencloud";
+        content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
+      };
 
-    templates."vaultwarden.env" = {
-      owner = "vaultwarden";
-      content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
+      "vaultwarden.env" = {
+        owner = "vaultwarden";
+        content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
+      };
+
+      "homepage.env" = {
+        content = "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}\n";
+      };
     };
   };
 }
