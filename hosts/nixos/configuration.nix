@@ -36,5 +36,8 @@
       "wheel"
       "docker"
     ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAp8p16DEVrTkM0+e9Ch4nmzIgBky2+DVEGwimxYx/FV wagou@homeserver"
+    ];
   };
 }
