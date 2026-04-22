@@ -1,5 +1,8 @@
 { config, host, ... }:
 
+let
+  homepageImages = ./homepage-images;
+in
 {
   services.caddy = {
     enable = true;
@@ -22,11 +25,23 @@
       '';
 
       "http://${host.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        handle_path /bg/* {
+          file_server
+          root * ${homepageImages}
+        }
+        handle {
+          reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        }
       '';
 
       "http://home.${host.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        handle_path /bg/* {
+          file_server
+          root * ${homepageImages}
+        }
+        handle {
+          reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        }
       '';
     };
   };
