@@ -15,7 +15,7 @@ in
       users = [
         {
           name = "admin";
-          password = "$2b$10$QaVAawDTM5J2KdD16q.pN.GGQ77Oi9a7aiXfY2orOQQF6gnX6RbNe";
+          password = "$2b$10$OMiNaJvds.A1vFeMbPDfxejabkoFDbmiLrwSQQQksCFj.ihIwAWpq";
         }
       ];
 
