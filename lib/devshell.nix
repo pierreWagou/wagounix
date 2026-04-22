@@ -18,7 +18,10 @@ nixpkgs.lib.genAttrs systems (
   {
     default = pkgs.mkShell {
       inherit shellHook;
-      buildInputs = enabledPackages;
+      buildInputs = enabledPackages ++ [
+        pkgs.sops
+        pkgs.ssh-to-age
+      ];
     };
   }
 )

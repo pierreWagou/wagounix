@@ -19,6 +19,10 @@
     nix-homebrew = {
       url = "github:zhaofengli/nix-homebrew";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
@@ -119,6 +123,7 @@
         homeserver = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
+            inputs.sops-nix.nixosModules.sops
             ./hosts/common
             ./hosts/nixos
             ./hosts/nixos/homeserver

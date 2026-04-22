@@ -1,4 +1,6 @@
-_: {
+{ config, ... }:
+
+{
   services.opencloud = {
     enable = true;
     url = "https://cloud.wagou.fr";
@@ -10,8 +12,7 @@ _: {
       PROXY_TLS = "false";
     };
 
-    # Secrets stored at /var/lib/opencloud-secrets/opencloud.env on the server
-    environmentFile = "/var/lib/opencloud-secrets/opencloud.env";
+    environmentFile = config.sops.templates."opencloud.env".path;
 
     settings = {
       proxy.enable_basic_auth = true;

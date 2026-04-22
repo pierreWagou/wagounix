@@ -7,6 +7,7 @@
   ];
 
   imports = [
+    ./secrets.nix
     ./vaultwarden.nix
     ./caddy.nix
     ./adguardhome.nix
