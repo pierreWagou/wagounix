@@ -16,9 +16,7 @@
 
     templates."opencloud.env" = {
       owner = "opencloud";
-      content = ''
-        IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}
-      '';
+      content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
     };
   };
 }
