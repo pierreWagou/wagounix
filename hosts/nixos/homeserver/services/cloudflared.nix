@@ -64,7 +64,7 @@ in
       configFile
     ];
     serviceConfig = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --config ${configFile}";
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared --config ${configFile} tunnel --no-autoupdate run";
       Restart = "on-failure";
       RestartSec = 5;
       User = "cloudflared";
