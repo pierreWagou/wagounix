@@ -1,9 +1,45 @@
 {
   config,
   pkgs,
+  host,
   ...
 }:
 
+let
+  tunnelId = host.cloudflareTunnelId;
+
+  configFile = pkgs.writeText "cloudflared-config.yml" ''
+    tunnel: ${tunnelId}
+    credentials-file: ${config.sops.secrets.cloudflare-credentials.path}
+
+    ingress:
+      - hostname: vault.${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - hostname: pixel.${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - hostname: cloud.${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - hostname: home.${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - hostname: ${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - hostname: guard.${host.domain}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${host.domain}
+      - service: http_status:404
+  '';
+in
 {
   users.users.cloudflared = {
     isSystemUser = true;
@@ -24,10 +60,11 @@
       "multi-user.target"
     ];
     restartTriggers = [
-      config.sops.secrets.cloudflared-token.path
+      config.sops.secrets.cloudflare-credentials.path
+      configFile
     ];
     serviceConfig = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --token-file ${config.sops.secrets.cloudflared-token.path}";
+      ExecStart = "${pkgs.cloudflared}/bin/cloudflared tunnel --no-autoupdate run --config ${configFile}";
       Restart = "on-failure";
       RestartSec = 5;
       User = "cloudflared";

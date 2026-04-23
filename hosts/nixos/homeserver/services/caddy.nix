@@ -68,12 +68,6 @@ in
   services.caddy = {
     enable = true;
 
-    globalConfig = ''
-      servers {
-        protocols h1 h2
-      }
-    '';
-
     virtualHosts = {
       "vault.${host.domain}" = {
         useACMEHost = host.domain;
