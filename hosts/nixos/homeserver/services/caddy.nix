@@ -81,10 +81,6 @@ in
         useACMEHost = host.domain;
         extraConfig = cloudConfig;
       };
-      "${host.domain}" = {
-        useACMEHost = host.domain;
-        extraConfig = homepageConfig;
-      };
       "home.${host.domain}" = {
         useACMEHost = host.domain;
         extraConfig = homepageConfig;
