@@ -7,9 +7,9 @@ in
   services.adguardhome = {
     enable = true;
     mutableSettings = false;
-    host = "0.0.0.0";
+    host = "127.0.0.1";
     port = 3000;
-    openFirewall = true;
+    openFirewall = false;
 
     settings = {
       users = [
@@ -66,6 +66,11 @@ in
           }
           {
             inherit domain;
+            answer = serverIP;
+            enabled = true;
+          }
+          {
+            domain = "guard.${domain}";
             answer = serverIP;
             enabled = true;
           }

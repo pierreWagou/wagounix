@@ -6,7 +6,12 @@
 
 let
   homepageImages = ./homepage-images;
+
+  # HSTS header — tells browsers to always use HTTPS for *.wagou.fr
+  hsts = ''header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"'';
+
   homepageConfig = ''
+    ${hsts}
     handle_path /bg/* {
       file_server
       root * ${homepageImages}
@@ -17,19 +22,27 @@ let
   '';
 
   vaultConfig = ''
+    ${hsts}
     reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
       header_up X-Real-IP {remote_host}
     }
   '';
 
   pixelConfig = ''
+    ${hsts}
     reverse_proxy 127.0.0.1:${toString config.services.immich.port}
   '';
 
   cloudConfig = ''
+    ${hsts}
     reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
       header_up X-Forwarded-Proto https
     }
+  '';
+
+  guardConfig = ''
+    ${hsts}
+    reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
   '';
 in
 {
@@ -55,6 +68,12 @@ in
   services.caddy = {
     enable = true;
 
+    globalConfig = ''
+      servers {
+        protocols h1 h2
+      }
+    '';
+
     virtualHosts = {
       "vault.${host.domain}" = {
         useACMEHost = host.domain;
@@ -75,6 +94,10 @@ in
       "home.${host.domain}" = {
         useACMEHost = host.domain;
         extraConfig = homepageConfig;
+      };
+      "guard.${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = guardConfig;
       };
     };
   };
