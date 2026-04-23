@@ -29,7 +29,10 @@
       adguard-password = {
         mode = "0400";
       };
-      cloudflare-api-token = {
+      cloudflare-tunnel-token = {
+        mode = "0400";
+      };
+      cloudflare-dns-token = {
         mode = "0400";
       };
     };
@@ -50,8 +53,12 @@
           "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
           "HOMEPAGE_VAR_ADGUARD_USER=admin"
           "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
-          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-api-token}"
+          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
         ];
+      };
+
+      "caddy.env" = {
+        content = "CLOUDFLARE_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
       };
     };
   };
