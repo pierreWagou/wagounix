@@ -1,7 +1,7 @@
 { host, ... }:
 
 let
-  inherit (host) serverIP;
+  inherit (host) serverIP domain;
 in
 {
   services.adguardhome = {
@@ -45,22 +45,27 @@ in
 
         rewrites = [
           {
-            domain = "vault.home.lan";
+            domain = "vault.${domain}";
             answer = serverIP;
             enabled = true;
           }
           {
-            domain = "pixel.home.lan";
+            domain = "pixel.${domain}";
             answer = serverIP;
             enabled = true;
           }
           {
-            domain = "cloud.home.lan";
+            domain = "cloud.${domain}";
             answer = serverIP;
             enabled = true;
           }
           {
-            domain = "home.home.lan";
+            domain = "home.${domain}";
+            answer = serverIP;
+            enabled = true;
+          }
+          {
+            inherit domain;
             answer = serverIP;
             enabled = true;
           }

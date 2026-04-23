@@ -53,7 +53,6 @@
     let
       systems = [
         "aarch64-darwin"
-        "x86_64-darwin"
         "x86_64-linux"
       ];
     in
@@ -77,20 +76,6 @@
           };
         };
 
-        wagou-old = nix-darwin.lib.darwinSystem {
-          system = "x86_64-darwin";
-          modules = [
-            ./hosts/common
-            ./hosts/darwin
-            ./hosts/darwin/personal
-            ./hosts/darwin/personal/wagou-old
-          ];
-          specialArgs = {
-            inherit inputs;
-            host = import ./hosts/darwin/personal/wagou-old/variables.nix;
-          };
-        };
-
         wagou = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
@@ -105,18 +90,18 @@
           };
         };
 
-        # pro — disabled (host files kept in hosts/darwin/work/pro/)
-        # pro = nix-darwin.lib.darwinSystem {
+        # alan — disabled (host files kept in hosts/darwin/work/alan/)
+        # alan = nix-darwin.lib.darwinSystem {
         #   system = "aarch64-darwin";
         #   modules = [
         #     ./hosts/common
         #     ./hosts/darwin
         #     ./hosts/darwin/work
-        #     ./hosts/darwin/work/pro
+        #     ./hosts/darwin/work/alan
         #   ];
         #   specialArgs = {
         #     inherit inputs;
-        #     host = import ./hosts/darwin/work/pro/variables.nix;
+        #     host = import ./hosts/darwin/work/alan/variables.nix;
         #   };
         # };
 

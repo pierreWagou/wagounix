@@ -1,5 +1,8 @@
 _: {
   networking.firewall = {
-    allowedTCPPorts = [ 80 ];
+    allowedTCPPorts = [
+      22
+      80
+    ];
   };
 }

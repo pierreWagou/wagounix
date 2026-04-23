@@ -266,12 +266,12 @@ in
           {
             "AdGuard Home" = {
               icon = "adguard-home.svg";
-              href = "http://${host.serverIP}:3000";
+              href = "http://${host.serverIP}:${toString config.services.adguardhome.port}";
               description = "DNS & ad blocking";
-              siteMonitor = "http://localhost:3000";
+              siteMonitor = "http://localhost:${toString config.services.adguardhome.port}";
               widget = {
                 type = "adguard";
-                url = "http://localhost:3000";
+                url = "http://localhost:${toString config.services.adguardhome.port}";
                 username = "{{HOMEPAGE_VAR_ADGUARD_USER}}";
                 password = "{{HOMEPAGE_VAR_ADGUARD_PASS}}";
               };
@@ -283,8 +283,8 @@ in
               description = "Secure remote access";
               widget = {
                 type = "cloudflared";
-                accountid = "65b2dca00576549f065820b1cd5c76c9";
-                tunnelid = "5b461ccf-54c8-4247-9a5c-f738da35d1ba";
+                accountid = host.cloudflareAccountId;
+                tunnelid = host.cloudflareTunnelId;
                 key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
               };
             };

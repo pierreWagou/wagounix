@@ -35,8 +35,8 @@ Each configuration is assembled from layered modules — common packages are sha
  ├─────────────┬────────────┼──────────────────────────────┤
  │  personal/  │   work/    │       homeserver/            │  layer / host
  ├───────┬─────┼──────┬─────┤                              │
- │ wagou │ old │ sap  │ pro │                              │
- └───────┴─────┴──────┴─────┴──────────────────────────────┘
+  │ wagou │ sap  │alan │                              │
+  └───────┴──────┴─────┴──────────────────────────────┘
 ```
 
 ## Structure
@@ -47,8 +47,8 @@ wagounix/
 └── hosts/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
-    │   ├── personal/  # Personal Macs (wagou, wagou-old)
-    │   └── work/      # Work Macs (sap, pro)
+    │   ├── personal/  # Personal Macs (wagou)
+    │   └── work/      # Work Macs (sap, alan)
     └── nixos/         # NixOS — platform config, services
         └── homeserver/
 ```
@@ -98,9 +98,6 @@ wagounix/
     │   │   │   ├── variables.nix
     │   │   │   ├── packages.nix
     │   │   │   └── homebrew.nix
-    │   │   └── wagou-old/
-    │   │       ├── default.nix
-    │   │       └── variables.nix
     │   └── work/
     │       ├── default.nix
     │       ├── dock.nix
@@ -111,7 +108,7 @@ wagounix/
     │       │   ├── variables.nix
     │       │   ├── packages.nix
     │       │   └── homebrew.nix
-    │       └── pro/
+    │       └── alan/
     │           ├── default.nix
     │           └── variables.nix
     └── nixos/
@@ -131,6 +128,8 @@ wagounix/
                 ├── caddy.nix
                 ├── adguardhome.nix
                 ├── cloudflared.nix
+                ├── homepage.nix
+                ├── homepage-images/
                 ├── fail2ban.nix
                 └── firewall.nix
 ```
@@ -144,9 +143,8 @@ wagounix/
 | Profile | System | Layer | Description |
 |---------|--------|-------|-------------|
 | `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
-| `wagou-old` | x86_64-darwin | personal | Old Intel Mac |
 | `wagou` | aarch64-darwin | personal | New personal Mac |
-| `pro` | aarch64-darwin | work | New work Mac |
+| `alan` | aarch64-darwin | work | New work Mac (disabled) |
 
 ### NixOS
 
