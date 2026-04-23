@@ -15,6 +15,22 @@ let
       reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
     }
   '';
+
+  vaultConfig = ''
+    reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
+      header_up X-Real-IP {remote_host}
+    }
+  '';
+
+  pixelConfig = ''
+    reverse_proxy 127.0.0.1:${toString config.services.immich.port}
+  '';
+
+  cloudConfig = ''
+    reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
+      header_up X-Forwarded-Proto https
+    }
+  '';
 in
 {
   # Wildcard certificate via Let's Encrypt DNS-01 challenge (Cloudflare)
@@ -39,41 +55,23 @@ in
   services.caddy = {
     enable = true;
 
-    globalConfig = ''
-      auto_https disable_redirects
-    '';
-
     virtualHosts = {
       "vault.${host.domain}" = {
         useACMEHost = host.domain;
-        extraConfig = ''
-          reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
-            header_up X-Real-IP {remote_host}
-          }
-        '';
+        extraConfig = vaultConfig;
       };
-
       "pixel.${host.domain}" = {
         useACMEHost = host.domain;
-        extraConfig = ''
-          reverse_proxy 127.0.0.1:${toString config.services.immich.port}
-        '';
+        extraConfig = pixelConfig;
       };
-
       "cloud.${host.domain}" = {
         useACMEHost = host.domain;
-        extraConfig = ''
-          reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
-            header_up X-Forwarded-Proto https
-          }
-        '';
+        extraConfig = cloudConfig;
       };
-
       "${host.domain}" = {
         useACMEHost = host.domain;
         extraConfig = homepageConfig;
       };
-
       "home.${host.domain}" = {
         useACMEHost = host.domain;
         extraConfig = homepageConfig;
