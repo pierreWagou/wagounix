@@ -205,13 +205,18 @@ in
       #footer svg {
         color: var(--ctp-overlay0) !important;
       }
+
+      /* Center the greeting widget */
+      .information-widget-greeting {
+        text-align: center;
+      }
     '';
 
     widgets = [
       {
         greeting = {
           text_size = "xl";
-          text = "There's no place like localhost";
+          text = "There's no place like 127.0.0.1";
         };
       }
       {
