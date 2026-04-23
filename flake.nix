@@ -90,21 +90,6 @@
           };
         };
 
-        # alan — disabled (host files kept in hosts/darwin/work/alan/)
-        # alan = nix-darwin.lib.darwinSystem {
-        #   system = "aarch64-darwin";
-        #   modules = [
-        #     ./hosts/common
-        #     ./hosts/darwin
-        #     ./hosts/darwin/work
-        #     ./hosts/darwin/work/alan
-        #   ];
-        #   specialArgs = {
-        #     inherit inputs;
-        #     host = import ./hosts/darwin/work/alan/variables.nix;
-        #   };
-        # };
-
       };
 
       # -----------------------------------------------------------------------

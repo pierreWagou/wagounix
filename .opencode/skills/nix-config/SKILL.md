@@ -135,6 +135,10 @@ rec {
   hostname = "homeserver";              # NixOS only
   domain = "wagou.fr";                  # NixOS only
   serverIP = "192.168.68.65";           # NixOS only
+  acmeEmail = "pierre.romon@gmail.com"; # NixOS only
+  cloudflareAccountId = "...";          # NixOS only
+  cloudflareTunnelId = "...";           # NixOS only
+  tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" ]; # NixOS only
 }
 ```
 

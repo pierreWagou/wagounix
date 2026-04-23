@@ -209,10 +209,9 @@ in
 
     widgets = [
       {
-        resources = {
-          cpu = true;
-          memory = true;
-          disk = "/";
+        greeting = {
+          text_size = "xl";
+          text = "There's no place like localhost";
         };
       }
       {
@@ -222,6 +221,21 @@ in
             dateStyle = "long";
             timeStyle = "short";
           };
+        };
+      }
+      {
+        openmeteo = {
+          label = "Paris";
+          latitude = 48.8566;
+          longitude = 2.3522;
+          units = "metric";
+        };
+      }
+      {
+        resources = {
+          cpu = true;
+          memory = true;
+          disk = "/";
         };
       }
     ];

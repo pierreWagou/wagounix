@@ -6,34 +6,19 @@
 }:
 
 let
-  d = host.domain;
-
-  configFile = pkgs.writeText "cloudflared-config.yml" ''
-    tunnel: ${host.cloudflareTunnelId}
-    credentials-file: ${config.sops.secrets.cloudflare-credentials.path}
-    ingress:
-      - hostname: vault.${d}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${d}
-      - hostname: pixel.${d}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${d}
-      - hostname: cloud.${d}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${d}
-      - hostname: home.${d}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${d}
-      - hostname: guard.${d}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${d}
-      - service: http_status:404
-  '';
+  configFile = pkgs.writeText "cloudflared-config.json" (
+    builtins.toJSON {
+      tunnel = host.cloudflareTunnelId;
+      credentials-file = config.sops.secrets.cloudflare-credentials.path;
+      ingress =
+        (map (sub: {
+          hostname = "${sub}.${host.domain}";
+          service = "https://localhost:443";
+          originRequest.originServerName = host.domain;
+        }) host.tunnelSubdomains)
+        ++ [ { service = "http_status:404"; } ];
+    }
+  );
 in
 {
   users.users.cloudflared = {

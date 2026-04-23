@@ -21,9 +21,8 @@ _: {
             "64" = {
               enabled = false;
             };
-            # Disable 'Cmd + Alt + Space' for Finder search window
+            # Keep 'Cmd + Alt + Space' for Finder search window
             "65" = {
-              # Set to false to disable
               enabled = true;
             };
           };
