@@ -53,7 +53,7 @@
         icon = ./icons/raycast.icns;
       }
       {
-        path = "${host.restricted_app_dir}/Spotify.app";
+        path = "${host.restrictedAppDir}/Spotify.app";
         icon = ./icons/spotify.icns;
       }
       {

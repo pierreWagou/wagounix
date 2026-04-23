@@ -3,6 +3,7 @@
 let
   # Place your photos in this directory (jpg, jpeg, png supported).
   # They are served by Caddy at /bg/* — no homepage-dashboard rebuild needed.
+  # Note: favicon.svg also lives here but is excluded from rotation by the extension filter.
   imagesSrc = ./homepage-images;
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir imagesSrc)

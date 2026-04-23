@@ -41,7 +41,7 @@
       {
         name = "discord";
         args = {
-          appdir = host.restricted_app_dir;
+          appdir = host.restrictedAppDir;
         };
       }
       "flutter"
@@ -63,7 +63,7 @@
       {
         name = "spotify";
         args = {
-          appdir = host.restricted_app_dir;
+          appdir = host.restrictedAppDir;
         };
       }
       "synology-drive"

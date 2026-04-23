@@ -3,55 +3,23 @@
 {
   nixpkgs.config.allowUnfree = true;
 
+  # Minimal set of packages for all machines (including the homeserver)
   environment.systemPackages = with pkgs; [
     age
     bat
     bottom
-    chezmoi
-    copier
-    delta
     eza
     fd
-    ffmpeg
-    fnm
     fzf
-    gh
     git
-    git-lfs
-    gnupg
-    imagemagick
-    lazygit
-    maven
-    mise
-    mprocs
-    mutt-wizard
     neovim
-    nix-index
-    openapi-generator-cli
     openssl
-    openvpn
-    pay-respects
-    poetry
-    R
     ripgrep
-    scala
-    sesh
-    sheldon
     sops
-    starship
-    television
-    terraform
     tmux
-    tmuxinator
-    tree-sitter
     unzip
-    uv
-    vivid
     wget
-    worktrunk
-    yt-dlp
     zip
-    zoxide
     zsh
   ];
 }
