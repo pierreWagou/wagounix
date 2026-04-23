@@ -44,9 +44,6 @@ wagounix/
 │   │   │   │   ├── variables.nix
 │   │   │   │   ├── packages.nix
 │   │   │   │   └── homebrew.nix   # docker-desktop
-│   │   │   └── wagou-old/         # Old Intel Mac (x86_64-darwin)
-│   │   │       ├── default.nix
-│   │   │       └── variables.nix
 │   │   └── work/                  # Work Mac layer
 │   │       ├── default.nix        # Imports dock, packages, homebrew
 │   │       ├── dock.nix           # Work dock apps (Outlook, Teams, etc.)
@@ -57,7 +54,7 @@ wagounix/
 │   │       │   ├── variables.nix
 │   │       │   ├── packages.nix   # databricks-cli
 │   │       │   └── homebrew.nix   # hai tap, btp, figma, etc.
-│   │       └── pro/               # New work Mac (aarch64-darwin)
+│   │       └── alan/              # New work Mac (aarch64-darwin, disabled)
 │   │           ├── default.nix
 │   │           └── variables.nix
 │   └── nixos/                     # NixOS platform base
@@ -77,6 +74,8 @@ wagounix/
 │               ├── caddy.nix
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
+│               ├── homepage.nix
+│               ├── homepage-images/
 │               ├── fail2ban.nix
 │               └── firewall.nix
 │
@@ -134,6 +133,8 @@ rec {
   restricted_app_dir = "/Applications"; # darwin only
   enableRosetta = false;                # darwin only
   hostname = "homeserver";              # NixOS only
+  domain = "wagou.fr";                  # NixOS only
+  serverIP = "192.168.68.65";           # NixOS only
 }
 ```
 

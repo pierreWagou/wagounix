@@ -16,10 +16,7 @@
 
   networking = {
     hostName = host.hostname;
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [ 22 ];
-    };
+    firewall.enable = true;
   };
 
   services.openssh = {

@@ -2,6 +2,15 @@
 
 let
   homepageImages = ./homepage-images;
+  homepageConfig = ''
+    handle_path /bg/* {
+      file_server
+      root * ${homepageImages}
+    }
+    handle {
+      reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+    }
+  '';
 in
 {
   services.caddy = {
@@ -24,25 +33,9 @@ in
         }
       '';
 
-      "http://${host.domain}".extraConfig = ''
-        handle_path /bg/* {
-          file_server
-          root * ${homepageImages}
-        }
-        handle {
-          reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
-        }
-      '';
+      "http://${host.domain}".extraConfig = homepageConfig;
 
-      "http://home.${host.domain}".extraConfig = ''
-        handle_path /bg/* {
-          file_server
-          root * ${homepageImages}
-        }
-        handle {
-          reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
-        }
-      '';
+      "http://home.${host.domain}".extraConfig = homepageConfig;
     };
   };
 }

@@ -9,7 +9,7 @@ Remote (phone/laptop outside home)
   ── https://*.wagou.fr ──▶ Cloudflare (valid TLS) ──▶ Tunnel (encrypted)
                                                              │
 Local (home network)                                         │
-  ── http://*.home.lan ──▶ AdGuard Home (DNS) ───────────────┤
+  ── *.wagou.fr ──▶ AdGuard Home (DNS rewrite) ──────────────┤
                                                              ▼
                                                        Caddy (HTTP :80)
                                                              │
@@ -19,19 +19,20 @@ Local (home network)                                         │
                                          (:8222)        (:9200)        (:2283)
 ```
 
-All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere). Local `.home.lan` shortcuts resolve directly to the Beelink via AdGuard Home. Caddy serves HTTP only — Cloudflare handles public TLS.
+All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere) when remote. On the local network, AdGuard Home rewrites `*.wagou.fr` to the Beelink's IP, bypassing Cloudflare. Caddy serves HTTP only — Cloudflare handles public TLS.
 
 ## Services
 
-| Service | Purpose | Remote URL | Local shortcut | Port |
-|---|---|---|---|---|
-| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` | `http://vault.home.lan` | 8222 |
-| **OpenCloud** | File sync & sharing (ownCloud-compatible) | `https://cloud.wagou.fr` | `http://cloud.home.lan` | 9200 |
-| **Immich** | Photo management (Google Photos replacement) | `https://pixel.wagou.fr` | `http://pixel.home.lan` | 2283 |
-| **Caddy** | Reverse proxy | - | - | 80 |
-| **AdGuard Home** | DNS server + ad blocker | - | `http://192.168.68.65:3000` | 53, 3000 |
-| **Cloudflare Tunnel** | Secure remote access | - | - | Outbound only |
-| **Fail2ban** | Brute force protection | - | - | - |
+| Service | Purpose | Remote URL | Port |
+|---|---|---|---|
+| **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` | 8222 |
+| **OpenCloud** | File sync & sharing (ownCloud-compatible) | `https://cloud.wagou.fr` | 9200 |
+| **Immich** | Photo management (Google Photos replacement) | `https://pixel.wagou.fr` | 2283 |
+| **Homepage** | Dashboard (Catppuccin Mocha theme) | `https://home.wagou.fr` | 8082 |
+| **Caddy** | Reverse proxy | - | 80 |
+| **AdGuard Home** | DNS server + ad blocker | - | 53, 3000 |
+| **Cloudflare Tunnel** | Secure remote access | - | Outbound only |
+| **Fail2ban** | Brute force protection | - | - |
 
 ## Hardware
 
@@ -57,7 +58,7 @@ All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere). Local `.hom
 ```
 hosts/nixos/homeserver/
 ├── default.nix              # Imports hardware.nix and services/
-├── variables.nix            # Host variables (username, homeDir, hostname)
+├── variables.nix            # Host variables (username, homeDir, hostname, domain, serverIP)
 ├── hardware.nix             # Auto-generated hardware config (boot, filesystems, kernel modules)
 ├── secrets.yaml             # sops-encrypted secrets (age encryption)
 └── services/
@@ -69,15 +70,17 @@ hosts/nixos/homeserver/
     ├── caddy.nix            # Reverse proxy (all virtual hosts)
     ├── adguardhome.nix      # DNS server + ad blocker
     ├── cloudflared.nix      # Cloudflare Tunnel
+    ├── homepage.nix         # Homepage dashboard
+    ├── homepage-images/     # Background images for Homepage dashboard
     ├── fail2ban.nix         # Brute force protection
-    └── firewall.nix         # Firewall rules
+    └── firewall.nix         # Firewall rules (ports 22, 80)
 ```
 
 Platform-level config at `hosts/nixos/`:
 
 | File | Purpose |
 |---|---|
-| `configuration.nix` | SSH (hardened), Docker, user account, timezone, auto-updates, firewall base |
+| `configuration.nix` | SSH (hardened), Docker, user account, timezone, auto-updates |
 
 ## Security
 
@@ -104,6 +107,11 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `cloudflared-token` | Cloudflare Tunnel | `/run/secrets/cloudflared-token` |
 | `opencloud-admin-password` | OpenCloud (via sops template) | `/run/secrets/rendered/opencloud.env` |
 | `vaultwarden-admin-token` | Vaultwarden (via sops template) | `/run/secrets/rendered/vaultwarden.env` |
+| `wagou-password-hash` | User password | `/run/secrets/wagou-password-hash` |
+| `root-password-hash` | Root password | `/run/secrets/root-password-hash` |
+| `immich-api-key` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
+| `adguard-password` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
+| `cloudflare-api-token` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 
 ### Editing secrets
 
@@ -148,8 +156,8 @@ nvim hosts/nixos/homeserver/secrets.yaml
 
 | Query | Resolution |
 |---|---|
-| `*.wagou.fr` (all devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
-| `*.home.lan` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct) |
+| `*.wagou.fr` (remote devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct, bypasses Cloudflare) |
 | Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> Cloudflare/Google DoH -> Internet |
 
@@ -173,9 +181,9 @@ nvim hosts/nixos/homeserver/secrets.yaml
      reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
    '';
    ```
-4. **Add DNS rewrite** in `services/adguardhome.nix` (only for `.home.lan` shortcut):
+4. **Add DNS rewrite** in `services/adguardhome.nix` (for local LAN shortcut):
    ```nix
-   { domain = "newservice.home.lan"; answer = serverIP; enabled = true; }
+   { domain = "newservice.${domain}"; answer = serverIP; enabled = true; }
    ```
 5. **Add secrets** if needed in `services/secrets.nix`
 6. **Add Cloudflare Tunnel route** in dashboard: subdomain `newservice`, domain `wagou.fr`, type `HTTP`, URL `localhost:80`
@@ -197,6 +205,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 | Edit secrets | `sops hosts/nixos/homeserver/secrets.yaml` |
 | Test build locally | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
 | AdGuard Home dashboard | `http://192.168.68.65:3000` |
+| Homepage dashboard | `https://home.wagou.fr` |
 | Vaultwarden | `https://vault.wagou.fr` |
 | OpenCloud | `https://cloud.wagou.fr` |
 | Immich | `https://pixel.wagou.fr` |
