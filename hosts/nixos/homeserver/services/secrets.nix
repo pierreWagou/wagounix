@@ -29,7 +29,7 @@
       adguard-password = {
         mode = "0400";
       };
-      cloudflared-token = {
+      cloudflare-tunnel-token = {
         mode = "0400";
       };
       cloudflare-dns-token = {
@@ -53,7 +53,7 @@
           "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
           "HOMEPAGE_VAR_ADGUARD_USER=admin"
           "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
-          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflared-token}"
+          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
         ];
       };
 
