@@ -25,18 +25,18 @@ This repository manages multiple machines through a layered, reproducible config
 Each configuration is assembled from layered modules — common packages are shared across all machines, platform modules add OS-specific config, and each host can override further.
 
 ```
- ┌─────────────────────────────────────────────────────────┐
- │                       flake.nix                         │
- ├─────────────────────────────────────────────────────────┤
- │                    hosts/common/                        │  common
- │              packages · fonts · users                   │
- ├──────────────────────────┬──────────────────────────────┤
- │       hosts/darwin/      │        hosts/nixos/          │  platform
- ├─────────────┬────────────┼──────────────────────────────┤
- │  personal/  │   work/    │       homeserver/            │  layer / host
- ├───────┬─────┼──────┬─────┤                              │
-  │ wagou │ sap  │alan │                              │
-  └───────┴──────┴─────┴──────────────────────────────┘
+  ┌───────────────────────────────────────────────────────┐
+  │                      flake.nix                        │
+  ├───────────────────────────────────────────────────────┤
+  │                   hosts/common/                       │  common
+  │             packages · fonts · users                  │
+  ├─────────────────────────┬─────────────────────────────┤
+  │      hosts/darwin/      │       hosts/nixos/          │  platform
+  ├────────────┬────────────┼─────────────────────────────┤
+  │  personal/ │   work/    │       homeserver/           │  layer / host
+  ├────────────┼──────┬─────┤                             │
+  │   wagou    │ sap  │alan │                             │
+  └────────────┴──────┴─────┴─────────────────────────────┘
 ```
 
 ## Structure
@@ -141,7 +141,7 @@ wagounix/
 ### macOS
 
 | Profile | System | Layer | Description |
-|---------|--------|-------|-------------|
+|---|---|---|---|
 | `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
 | `wagou` | aarch64-darwin | personal | New personal Mac |
 | `alan` | aarch64-darwin | work | New work Mac (disabled) |
@@ -149,7 +149,7 @@ wagounix/
 ### NixOS
 
 | Profile | System | Description |
-|---------|--------|-------------|
+|---|---|---|
 | `homeserver` | x86_64-linux | Home server (Docker, services) |
 
 ## Getting Started
@@ -191,7 +191,7 @@ Git hooks auto-install when entering the project directory (via [mise](https://m
 Managed by [git-hooks.nix](https://github.com/cachix/git-hooks.nix):
 
 | Stage | Check | Description |
-|-------|-------|-------------|
+|---|---|---|
 | commit | **nixfmt** | Formatting |
 | commit | **statix** | Anti-pattern linting |
 | commit | **deadnix** | Unused code detection |
@@ -201,7 +201,7 @@ Managed by [git-hooks.nix](https://github.com/cachix/git-hooks.nix):
 GitHub Actions runs on push to `main` and on PRs:
 
 | Job | Runner | Profiles |
-|-----|--------|----------|
+|---|---|---|
 | Lint | macos-15 | nixfmt, statix, deadnix |
 | Build darwin | macos-15 | sap, wagou (parallel) |
 | Build NixOS | ubuntu-latest | homeserver |
@@ -209,7 +209,7 @@ GitHub Actions runs on push to `main` and on PRs:
 ## Quick Reference
 
 | Action | Command |
-|--------|---------|
+|---|---|
 | Rebuild Mac | `darwin-rebuild switch --flake .#<profile>` |
 | Rebuild NixOS | `sudo nixos-rebuild switch --flake .#<profile>` |
 | Test build (no activate) | `darwin-rebuild build --flake .#<profile>` |

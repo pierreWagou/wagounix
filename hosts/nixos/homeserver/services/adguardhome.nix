@@ -43,33 +43,11 @@ in
         protection_enabled = true;
         filtering_enabled = true;
 
-        rewrites = [
-          {
-            domain = "vault.${domain}";
-            answer = serverIP;
-            enabled = true;
-          }
-          {
-            domain = "pixel.${domain}";
-            answer = serverIP;
-            enabled = true;
-          }
-          {
-            domain = "cloud.${domain}";
-            answer = serverIP;
-            enabled = true;
-          }
-          {
-            domain = "home.${domain}";
-            answer = serverIP;
-            enabled = true;
-          }
-          {
-            domain = "guard.${domain}";
-            answer = serverIP;
-            enabled = true;
-          }
-        ];
+        rewrites = map (sub: {
+          domain = "${sub}.${domain}";
+          answer = serverIP;
+          enabled = true;
+        }) host.tunnelSubdomains;
       };
 
       filters = [

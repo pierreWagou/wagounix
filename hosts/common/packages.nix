@@ -8,7 +8,6 @@
     bat
     bottom
     chezmoi
-    cloudflared
     copier
     delta
     eza

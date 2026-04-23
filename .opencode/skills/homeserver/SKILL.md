@@ -12,13 +12,13 @@ Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 ## Architecture
 
 ```
-Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Caddy (HTTP :80) -> Service
-Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Caddy (HTTP :80) -> Service
+Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Caddy (HTTPS :443) -> Service
+Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Caddy (HTTPS :443) -> Service
 ```
 
-Caddy serves HTTP only. Cloudflare handles public-facing HTTPS with valid certificates. Internal traffic between the tunnel and Caddy is plain HTTP on localhost — no TLS needed.
+Caddy serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Caddy over HTTPS with `originServerName` for SNI matching.
 
-IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare. Remote devices resolve `*.wagou.fr` via Cloudflare DNS as usual.
+IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Caddy HTTPS.
 
 ## Current services
 
@@ -28,8 +28,8 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | OpenCloud | `services/opencloud.nix` | 9200 (localhost) | `https://cloud.wagou.fr` |
 | Immich | `services/immich.nix` | 2283 (localhost) | `https://pixel.wagou.fr` |
 | Homepage | `services/homepage.nix` | 8082 (localhost) | `https://home.wagou.fr` |
-| Caddy | `services/caddy.nix` | 80 | - |
-| AdGuard Home | `services/adguardhome.nix` | 53 (DNS), 3000 (web UI) | Not exposed |
+| Caddy | `services/caddy.nix` | 443 | - |
+| AdGuard Home | `services/adguardhome.nix` | 53 (DNS), 3000 (web UI) | `https://guard.wagou.fr` |
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
 | Fail2ban | `services/fail2ban.nix` | - | - |
 
@@ -40,7 +40,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "homeserver"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "homeserver"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/homeserver/services/`
@@ -58,7 +58,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | `homepage.nix` | Homepage dashboard (Catppuccin Mocha theme, service widgets) |
 | `homepage-images/` | Background images for Homepage dashboard |
 | `fail2ban.nix` | Brute force protection |
-| `firewall.nix` | Firewall rules (ports 22, 80) |
+| `firewall.nix` | Firewall rules (ports 22, 53, 443) |
 
 ### Platform-level NixOS config: `hosts/nixos/`
 
@@ -85,12 +85,12 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 |---|---|
 | **SSH** | Key-only auth, password disabled, root login disabled (`hosts/nixos/configuration.nix`) |
 | **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour (`services/fail2ban.nix`) |
-| **Firewall** | Only ports 22 (SSH), 53 (DNS), 80 (HTTP), 3000 (AdGuard web UI) open |
+| **Firewall** | Only ports 22 (SSH), 53 (DNS), 443 (HTTPS) open |
 | **Service binding** | All services on `127.0.0.1` only, behind Caddy reverse proxy |
 | **Secrets** | sops-nix with age encryption, decrypted to tmpfs (`/run/secrets/`) |
 | **Vaultwarden** | Signups disabled, admin panel protected with sops-managed token |
 | **Network** | No open ports on router, all external traffic through Cloudflare Tunnel |
-| **TLS** | Cloudflare manages public HTTPS certificates |
+| **TLS** | Let's Encrypt wildcard certificate (DNS-01 via Cloudflare), served by Caddy |
 | **DNS** | AdGuard Home with DNS-over-HTTPS upstream |
 | **Rate limiting** | Cloudflare WAF rate limiting on `*.wagou.fr` |
 | **Auto-updates** | Daily rebuild at 4:00 AM from flake (`system.autoUpgrade`) |
@@ -103,14 +103,15 @@ Secrets are encrypted with age in `hosts/nixos/homeserver/secrets.yaml` (colocat
 
 | Secret key | Used by | Mechanism |
 |---|---|---|
-| `cloudflared-token` | `cloudflared.nix` | Read directly via `config.sops.secrets.cloudflared-token.path` |
-| `opencloud-admin-password` | `opencloud.nix` | Via sops template `opencloud.env` (`IDM_ADMIN_PASSWORD=<value>`) |
-| `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` (`ADMIN_TOKEN=<value>`) |
+| `cloudflare-credentials` | `cloudflared.nix` | Credentials file for tunnel auth |
+| `opencloud-admin-password` | `opencloud.nix` | Via sops template `opencloud.env` |
+| `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` |
 | `wagou-password-hash` | `configuration.nix` | User password hash (neededForUsers) |
 | `root-password-hash` | `configuration.nix` | Root password hash (neededForUsers) |
 | `immich-api-key` | `homepage.nix` | Via sops template `homepage.env` |
 | `adguard-password` | `homepage.nix` | Via sops template `homepage.env` |
-| `cloudflare-api-token` | `homepage.nix` | Via sops template `homepage.env` |
+| `cloudflare-tunnel-token` | `homepage.nix` | Via sops template `homepage.env` |
+| `cloudflare-dns-token` | `caddy.nix` (ACME) | Via sops template `caddy.env` |
 
 ### Encryption keys
 
@@ -167,7 +168,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 | Scenario | Resolution path |
 |---|---|
 | `*.wagou.fr` (remote devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
-| `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTP, bypasses Cloudflare) |
+| `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTPS, bypasses Cloudflare) |
 | Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> upstream DoH (Cloudflare/Google) -> Internet |
 
@@ -177,7 +178,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 |---|---|
 | Domain registrar | OVH (`wagou.fr`) |
 | DNS | Cloudflare (OVH nameservers pointed to Cloudflare) |
-| TLS certificates | Cloudflare (auto-provisioned) |
+| TLS certificates | Let's Encrypt (wildcard via DNS-01, Cloudflare DNS) |
 | Email | OVH Zimbra (MX records in Cloudflare) |
 
 ## AdGuard Home configuration
@@ -198,15 +199,16 @@ Runs with `mutableSettings = false` — fully declarative, config reset on every
 
 ## Caddy virtual hosts
 
-Each service gets an `http://` virtual host. Caddy routes by hostname:
+Each service gets a virtual host with `useACMEHost` for HTTPS. Caddy routes by hostname:
 
 | Virtual host | Proxies to | Special headers |
 |---|---|---|
-| `http://vault.wagou.fr` | `127.0.0.1:8222` | `X-Real-IP` (client IP for audit logs) |
-| `http://pixel.wagou.fr` | `127.0.0.1:2283` | - |
-| `http://cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
-| `http://wagou.fr` | `127.0.0.1:8082` | Serves Homepage dashboard + `/bg/*` static images |
-| `http://home.wagou.fr` | `127.0.0.1:8082` | Same as above |
+| `vault.wagou.fr` | `127.0.0.1:8222` | `X-Real-IP` (client IP for audit logs) |
+| `pixel.wagou.fr` | `127.0.0.1:2283` | - |
+| `cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
+| `guard.wagou.fr` | `127.0.0.1:3000` | AdGuard Home web UI |
+| `wagou.fr` | `127.0.0.1:8082` | Serves Homepage dashboard + `/bg/*` static images |
+| `home.wagou.fr` | `127.0.0.1:8082` | Same as above |
 
 OpenCloud requires the `X-Forwarded-Proto: https` header because its configured URL is `https://cloud.wagou.fr` and it would otherwise redirect HTTP to HTTPS in a loop.
 
@@ -255,24 +257,19 @@ Add `./newservice.nix` to the imports in `services/default.nix`.
 In `services/caddy.nix`, add to the `virtualHosts` block:
 
 ```nix
-"http://newservice.wagou.fr".extraConfig = ''
-  reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
-'';
+"newservice.wagou.fr" = {
+  useACMEHost = "wagou.fr";
+  extraConfig = ''
+    reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
+  '';
+};
 ```
 
 If the service needs `X-Forwarded-Proto` (because its URL is configured as https), add `header_up X-Forwarded-Proto https`.
 
-### Step 4 — Add local DNS shortcut
+### Step 4 — Add subdomain to variables
 
-In `services/adguardhome.nix`, add to the `rewrites` list:
-
-```nix
-{ domain = "newservice.${domain}"; answer = serverIP; enabled = true; }
-```
-
-IMPORTANT: `enabled = true` is required — AdGuard Home defaults to `false`.
-
-This ensures LAN devices bypass Cloudflare and reach the service directly.
+Add the subdomain to `tunnelSubdomains` in `hosts/nixos/homeserver/variables.nix`. The DNS rewrite, tunnel ingress rule, and Caddy vhost are all derived from this list automatically.
 
 ### Step 5 — Add secrets (if needed)
 
@@ -290,15 +287,9 @@ sops.templates."newservice.env" = {
 
 Then edit `hosts/nixos/homeserver/secrets.yaml` with `sops` to add the secret value.
 
-### Step 6 — Add Cloudflare Tunnel route
+### Step 6 — Add Cloudflare DNS route
 
-In the Cloudflare Zero Trust dashboard:
-1. Go to **Networks > Tunnels** > click your tunnel
-2. Under **Route**, add a **Published Application**:
-   - Subdomain: `newservice`
-   - Domain: `wagou.fr`
-   - Type: `HTTP`
-   - URL: `localhost:80`
+Run `cloudflared tunnel route dns homeserver newservice.wagou.fr` once from your Mac (requires `cert.pem` from `cloudflared login`).
 
 ### Step 7 — Deploy
 
@@ -328,22 +319,22 @@ If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` pack
 
 1. `systemctl status cloudflared-tunnel`
 2. `journalctl -u cloudflared-tunnel --no-pager -f`
-3. Common error: "Provided Tunnel token is not valid" — check sops secret is set correctly
+3. Common error: "couldn't read tunnel credentials" — check `cloudflare-credentials` sops secret and credentials-file path
 
 ### 502 Bad Gateway from Cloudflare
 
 Tunnel connected but service not responding:
 1. Is Caddy running? `systemctl status caddy`
 2. Is the service running? `systemctl status <service>`
-3. Test locally: `curl -H "Host: service.wagou.fr" http://localhost:80`
-4. Ensure tunnel route uses `HTTP` (not HTTPS) with `localhost:80`
+3. Test locally: `curl -H "Host: service.wagou.fr" https://localhost:443`
+4. Ensure tunnel route uses HTTPS with `localhost:443` and `originServerName` is set
 
 ### DNS not resolving locally
 
 1. `scutil --dns | grep nameserver` — should show `192.168.68.65`
 2. Force DHCP renewal: `sudo ipconfig set en0 DHCP`
 3. Test directly: `nslookup vault.wagou.fr 192.168.68.65`
-4. Do NOT use `.local` domains — macOS intercepts them for mDNS. Use `.home.lan` or a real domain.
+4. Do NOT use `.local` domains — macOS intercepts them for mDNS. Use `*.wagou.fr` with AdGuard Home rewrites.
 
 ### "Internet not available" on macOS
 
@@ -370,8 +361,8 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 - Each service gets its own file in `services/` — one service per file
 - Secrets go in `hosts/nixos/homeserver/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
 - AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
-- Caddy serves HTTP only — Cloudflare handles public HTTPS
-- Cloudflare Tunnel routes must use `HTTP` type with `localhost:80` — not HTTPS
+- Caddy serves HTTPS with Let's Encrypt wildcard cert
+- Cloudflare Tunnel routes use HTTPS with `localhost:443` and `originServerName`
 - AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare
 - `system.stateVersion = "25.05"` — never change this
 - `hardware.nix` was generated by `nixos-generate-config` — only regenerate if hardware changes
