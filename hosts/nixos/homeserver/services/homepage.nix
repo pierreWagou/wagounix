@@ -266,7 +266,7 @@ in
           {
             "AdGuard Home" = {
               icon = "adguard-home.svg";
-              href = "http://${host.serverIP}:${toString config.services.adguardhome.port}";
+              href = "https://guard.${host.domain}";
               description = "DNS & ad blocking";
               siteMonitor = "http://localhost:${toString config.services.adguardhome.port}";
               widget = {
