@@ -39,6 +39,10 @@ in
   services.caddy = {
     enable = true;
 
+    globalConfig = ''
+      auto_https disable_redirects
+    '';
+
     virtualHosts = {
       "vault.${host.domain}" = {
         useACMEHost = host.domain;
