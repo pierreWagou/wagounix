@@ -1,4 +1,9 @@
-{ config, host, ... }:
+{
+  config,
+  pkgs,
+  host,
+  ...
+}:
 
 let
   homepageImages = ./homepage-images;
@@ -16,26 +21,40 @@ in
   services.caddy = {
     enable = true;
 
+    package = pkgs.caddy.withPlugins {
+      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.1" ];
+      hash = "sha256-Zls+5kWd/JSQsmZC4SRQ/WS+pUcRolNaaI7UQoPzJA0=";
+    };
+
+    globalConfig = ''
+      email pierre.romon@gmail.com
+      acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+      auto_https disable_redirects
+    '';
+
     virtualHosts = {
-      "http://vault.${host.domain}".extraConfig = ''
+      "vault.${host.domain}".extraConfig = ''
         reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
           header_up X-Real-IP {remote_host}
         }
       '';
 
-      "http://pixel.${host.domain}".extraConfig = ''
+      "pixel.${host.domain}".extraConfig = ''
         reverse_proxy 127.0.0.1:${toString config.services.immich.port}
       '';
 
-      "http://cloud.${host.domain}".extraConfig = ''
+      "cloud.${host.domain}".extraConfig = ''
         reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
           header_up X-Forwarded-Proto https
         }
       '';
 
-      "http://${host.domain}".extraConfig = homepageConfig;
+      "${host.domain}".extraConfig = homepageConfig;
 
-      "http://home.${host.domain}".extraConfig = homepageConfig;
+      "home.${host.domain}".extraConfig = homepageConfig;
     };
   };
+
+  # Inject Cloudflare DNS API token for ACME DNS-01 challenge
+  systemd.services.caddy.serviceConfig.EnvironmentFile = config.sops.templates."caddy.env".path;
 }
