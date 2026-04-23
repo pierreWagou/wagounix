@@ -11,20 +11,30 @@ let
   # HSTS header — tells browsers to always use HTTPS for *.wagou.fr
   hsts = ''header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"'';
 
+  # Redirect /favicon.ico to the custom synthwave sunset SVG
+  faviconRedirect = ''
+    handle /favicon.ico {
+      redir https://home.${host.domain}/bg/favicon.svg permanent
+    }
+  '';
+
   # Per-subdomain reverse proxy configuration
   serviceConfigs = {
     vault = ''
       ${hsts}
+      ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
         header_up X-Real-IP {remote_host}
       }
     '';
     pixel = ''
       ${hsts}
+      ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.immich.port}
     '';
     cloud = ''
       ${hsts}
+      ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
         header_up X-Forwarded-Proto https
       }
@@ -41,6 +51,7 @@ let
     '';
     guard = ''
       ${hsts}
+      ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
     '';
   };

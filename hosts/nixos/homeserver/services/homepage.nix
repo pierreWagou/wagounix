@@ -22,6 +22,7 @@ in
 
     settings = {
       title = "wagou://home";
+      favicon = "https://home.${host.domain}/bg/favicon.svg";
       theme = "dark";
       color = "slate";
       headerStyle = "clean";
