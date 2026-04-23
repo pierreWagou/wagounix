@@ -58,7 +58,7 @@
       };
 
       "caddy.env" = {
-        content = "CLOUDFLARE_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
+        content = "CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
       };
     };
   };

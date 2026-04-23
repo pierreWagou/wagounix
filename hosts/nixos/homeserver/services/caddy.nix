@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   host,
   ...
 }:
@@ -18,43 +17,63 @@ let
   '';
 in
 {
-  services.caddy = {
-    enable = true;
+  # Wildcard certificate via Let's Encrypt DNS-01 challenge (Cloudflare)
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "pierre.romon@gmail.com";
 
-    package = pkgs.caddy.withPlugins {
-      plugins = [ "github.com/caddy-dns/cloudflare@v0.2.1" ];
-      hash = "sha256-Zls+5kWd/JSQsmZC4SRQ/WS+pUcRolNaaI7UQoPzJA0=";
-    };
-
-    globalConfig = ''
-      email pierre.romon@gmail.com
-      acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
-      auto_https disable_redirects
-    '';
-
-    virtualHosts = {
-      "vault.${host.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
-          header_up X-Real-IP {remote_host}
-        }
-      '';
-
-      "pixel.${host.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.immich.port}
-      '';
-
-      "cloud.${host.domain}".extraConfig = ''
-        reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
-          header_up X-Forwarded-Proto https
-        }
-      '';
-
-      "${host.domain}".extraConfig = homepageConfig;
-
-      "home.${host.domain}".extraConfig = homepageConfig;
+    certs."${host.domain}" = {
+      domain = "*.${host.domain}";
+      extraDomainNames = [ host.domain ];
+      dnsProvider = "cloudflare";
+      dnsResolver = "1.1.1.1:53";
+      environmentFile = config.sops.templates."caddy.env".path;
+      reloadServices = [ "caddy.service" ];
+      inherit (config.services.caddy) group;
     };
   };
 
-  # Inject Cloudflare DNS API token for ACME DNS-01 challenge
-  systemd.services.caddy.serviceConfig.EnvironmentFile = config.sops.templates."caddy.env".path;
+  # Grant caddy user access to ACME certs
+  users.users.${config.services.caddy.user}.extraGroups = [ "acme" ];
+
+  services.caddy = {
+    enable = true;
+
+    virtualHosts = {
+      "vault.${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
+            header_up X-Real-IP {remote_host}
+          }
+        '';
+      };
+
+      "pixel.${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:${toString config.services.immich.port}
+        '';
+      };
+
+      "cloud.${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
+            header_up X-Forwarded-Proto https
+          }
+        '';
+      };
+
+      "${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = homepageConfig;
+      };
+
+      "home.${host.domain}" = {
+        useACMEHost = host.domain;
+        extraConfig = homepageConfig;
+      };
+    };
+  };
 }
