@@ -202,13 +202,24 @@ in
         background: var(--ctp-surface2);
       }
 
-      #footer svg {
-        color: var(--ctp-overlay0) !important;
+      /* Center the greeting widget below the widget bar */
+      .information-widget-greeting {
+        order: 99;
+        width: 100%;
+        text-align: center;
+        padding-top: 1rem;
+        padding-bottom: 0.5rem;
       }
 
-      /* Center the greeting widget */
-      .information-widget-greeting {
-        text-align: center;
+      .information-widget-greeting span {
+        font-size: 1.4rem !important;
+        font-weight: 600;
+        color: var(--ctp-lavender) !important;
+        letter-spacing: 0.5px;
+      }
+
+      #footer svg {
+        color: var(--ctp-overlay0) !important;
       }
     '';
 
