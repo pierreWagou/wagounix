@@ -65,11 +65,6 @@ in
             enabled = true;
           }
           {
-            inherit domain;
-            answer = serverIP;
-            enabled = true;
-          }
-          {
             domain = "guard.${domain}";
             answer = serverIP;
             enabled = true;
