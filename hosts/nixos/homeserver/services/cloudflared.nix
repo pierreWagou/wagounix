@@ -9,31 +9,42 @@ let
   tunnelId = host.cloudflareTunnelId;
   tunnelTarget = "${tunnelId}.cfargotunnel.com";
   zoneId = host.cloudflareZoneId;
+  d = host.domain;
 
   # Hostnames routed through the tunnel — single source of truth
   tunnelHostnames = [
-    "vault.${host.domain}"
-    "pixel.${host.domain}"
-    "cloud.${host.domain}"
-    "home.${host.domain}"
-    "guard.${host.domain}"
+    "vault.${d}"
+    "pixel.${d}"
+    "cloud.${d}"
+    "home.${d}"
+    "guard.${d}"
   ];
-
-  ingressRules = builtins.concatStringsSep "\n" (
-    map (hostname: ''
-      - hostname: ${hostname}
-        service: https://localhost:443
-        originRequest:
-          originServerName: ${host.domain}
-    '') tunnelHostnames
-  );
 
   configFile = pkgs.writeText "cloudflared-config.yml" ''
     tunnel: ${tunnelId}
     credentials-file: ${config.sops.secrets.cloudflare-credentials.path}
-
     ingress:
-    ${ingressRules}  - service: http_status:404
+      - hostname: vault.${d}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${d}
+      - hostname: pixel.${d}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${d}
+      - hostname: cloud.${d}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${d}
+      - hostname: home.${d}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${d}
+      - hostname: guard.${d}
+        service: https://localhost:443
+        originRequest:
+          originServerName: ${d}
+      - service: http_status:404
   '';
 
   # Script to ensure DNS CNAME records exist for all tunnel hostnames
