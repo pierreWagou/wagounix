@@ -15,6 +15,8 @@ in
       users = [
         {
           name = "admin";
+          # Bcrypt hash inline because AdGuard requires it in the YAML config at build time.
+          # The matching plaintext password is in sops (adguard-password) for the homepage widget.
           password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
         }
       ];

@@ -130,7 +130,7 @@ Each host has a `variables.nix` that exports a plain attribute set (not a module
 rec {
   username = "wagou";
   homeDir = "/Users/${username}";     # /home/${username} for NixOS
-  restricted_app_dir = "/Applications"; # darwin only
+  restrictedAppDir = "/Applications";   # darwin only
   enableRosetta = false;                # darwin only
   hostname = "homeserver";              # NixOS only
   domain = "wagou.fr";                  # NixOS only

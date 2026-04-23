@@ -56,6 +56,9 @@ let
     '';
   };
 in
+assert
+  builtins.all (sub: serviceConfigs ? ${sub}) host.tunnelSubdomains
+  || throw "caddy.nix: every subdomain in tunnelSubdomains must have a matching key in serviceConfigs";
 {
   # Wildcard certificate via Let's Encrypt DNS-01 challenge (Cloudflare)
   security.acme = {

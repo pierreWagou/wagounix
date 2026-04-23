@@ -56,7 +56,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | `adguardhome.nix` | DNS server, ad blocking, blocklists, local DNS rewrites |
 | `cloudflared.nix` | Cloudflare Tunnel systemd service |
 | `homepage.nix` | Homepage dashboard (Catppuccin Mocha theme, service widgets) |
-| `homepage-images/` | Background images for Homepage dashboard |
+| `homepage-images/` | Background images and favicon for Homepage dashboard |
 | `fail2ban.nix` | Brute force protection |
 | `firewall.nix` | Firewall rules (ports 22, 53, 443) |
 
@@ -207,8 +207,7 @@ Each service gets a virtual host with `useACMEHost` for HTTPS. Caddy routes by h
 | `pixel.wagou.fr` | `127.0.0.1:2283` | - |
 | `cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
 | `guard.wagou.fr` | `127.0.0.1:3000` | AdGuard Home web UI |
-| `wagou.fr` | `127.0.0.1:8082` | Serves Homepage dashboard + `/bg/*` static images |
-| `home.wagou.fr` | `127.0.0.1:8082` | Same as above |
+| `home.wagou.fr` | `127.0.0.1:8082` | Homepage dashboard + `/bg/*` static images (including favicon) |
 
 OpenCloud requires the `X-Forwarded-Proto: https` header because its configured URL is `https://cloud.wagou.fr` and it would otherwise redirect HTTP to HTTPS in a loop.
 
@@ -252,14 +251,16 @@ _: {
 
 Add `./newservice.nix` to the imports in `services/default.nix`.
 
-### Step 3 — Add Caddy virtual host
+### Step 3 — Add Caddy service config
 
-In `services/caddy.nix`, add to the `virtualHosts` block:
+In `services/caddy.nix`, add a new entry to the `serviceConfigs` attrset with the subdomain as the key:
 
 ```nix
-"newservice.wagou.fr" = {
-  useACMEHost = "wagou.fr";
-  extraConfig = ''
+serviceConfigs = {
+  # ... existing entries ...
+  newservice = ''
+    ${hsts}
+    ${faviconRedirect}
     reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
   '';
 };
@@ -269,7 +270,16 @@ If the service needs `X-Forwarded-Proto` (because its URL is configured as https
 
 ### Step 4 — Add subdomain to variables
 
-Add the subdomain to `tunnelSubdomains` in `hosts/nixos/homeserver/variables.nix`. The DNS rewrite, tunnel ingress rule, and Caddy vhost are all derived from this list automatically.
+Add the subdomain to `tunnelSubdomains` in `hosts/nixos/homeserver/variables.nix`:
+
+```nix
+tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" "newservice" ];
+```
+
+This automatically wires up:
+- DNS rewrite in AdGuard Home (local HTTPS bypass)
+- Tunnel ingress rule in cloudflared (remote access)
+- Caddy virtual host (HTTPS termination, using the `serviceConfigs` entry from Step 3)
 
 ### Step 5 — Add secrets (if needed)
 

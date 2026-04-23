@@ -71,7 +71,7 @@ hosts/nixos/homeserver/
     ├── adguardhome.nix      # DNS server + ad blocker
     ├── cloudflared.nix      # Cloudflare Tunnel
     ├── homepage.nix         # Homepage dashboard
-    ├── homepage-images/     # Background images for Homepage dashboard
+    ├── homepage-images/     # Background images and favicon for Homepage dashboard
     ├── fail2ban.nix         # Brute force protection
     └── firewall.nix         # Firewall rules (ports 22, 53, 443)
 ```
