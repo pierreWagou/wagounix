@@ -323,18 +323,6 @@ in
               };
             };
           }
-          {
-            "Speedtest Tracker" = {
-              icon = "speedtest-tracker.svg";
-              href = "https://speed.${host.domain}";
-              description = "Internet speed monitoring";
-              siteMonitor = "http://localhost:8765";
-              widget = {
-                type = "speedtest";
-                url = "http://localhost:8765";
-              };
-            };
-          }
         ];
       }
     ];
