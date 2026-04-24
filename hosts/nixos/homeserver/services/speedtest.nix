@@ -12,7 +12,7 @@
       PUID = "1000";
       PGID = "1000";
       TZ = "Europe/Paris";
-      # Run speed test once per day at 3:00 AM
+      DB_CONNECTION = "sqlite";
       SPEEDTEST_SCHEDULE = "0 3 * * *";
       APP_URL = "https://speed.${host.domain}";
     };
