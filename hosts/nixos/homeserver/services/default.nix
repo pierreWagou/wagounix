@@ -15,6 +15,7 @@
     ./immich.nix
     ./opencloud.nix
     ./homepage.nix
+    ./speedtest.nix
     ./fail2ban.nix
     ./firewall.nix
   ];
