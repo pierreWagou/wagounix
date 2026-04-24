@@ -15,5 +15,6 @@ rec {
     "cloud"
     "home"
     "guard"
+    "speed"
   ];
 }

@@ -54,6 +54,11 @@ let
       ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
     '';
+    speed = ''
+      ${hsts}
+      ${faviconRedirect}
+      reverse_proxy 127.0.0.1:8765
+    '';
   };
 in
 assert

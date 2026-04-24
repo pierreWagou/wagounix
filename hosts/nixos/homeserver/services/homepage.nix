@@ -8,6 +8,7 @@ let
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir imagesSrc)
   );
+  defaultImage = if imageFiles != [ ] then builtins.head imageFiles else "placeholder.jpg";
   imageListJS = builtins.concatStringsSep ", " (map (f: ''"${f}"'') imageFiles);
 in
 {
@@ -24,6 +25,7 @@ in
     settings = {
       title = "wagou://home";
       favicon = "https://home.${host.domain}/bg/favicon.svg";
+      logo = "https://home.${host.domain}/bg/favicon.svg";
       theme = "dark";
       color = "slate";
       headerStyle = "clean";
@@ -32,7 +34,7 @@ in
       hideVersion = true;
       cardBlur = "sm";
       background = {
-        image = "http://home.${host.domain}/bg/${builtins.head imageFiles}";
+        image = "https://home.${host.domain}/bg/${defaultImage}";
         blur = "xl";
         brightness = 75;
         opacity = 75;
@@ -318,6 +320,18 @@ in
                 accountid = host.cloudflareAccountId;
                 tunnelid = host.cloudflareTunnelId;
                 key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
+              };
+            };
+          }
+          {
+            "Speedtest Tracker" = {
+              icon = "speedtest-tracker.svg";
+              href = "https://speed.${host.domain}";
+              description = "Internet speed monitoring";
+              siteMonitor = "http://localhost:8765";
+              widget = {
+                type = "speedtest";
+                url = "http://localhost:8765";
               };
             };
           }

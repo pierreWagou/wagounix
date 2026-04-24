@@ -164,7 +164,7 @@ Edit the appropriate `packages.nix` under `hosts/darwin/<layer>/` or `hosts/darw
 ### Homebrew cask (GUI app)
 
 Edit the appropriate `homebrew.nix` and add to the `casks` list.
-For custom install path: `{ name = "app"; args = { appdir = host.restricted_app_dir; }; }`
+For custom install path: `{ name = "app"; args = { appdir = host.restrictedAppDir; }; }`
 
 ### Homebrew brew (CLI formula)
 
@@ -185,7 +185,7 @@ masApps = { "App Name" = 123456789; };
    rec {
      username = "myuser";
      homeDir = "/Users/${username}";
-     restricted_app_dir = "/Applications";
+     restrictedAppDir = "/Applications";
      enableRosetta = false;
    }
    ```
