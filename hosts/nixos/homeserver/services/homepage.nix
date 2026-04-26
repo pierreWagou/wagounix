@@ -16,16 +16,16 @@ in
     enable = true;
     listenPort = 8082;
     openFirewall = false;
-    allowedHosts = "${host.domain},home.${host.domain}";
+    allowedHosts = "${host.domain},dash.${host.domain}";
 
     environmentFiles = [
       config.sops.templates."homepage.env".path
     ];
 
     settings = {
-      title = "wagou://home";
-      favicon = "https://home.${host.domain}/bg/favicon.svg";
-      logo = "https://home.${host.domain}/bg/favicon.svg";
+      title = "wagou://dash";
+      favicon = "https://dash.${host.domain}/bg/favicon.svg";
+      logo = "https://dash.${host.domain}/bg/favicon.svg";
       theme = "dark";
       color = "slate";
       headerStyle = "clean";
@@ -34,7 +34,7 @@ in
       hideVersion = true;
       cardBlur = "sm";
       background = {
-        image = "https://home.${host.domain}/bg/${defaultImage}";
+        image = "https://dash.${host.domain}/bg/${defaultImage}";
         blur = "xl";
         brightness = 75;
         opacity = 75;
@@ -42,7 +42,7 @@ in
       layout = {
         Services = {
           style = "row";
-          columns = 3;
+          columns = 4;
         };
         Infrastructure = {
           style = "row";
@@ -291,6 +291,14 @@ in
                 key = "{{HOMEPAGE_VAR_IMMICH_API_KEY}}";
                 version = 2;
               };
+            };
+          }
+          {
+            "Home Assistant" = {
+              icon = "home-assistant.svg";
+              href = "https://home.${host.domain}";
+              description = "Home automation";
+              siteMonitor = "http://localhost:8123";
             };
           }
         ];

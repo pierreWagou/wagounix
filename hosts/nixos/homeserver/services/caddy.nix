@@ -14,7 +14,7 @@ let
   # Redirect /favicon.ico to the custom synthwave sunset SVG
   faviconRedirect = ''
     handle /favicon.ico {
-      redir https://home.${host.domain}/bg/favicon.svg permanent
+      redir https://dash.${host.domain}/bg/favicon.svg permanent
     }
   '';
 
@@ -40,6 +40,11 @@ let
       }
     '';
     home = ''
+      ${hsts}
+      ${faviconRedirect}
+      reverse_proxy 127.0.0.1:8123
+    '';
+    dash = ''
       ${hsts}
       handle_path /bg/* {
         file_server
