@@ -2,9 +2,11 @@
 
 {
   environment.systemPackages = with pkgs; [
-    cloudflared
     ghostty.terminfo
   ];
+
+  # All OCI containers use Docker as the backend
+  virtualisation.oci-containers.backend = "docker";
 
   imports = [
     ./secrets.nix

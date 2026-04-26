@@ -57,7 +57,7 @@ in
 
     customJS = ''
       // Randomly pick a background image on each page load.
-      // Images are served by Caddy from hosts/nixos/homeserver/services/homepage-images/
+      // Images are served by Caddy from hosts/nixos/wagoulab/services/homepage-images/
       const images = [${imageListJS}];
       const pick = images[Math.floor(Math.random() * images.length)];
       const bgEl = document.getElementById("background");
@@ -358,4 +358,8 @@ in
       }
     ];
   };
+
+  systemd.services.homepage-dashboard.restartTriggers = [
+    config.sops.templates."homepage.env".content
+  ];
 }

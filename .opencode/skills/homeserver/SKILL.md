@@ -27,7 +27,9 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | Vaultwarden | `services/vaultwarden.nix` | 8222 (localhost) | `https://vault.wagou.fr` |
 | OpenCloud | `services/opencloud.nix` | 9200 (localhost) | `https://cloud.wagou.fr` |
 | Immich | `services/immich.nix` | 2283 (localhost) | `https://pixel.wagou.fr` |
-| Homepage | `services/homepage.nix` | 8082 (localhost) | `https://home.wagou.fr` |
+| Homepage | `services/homepage.nix` | 8082 (localhost) | `https://dash.wagou.fr` |
+| Home Assistant | `services/home-assistant.nix` | 8123 (Docker, localhost) | `https://home.wagou.fr` |
+| Jellyfin | `services/jellyfin.nix` | 8096 (localhost) | `https://tape.wagou.fr` |
 | Caddy | `services/caddy.nix` | 443 | - |
 | AdGuard Home | `services/adguardhome.nix` | 53 (DNS), 3000 (web UI) | `https://guard.wagou.fr` |
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
@@ -57,6 +59,8 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | `cloudflared.nix` | Cloudflare Tunnel systemd service |
 | `homepage.nix` | Homepage dashboard (Catppuccin Mocha theme, service widgets) |
 | `homepage-images/` | Background images and favicon for Homepage dashboard |
+| `home-assistant.nix` | Home automation (Docker OCI container) |
+| `jellyfin.nix` | Media server with Intel hardware transcoding |
 | `fail2ban.nix` | Brute force protection |
 | `firewall.nix` | Firewall rules (ports 22, 53, 443) |
 
@@ -112,6 +116,7 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `adguard-password` | `homepage.nix` | Via sops template `homepage.env` |
 | `cloudflare-tunnel-token` | `homepage.nix` | Via sops template `homepage.env` |
 | `cloudflare-dns-token` | `caddy.nix` (ACME) | Via sops template `caddy.env` |
+| `jellyfin-api-key` | `homepage.nix` | Via sops template `homepage.env` |
 
 ### Encryption keys
 
@@ -208,7 +213,9 @@ Each service gets a virtual host with `useACMEHost` for HTTPS. Caddy routes by h
 | `pixel.wagou.fr` | `127.0.0.1:2283` | - |
 | `cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
 | `guard.wagou.fr` | `127.0.0.1:3000` | AdGuard Home web UI |
-| `home.wagou.fr` | `127.0.0.1:8082` | Homepage dashboard + `/bg/*` static images (including favicon) |
+| `dash.wagou.fr` | `127.0.0.1:8082` | Homepage dashboard + `/bg/*` static images (including favicon) |
+| `home.wagou.fr` | `127.0.0.1:8123` | Home Assistant (Docker container) |
+| `tape.wagou.fr` | `127.0.0.1:8096` | Jellyfin media server |
 
 OpenCloud requires the `X-Forwarded-Proto: https` header because its configured URL is `https://cloud.wagou.fr` and it would otherwise redirect HTTP to HTTPS in a loop.
 
