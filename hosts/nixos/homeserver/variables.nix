@@ -16,5 +16,6 @@ rec {
     "dash"
     "guard"
     "home"
+    "tape"
   ];
 }
