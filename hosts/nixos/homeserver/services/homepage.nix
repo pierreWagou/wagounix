@@ -60,7 +60,7 @@ in
               icon = "vaultwarden.svg";
               href = "https://${config.homelab.vaultwarden.domain}";
               description = "Password manager";
-              siteMonitor = "http://host.docker.internal:${toString config.homelab.vaultwarden.port}";
+              siteMonitor = "http://localhost:${toString config.homelab.vaultwarden.port}";
             };
           }
           {
@@ -68,7 +68,7 @@ in
               icon = "owncloud.svg";
               href = "https://${config.homelab.opencloud.domain}";
               description = "File sync & sharing";
-              siteMonitor = "http://host.docker.internal:${toString config.homelab.opencloud.port}";
+              siteMonitor = "http://localhost:${toString config.homelab.opencloud.port}";
             };
           }
           {
@@ -76,10 +76,10 @@ in
               icon = "immich.svg";
               href = "https://pixel.${host.domain}";
               description = "Photo management";
-              siteMonitor = "http://host.docker.internal:${toString config.homelab.immich.port}";
+              siteMonitor = "http://localhost:${toString config.homelab.immich.port}";
               widget = {
                 type = "immich";
-                url = "http://host.docker.internal:${toString config.homelab.immich.port}";
+                url = "http://localhost:${toString config.homelab.immich.port}";
                 key = "{{HOMEPAGE_VAR_IMMICH_API_KEY}}";
                 version = 2;
               };
@@ -90,7 +90,7 @@ in
               icon = "home-assistant.svg";
               href = "https://${config.homelab.home-assistant.domain}";
               description = "Home automation";
-              siteMonitor = "http://host.docker.internal:${toString config.homelab.home-assistant.port}";
+              siteMonitor = "http://localhost:${toString config.homelab.home-assistant.port}";
             };
           }
         ];
@@ -102,10 +102,10 @@ in
               icon = "adguard-home.svg";
               href = "https://guard.${host.domain}";
               description = "DNS & ad blocking";
-              siteMonitor = "http://host.docker.internal:${toString config.homelab.adguardhome.port}";
+              siteMonitor = "http://localhost:${toString config.homelab.adguardhome.port}";
               widget = {
                 type = "adguard";
-                url = "http://host.docker.internal:${toString config.homelab.adguardhome.port}";
+                url = "http://localhost:${toString config.homelab.adguardhome.port}";
                 username = "{{HOMEPAGE_VAR_ADGUARD_USER}}";
                 password = "{{HOMEPAGE_VAR_ADGUARD_PASS}}";
               };

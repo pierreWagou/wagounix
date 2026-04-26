@@ -62,7 +62,6 @@ in
   config = lib.mkIf cfg.enable {
     virtualisation.oci-containers.containers.homepage = {
       image = "ghcr.io/gethomepage/homepage:latest";
-      ports = [ "127.0.0.1:${toString cfg.port}:3000" ];
       volumes = [
         "${settingsFile}:/app/config/settings.yaml:ro"
         "${servicesFile}:/app/config/services.yaml:ro"
@@ -74,11 +73,13 @@ in
       ];
       environment = {
         HOMEPAGE_ALLOWED_HOSTS = cfg.allowedHosts;
+        PORT = toString cfg.port;
       };
       environmentFiles = [
         config.sops.templates."homepage.env".path
       ];
-      extraOptions = [ "--add-host=host.docker.internal:host-gateway" ];
+      # Use host network so Homepage can reach all services on localhost
+      extraOptions = [ "--network=host" ];
     };
   };
 }
