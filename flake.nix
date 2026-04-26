@@ -97,17 +97,17 @@
       # -----------------------------------------------------------------------
       nixosConfigurations = {
 
-        homeserver = nixpkgs.lib.nixosSystem {
+        wagoulab = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             inputs.sops-nix.nixosModules.sops
             ./hosts/common
             ./hosts/nixos
-            ./hosts/nixos/homeserver
+            ./hosts/nixos/wagoulab
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/nixos/homeserver/variables.nix;
+            host = import ./hosts/nixos/wagoulab/variables.nix;
           };
         };
 

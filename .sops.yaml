@@ -1,9 +1,9 @@
 keys:
   - &admin age1ygezr8p29dslzduyvleekzl9zf4swqjntyy4t3yp4fr590jhrfyqsjcy9s
-  - &homeserver age1fqkxw5ly485yz6lpqw9v84hka764sy45xyrd53vx7grs4yvjud9sa4chjc
+  - &wagoulab age1fqkxw5ly485yz6lpqw9v84hka764sy45xyrd53vx7grs4yvjud9sa4chjc
 creation_rules:
-  - path_regex: hosts/nixos/homeserver/secrets\.yaml$
+  - path_regex: hosts/nixos/wagoulab/secrets\.yaml$
     key_groups:
       - age:
           - *admin
-          - *homeserver
+          - *wagoulab
