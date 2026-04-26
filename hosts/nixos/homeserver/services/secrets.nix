@@ -35,6 +35,9 @@
       cloudflare-dns-token = {
         mode = "0400";
       };
+      jellyfin-api-key = {
+        mode = "0400";
+      };
     };
 
     templates = {
@@ -54,6 +57,7 @@
           "HOMEPAGE_VAR_ADGUARD_USER=admin"
           "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
           "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
+          "HOMEPAGE_VAR_JELLYFIN_API_KEY=${config.sops.placeholder.jellyfin-api-key}"
         ];
       };
 

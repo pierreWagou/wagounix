@@ -59,6 +59,11 @@ let
       ${faviconRedirect}
       reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
     '';
+    tape = ''
+      ${hsts}
+      ${faviconRedirect}
+      reverse_proxy 127.0.0.1:8096
+    '';
   };
 in
 assert

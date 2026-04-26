@@ -42,7 +42,7 @@ in
       layout = {
         Services = {
           style = "row";
-          columns = 4;
+          columns = 5;
         };
         Infrastructure = {
           style = "row";
@@ -299,6 +299,21 @@ in
               href = "https://home.${host.domain}";
               description = "Home automation";
               siteMonitor = "http://localhost:8123";
+            };
+          }
+          {
+            "Jellyfin" = {
+              icon = "jellyfin.svg";
+              href = "https://tape.${host.domain}";
+              description = "Media server";
+              siteMonitor = "http://localhost:8096";
+              widget = {
+                type = "jellyfin";
+                url = "http://localhost:8096";
+                key = "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}";
+                enableBlocks = true;
+                enableNowPlaying = true;
+              };
             };
           }
         ];

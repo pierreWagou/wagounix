@@ -16,6 +16,7 @@
     ./opencloud.nix
     ./homepage.nix
     ./home-assistant.nix
+    ./jellyfin.nix
     ./fail2ban.nix
     ./firewall.nix
   ];
