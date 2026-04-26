@@ -18,6 +18,8 @@ let
   '';
 in
 {
+  virtualisation.oci-containers.backend = "docker";
+
   virtualisation.oci-containers.containers.home-assistant = {
     image = "ghcr.io/home-assistant/home-assistant:stable";
     volumes = [ "/var/lib/home-assistant:/config" ];
