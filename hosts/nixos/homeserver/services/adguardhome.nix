@@ -83,10 +83,18 @@ in
       "127.0.0.1:3000:3000"
     ];
     volumes = [
-      "${adguardConfig}:/opt/adguardhome/conf/AdGuardHome.yaml:ro"
+      "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
       "/var/lib/adguardhome/work:/opt/adguardhome/work"
     ];
   };
+
+  # Copy the Nix-generated config before the container starts (replicates mutableSettings = false).
+  # AdGuard needs a writable conf directory because its config migrator rewrites the file on startup.
+  system.activationScripts.adguardhome-config = ''
+    mkdir -p /var/lib/adguardhome/conf
+    cp ${adguardConfig} /var/lib/adguardhome/conf/AdGuardHome.yaml
+    chmod 644 /var/lib/adguardhome/conf/AdGuardHome.yaml
+  '';
 
   systemd.tmpfiles.rules = [
     "d /var/lib/adguardhome 0755 root root -"

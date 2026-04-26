@@ -85,9 +85,9 @@ in
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
-        ExecStart = "/run/current-system/sw/bin/docker network create ${immichNetwork} || true";
-        ExecStop = "/run/current-system/sw/bin/docker network rm ${immichNetwork} || true";
       };
+      script = "/run/current-system/sw/bin/docker network create immich || true";
+      preStop = "/run/current-system/sw/bin/docker network rm immich || true";
     };
 
     # Ensure Immich containers start after the network is created
