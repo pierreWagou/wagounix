@@ -7,6 +7,8 @@ let
   # The Docker container cannot modify this file; it is regenerated on every NixOS rebuild.
   adguardConfig = pkgs.writeText "AdGuardHome.yaml" (
     builtins.toJSON {
+      schema_version = 34;
+
       http = {
         address = "0.0.0.0:3000";
       };
