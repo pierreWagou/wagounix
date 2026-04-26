@@ -5,7 +5,11 @@
     ghostty.terminfo
   ];
 
-  # All OCI containers use Docker as the backend
+  # Service policy:
+  # - Default to NixOS native services (module system, systemd, sops integration).
+  # - OCI containers are exceptions for software that is impractical to run natively
+  #   (e.g. upstream only tests Docker, ecosystem assumes container environment).
+  #   Each container must document the justification in its service file.
   virtualisation.oci-containers.backend = "docker";
 
   imports = [
