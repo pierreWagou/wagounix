@@ -1,4 +1,4 @@
-# Homeserver
+# Wagoulab
 
 NixOS on a Beelink EQI13 (x86_64-linux, 32 GB RAM, 512 GB NVMe) running self-hosted services with network-wide ad blocking and secure remote access.
 
@@ -28,7 +28,9 @@ All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere) when remote.
 | **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` | 8222 |
 | **OpenCloud** | File sync & sharing (ownCloud-compatible) | `https://cloud.wagou.fr` | 9200 |
 | **Immich** | Photo management (Google Photos replacement) | `https://pixel.wagou.fr` | 2283 |
-| **Homepage** | Dashboard (Catppuccin Mocha theme) | `https://home.wagou.fr` | 8082 |
+| **Homepage** | Dashboard (Catppuccin Mocha theme) | `https://dash.wagou.fr` | 8082 |
+| **Home Assistant** | Home automation (Docker) | `https://home.wagou.fr` | 8123 |
+| **Jellyfin** | Media server (hardware transcoding) | `https://tape.wagou.fr` | 8096 |
 | **Caddy** | Reverse proxy + HTTPS termination | - | 443 |
 | **AdGuard Home** | DNS server + ad blocker | `https://guard.wagou.fr` | 53, 3000 |
 | **Cloudflare Tunnel** | Secure remote access | - | Outbound only |
@@ -56,7 +58,7 @@ All `*.wagou.fr` traffic goes through Cloudflare (HTTPS everywhere) when remote.
 ## Files
 
 ```
-hosts/nixos/homeserver/
+hosts/nixos/wagoulab/
 ├── default.nix              # Imports hardware.nix and services/
 ├── variables.nix            # Host variables (username, homeDir, hostname, domain, serverIP, acmeEmail, cloudflare IDs, tunnel subdomains)
 ├── hardware.nix             # Auto-generated hardware config (boot, filesystems, kernel modules)
@@ -67,6 +69,8 @@ hosts/nixos/homeserver/
     ├── vaultwarden.nix      # Password manager
     ├── opencloud.nix        # File sync & sharing
     ├── immich.nix           # Photo management
+    ├── home-assistant.nix   # Home automation
+    ├── jellyfin.nix         # Media server
     ├── caddy.nix            # Reverse proxy (all virtual hosts)
     ├── adguardhome.nix      # DNS server + ad blocker
     ├── cloudflared.nix      # Cloudflare Tunnel
@@ -113,17 +117,18 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `adguard-password` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 | `cloudflare-tunnel-token` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 | `cloudflare-dns-token` | ACME DNS-01 challenge (via sops template) | `/run/secrets/rendered/caddy.env` |
+| `jellyfin-api-key` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 
 ### Editing secrets
 
 ```bash
-sops hosts/nixos/homeserver/secrets.yaml
+sops hosts/nixos/wagoulab/secrets.yaml
 ```
 
 Or in Neovim (sops.nvim auto-decrypts):
 
 ```bash
-nvim hosts/nixos/homeserver/secrets.yaml
+nvim hosts/nixos/wagoulab/secrets.yaml
 ```
 
 ### Adding a new secret
@@ -186,37 +191,38 @@ nvim hosts/nixos/homeserver/secrets.yaml
    };
    ```
    Don't forget to add the subdomain to `tunnelSubdomains` in `variables.nix` — it will automatically propagate to Caddy, cloudflared, and AdGuard Home.
-4. **Add subdomain** to `tunnelSubdomains` in `hosts/nixos/homeserver/variables.nix`. The DNS rewrite, tunnel route, and Caddy vhost are all derived from this list.
+4. **Add subdomain** to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`. The DNS rewrite, tunnel route, and Caddy vhost are all derived from this list.
 5. **Add secrets** if needed in `services/secrets.nix`
-6. **Add DNS CNAME record**: Run `cloudflared tunnel route dns homeserver newservice.wagou.fr` once from a machine with `cert.pem` (your Mac after `cloudflared login`).
+6. **Add DNS CNAME record**: Run `cloudflared tunnel route dns wagoulab newservice.wagou.fr` once from a machine with `cert.pem` (your Mac after `cloudflared login`).
 7. **Push and rebuild**:
    ```bash
    git add -A && git commit -m "feat: add newservice" && git push
-   sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh
+   sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
    ```
 
 ## Quick reference
 
 | Action | Command |
 |---|---|
-| SSH into server | `ssh homeserver` |
-| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh` |
+| SSH into server | `ssh wagoulab` |
+| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh` |
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
-| Edit secrets | `sops hosts/nixos/homeserver/secrets.yaml` |
-| Test build locally | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
+| Edit secrets | `sops hosts/nixos/wagoulab/secrets.yaml` |
+| Test build locally | `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath` |
 | AdGuard Home dashboard | `https://guard.wagou.fr` |
-| Homepage dashboard | `https://home.wagou.fr` |
+| Homepage dashboard | `https://dash.wagou.fr` |
 | Vaultwarden | `https://vault.wagou.fr` |
 | OpenCloud | `https://cloud.wagou.fr` |
 | Immich | `https://pixel.wagou.fr` |
+| Home Assistant | `https://home.wagou.fr` |
+| Jellyfin | `https://tape.wagou.fr` |
 
 ## Planned services
 
 | Service | Purpose | Status |
 |---|---|---|
-| Home Assistant | Home automation (Docker via `oci-containers`) | Planned |
 | Ollama | Local LLM inference | Planned |
 | Backups | borgbackup/restic to external drive or cloud | Planned |
 | Monitoring | Uptime Kuma or similar | Planned |

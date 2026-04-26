@@ -3,7 +3,7 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Minimal set of packages for all machines (including the homeserver)
+  # Minimal set of packages for all machines (including wagoulab)
   environment.systemPackages = with pkgs; [
     age
     bat

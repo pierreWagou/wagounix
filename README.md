@@ -33,7 +33,7 @@ Each configuration is assembled from layered modules — common packages are sha
   ├─────────────────────────┬─────────────────────────────┤
   │      hosts/darwin/      │       hosts/nixos/          │  platform
   ├────────────┬────────────┼─────────────────────────────┤
-  │  personal/ │   work/    │       homeserver/           │  layer / host
+  │  personal/ │   work/    │       wagoulab/             │  layer / host
   ├────────────┼──────┬─────┤                             │
   │   wagou    │ sap  │alan │                             │
   └────────────┴──────┴─────┴─────────────────────────────┘
@@ -50,7 +50,7 @@ wagounix/
     │   ├── personal/  # Personal Macs (wagou)
     │   └── work/      # Work Macs (sap, alan)
     └── nixos/         # NixOS — platform config, services
-        └── homeserver/
+        └── wagoulab/
 ```
 
 <details>
@@ -114,7 +114,7 @@ wagounix/
     └── nixos/
         ├── default.nix
         ├── configuration.nix
-        └── homeserver/
+        └── wagoulab/
             ├── default.nix
             ├── variables.nix
             ├── hardware.nix
@@ -130,6 +130,8 @@ wagounix/
                 ├── cloudflared.nix
                 ├── homepage.nix
                 ├── homepage-images/
+                ├── home-assistant.nix
+                ├── jellyfin.nix
                 ├── fail2ban.nix
                 └── firewall.nix
 ```
@@ -150,7 +152,7 @@ wagounix/
 
 | Profile | System | Description |
 |---|---|---|
-| `homeserver` | x86_64-linux | Home server (Docker, services) |
+| `wagoulab` | x86_64-linux | Home server (Docker, services) |
 
 ## Getting Started
 
@@ -167,8 +169,8 @@ sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 
 1. Install NixOS with flake support enabled
 2. Clone this repo to `~/.config/wagounix`
-3. Replace `hosts/nixos/homeserver/hardware.nix` with the output of `nixos-generate-config`
-4. Run `sudo nixos-rebuild switch --flake ~/.config/wagounix#homeserver`
+3. Replace `hosts/nixos/wagoulab/hardware.nix` with the output of `nixos-generate-config`
+4. Run `sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab`
 
 </details>
 
@@ -204,7 +206,7 @@ GitHub Actions runs on push to `main` and on PRs:
 |---|---|---|
 | Lint | macos-15 | nixfmt, statix, deadnix |
 | Build darwin | macos-15 | sap, wagou (parallel) |
-| Build NixOS | ubuntu-latest | homeserver |
+| Build NixOS | ubuntu-latest | wagoulab |
 
 ## Quick Reference
 

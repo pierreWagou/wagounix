@@ -60,7 +60,7 @@ wagounix/
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration
 │       ├── configuration.nix      # NixOS system config (SSH, Docker, auto-updates, users)
-│       └── homeserver/            # Home server (x86_64-linux)
+│       └── wagoulab/              # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
 │           ├── hardware.nix       # Auto-generated hardware config (nixos-generate-config)
@@ -75,6 +75,8 @@ wagounix/
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
 │               ├── homepage.nix
+│               ├── home-assistant.nix
+│               ├── jellyfin.nix
 │               ├── homepage-images/
 │               ├── fail2ban.nix
 │               └── firewall.nix
@@ -110,13 +112,13 @@ sap = nix-darwin.lib.darwinSystem {
 };
 
 # NixOS host
-homeserver = nixpkgs.lib.nixosSystem {
+wagoulab = nixpkgs.lib.nixosSystem {
   modules = [
     ./hosts/common              # common
     ./hosts/nixos               # platform
-    ./hosts/nixos/homeserver    # host
+    ./hosts/nixos/wagoulab      # host
   ];
-  specialArgs = { inherit inputs; host = import ./hosts/nixos/homeserver/variables.nix; };
+  specialArgs = { inherit inputs; host = import ./hosts/nixos/wagoulab/variables.nix; };
 };
 ```
 
@@ -132,13 +134,13 @@ rec {
   homeDir = "/Users/${username}";     # /home/${username} for NixOS
   restrictedAppDir = "/Applications";   # darwin only
   enableRosetta = false;                # darwin only
-  hostname = "homeserver";              # NixOS only
+  hostname = "wagoulab";              # NixOS only
   domain = "wagou.fr";                  # NixOS only
   serverIP = "192.168.68.65";           # NixOS only
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
-  tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" ]; # NixOS only
+  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" ]; # NixOS only
 }
 ```
 
@@ -324,7 +326,7 @@ nix flake check      # runs all checks + builds
 
 - **lint** — nixfmt, statix, deadnix (macos-15)
 - **build-darwin** — sap, wagou (macos-15, parallel)
-- **build-nixos** — homeserver (ubuntu-latest)
+- **build-nixos** — wagoulab (ubuntu-latest)
 
 ## Key commands
 
