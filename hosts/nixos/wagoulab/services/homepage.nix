@@ -42,7 +42,11 @@ in
       layout = {
         Services = {
           style = "row";
-          columns = 5;
+          columns = 3;
+        };
+        Media = {
+          style = "row";
+          columns = 2;
         };
         Infrastructure = {
           style = "row";
@@ -293,6 +297,10 @@ in
               };
             };
           }
+        ];
+      }
+      {
+        "Media" = [
           {
             "Home Assistant" = {
               icon = "home-assistant.svg";
@@ -312,7 +320,7 @@ in
                 url = "http://localhost:8096";
                 key = "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}";
                 enableBlocks = true;
-                enableNowPlaying = true;
+                enableNowPlaying = false;
               };
             };
           }
