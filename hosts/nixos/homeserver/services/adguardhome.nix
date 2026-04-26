@@ -1,17 +1,16 @@
-{ host, ... }:
+{ pkgs, host, ... }:
 
 let
   inherit (host) serverIP domain;
-in
-{
-  services.adguardhome = {
-    enable = true;
-    mutableSettings = false;
-    host = "127.0.0.1";
-    port = 3000;
-    openFirewall = false;
 
-    settings = {
+  # AdGuard Home configuration — bind-mounted read-only to replicate mutableSettings = false.
+  # The Docker container cannot modify this file; it is regenerated on every NixOS rebuild.
+  adguardConfig = pkgs.writeText "AdGuardHome.yaml" (
+    builtins.toJSON {
+      http = {
+        address = "0.0.0.0:3000";
+      };
+
       users = [
         {
           name = "admin";
@@ -72,6 +71,25 @@ in
           url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt";
         }
       ];
-    };
+    }
+  );
+in
+{
+  virtualisation.oci-containers.containers.adguardhome = {
+    image = "adguard/adguardhome:latest";
+    ports = [
+      "53:53/tcp"
+      "53:53/udp"
+      "127.0.0.1:3000:3000"
+    ];
+    volumes = [
+      "${adguardConfig}:/opt/adguardhome/conf/AdGuardHome.yaml:ro"
+      "/var/lib/adguardhome/work:/opt/adguardhome/work"
+    ];
   };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/adguardhome 0755 root root -"
+    "d /var/lib/adguardhome/work 0755 root root -"
+  ];
 }

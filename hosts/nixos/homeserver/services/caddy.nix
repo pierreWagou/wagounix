@@ -19,23 +19,24 @@ let
   '';
 
   # Per-subdomain reverse proxy configuration
+  # Ports are hardcoded because services run as Docker containers (no config.services.* references)
   serviceConfigs = {
     vault = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
+      reverse_proxy 127.0.0.1:8222 {
         header_up X-Real-IP {remote_host}
       }
     '';
     pixel = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.immich.port}
+      reverse_proxy 127.0.0.1:2283
     '';
     cloud = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
+      reverse_proxy 127.0.0.1:9200 {
         header_up X-Forwarded-Proto https
       }
     '';
@@ -51,13 +52,13 @@ let
         root * ${homepageImages}
       }
       handle {
-        reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        reverse_proxy 127.0.0.1:8082
       }
     '';
     guard = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
+      reverse_proxy 127.0.0.1:3000
     '';
   };
 in

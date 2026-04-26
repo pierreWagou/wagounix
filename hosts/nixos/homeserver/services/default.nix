@@ -6,6 +6,9 @@
     ghostty.terminfo
   ];
 
+  # All OCI containers use Docker as the backend
+  virtualisation.oci-containers.backend = "docker";
+
   imports = [
     ./secrets.nix
     ./vaultwarden.nix

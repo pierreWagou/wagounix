@@ -26,6 +26,9 @@
       immich-api-key = {
         mode = "0400";
       };
+      immich-db-password = {
+        mode = "0400";
+      };
       adguard-password = {
         mode = "0400";
       };
@@ -39,13 +42,20 @@
 
     templates = {
       "opencloud.env" = {
-        owner = "opencloud";
         content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
       };
 
       "vaultwarden.env" = {
-        owner = "vaultwarden";
         content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
+      };
+
+      # Shared DB password for Immich server and Postgres containers
+      "immich.env" = {
+        content = "DB_PASSWORD=${config.sops.placeholder.immich-db-password}\n";
+      };
+
+      "immich-db.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.immich-db-password}\n";
       };
 
       "homepage.env" = {
