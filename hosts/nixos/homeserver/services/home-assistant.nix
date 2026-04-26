@@ -1,7 +1,7 @@
 { pkgs, host, ... }:
 
 let
-  initialConfig = pkgs.writeText "home-assistant-initial-config" ''
+  configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
     default_config:
 
     homeassistant:
@@ -15,6 +15,13 @@ let
       use_x_forwarded_for: true
       trusted_proxies:
         - 172.16.0.0/12
+
+    frontend:
+      themes: !include_dir_merge_named themes
+
+    automation: !include automations.yaml
+    script: !include scripts.yaml
+    scene: !include scenes.yaml
   '';
 in
 {
@@ -22,7 +29,10 @@ in
 
   virtualisation.oci-containers.containers.home-assistant = {
     image = "ghcr.io/home-assistant/home-assistant:stable";
-    volumes = [ "/var/lib/home-assistant:/config" ];
+    volumes = [
+      "/var/lib/home-assistant:/config"
+      "${configFile}:/config/configuration.yaml:ro"
+    ];
     environment = {
       TZ = "Europe/Paris";
     };
@@ -32,11 +42,4 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/home-assistant 0755 root root -"
   ];
-
-  # Seed configuration.yaml on first boot (won't overwrite if it already exists)
-  system.activationScripts.home-assistant-config = ''
-    if [ ! -f /var/lib/home-assistant/configuration.yaml ]; then
-      cp ${initialConfig} /var/lib/home-assistant/configuration.yaml
-    fi
-  '';
 }
