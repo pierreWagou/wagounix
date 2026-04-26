@@ -13,7 +13,8 @@ rec {
     "vault"
     "pixel"
     "cloud"
-    "home"
+    "dash"
     "guard"
+    "home"
   ];
 }

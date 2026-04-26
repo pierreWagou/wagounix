@@ -8,6 +8,7 @@
     age
     bat
     bottom
+    cloudflared
     eza
     fd
     fzf
