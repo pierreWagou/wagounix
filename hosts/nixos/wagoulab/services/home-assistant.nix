@@ -1,6 +1,8 @@
 { pkgs, host, ... }:
 
 let
+  port = host.homeAssistantPort;
+
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
     default_config:
 
@@ -25,6 +27,8 @@ let
   '';
 in
 {
+  # OCI container exception: Home Assistant's ecosystem (HACS, custom integrations, add-ons)
+  # assumes the Docker environment. Upstream only tests against their container image.
   virtualisation.oci-containers.containers.home-assistant = {
     image = "ghcr.io/home-assistant/home-assistant:stable";
     volumes = [
@@ -34,7 +38,8 @@ in
     environment = {
       TZ = "Europe/Paris";
     };
-    ports = [ "127.0.0.1:8123:8123" ];
+    ports = [ "127.0.0.1:${toString port}:8123" ];
+    extraOptions = [ "--log-driver=journald" ];
   };
 
   systemd.tmpfiles.rules = [

@@ -42,7 +42,7 @@ let
     home = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:8123
+      reverse_proxy 127.0.0.1:${toString host.homeAssistantPort}
     '';
     dash = ''
       ${hsts}
@@ -62,7 +62,7 @@ let
     tape = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:8096
+      reverse_proxy 127.0.0.1:${toString host.jellyfinPort}
     '';
   };
 in
