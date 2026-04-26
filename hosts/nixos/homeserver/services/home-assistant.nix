@@ -1,43 +1,8 @@
-{ pkgs, host, ... }:
+{ host, ... }:
 
-let
-  configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
-    default_config:
-
-    homeassistant:
-      name: Home
-      unit_system: metric
-      time_zone: Europe/Paris
-      external_url: https://home.${host.domain}
-      internal_url: https://home.${host.domain}
-
-    http:
-      use_x_forwarded_for: true
-      trusted_proxies:
-        - 172.16.0.0/12
-
-    frontend:
-      themes: !include_dir_merge_named themes
-
-    automation: !include automations.yaml
-    script: !include scripts.yaml
-    scene: !include scenes.yaml
-  '';
-in
 {
-  virtualisation.oci-containers.containers.home-assistant = {
-    image = "ghcr.io/home-assistant/home-assistant:stable";
-    volumes = [
-      "/var/lib/home-assistant:/config"
-      "${configFile}:/config/configuration.yaml:ro"
-    ];
-    environment = {
-      TZ = "Europe/Paris";
-    };
-    ports = [ "127.0.0.1:8123:8123" ];
+  homelab.home-assistant = {
+    enable = true;
+    domain = "home.${host.domain}";
   };
-
-  systemd.tmpfiles.rules = [
-    "d /var/lib/home-assistant 0755 root root -"
-  ];
 }

@@ -14,36 +14,36 @@ let
   # Redirect /favicon.ico to the custom synthwave sunset SVG
   faviconRedirect = ''
     handle /favicon.ico {
-      redir https://dash.${host.domain}/bg/favicon.svg permanent
+      redir https://${config.homelab.homepage.domain}/bg/favicon.svg permanent
     }
   '';
 
   # Per-subdomain reverse proxy configuration
-  # Ports are hardcoded because services run as Docker containers (no config.services.* references)
+  # Ports are referenced from container module options (type-checked, cross-referenceable)
   serviceConfigs = {
     vault = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:8222 {
+      reverse_proxy 127.0.0.1:${toString config.homelab.vaultwarden.port} {
         header_up X-Real-IP {remote_host}
       }
     '';
     pixel = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:2283
+      reverse_proxy 127.0.0.1:${toString config.homelab.immich.port}
     '';
     cloud = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:9200 {
+      reverse_proxy 127.0.0.1:${toString config.homelab.opencloud.port} {
         header_up X-Forwarded-Proto https
       }
     '';
     home = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:8123
+      reverse_proxy 127.0.0.1:${toString config.homelab.home-assistant.port}
     '';
     dash = ''
       ${hsts}
@@ -52,13 +52,13 @@ let
         root * ${homepageImages}
       }
       handle {
-        reverse_proxy 127.0.0.1:8082
+        reverse_proxy 127.0.0.1:${toString config.homelab.homepage.port}
       }
     '';
     guard = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:3000
+      reverse_proxy 127.0.0.1:${toString config.homelab.adguardhome.port}
     '';
   };
 in

@@ -10,6 +10,7 @@
   virtualisation.oci-containers.backend = "docker";
 
   imports = [
+    ../modules
     ./secrets.nix
     ./vaultwarden.nix
     ./caddy.nix
