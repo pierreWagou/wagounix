@@ -55,5 +55,5 @@ jobs:
       - name: Configure SAP GitHub access
         run: |
           git config --global url."https://${{ secrets.SAP_GITHUB_TOKEN }}@github.tools.sap/".insteadOf "https://github.tools.sap/"
-      - name: Build homeserver
-        run: nix build .#nixosConfigurations.homeserver.config.system.build.toplevel --no-link
+      - name: Build wagoulab
+        run: nix build .#nixosConfigurations.wagoulab.config.system.build.toplevel --no-link

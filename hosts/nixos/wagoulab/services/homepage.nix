@@ -23,7 +23,7 @@ in
     ];
 
     settings = {
-      title = "wagou://dash";
+      title = "wagoulab://dash";
       favicon = "https://dash.${host.domain}/bg/favicon.svg";
       logo = "https://dash.${host.domain}/bg/favicon.svg";
       theme = "dark";

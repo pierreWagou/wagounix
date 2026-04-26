@@ -1,11 +1,11 @@
 ---
 name: homeserver
-description: Manage the NixOS homeserver — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Caddy reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
+description: Manage the NixOS homeserver (wagoulab) — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Caddy reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
 ---
 
 ## Overview
 
-The homeserver is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel.
+The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel.
 
 Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
@@ -35,15 +35,15 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 
 ## Files
 
-### Host-level config: `hosts/nixos/homeserver/`
+### Host-level config: `hosts/nixos/wagoulab/`
 
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "homeserver"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
-### Services: `hosts/nixos/homeserver/services/`
+### Services: `hosts/nixos/wagoulab/services/`
 
 | File | Purpose |
 |---|---|
@@ -67,7 +67,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | `default.nix` | Imports configuration.nix |
 | `configuration.nix` | SSH (hardened, key-only), Docker, user account, timezone, locale, auto-updates |
 
-### Secrets: `hosts/nixos/homeserver/`
+### Secrets: `hosts/nixos/wagoulab/`
 
 | File | Purpose |
 |---|---|
@@ -97,7 +97,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 
 ## Secrets management (sops-nix)
 
-Secrets are encrypted with age in `hosts/nixos/homeserver/secrets.yaml` (colocated with the host config) and committed to Git. They are decrypted at NixOS activation time on the Beelink using its SSH host key.
+Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated with the host config) and committed to Git. They are decrypted at NixOS activation time on the Beelink using its SSH host key.
 
 ### Current secrets
 
@@ -125,14 +125,14 @@ Secrets are encrypted with age in `hosts/nixos/homeserver/secrets.yaml` (colocat
 
 ```bash
 # From the wagounix directory:
-sops hosts/nixos/homeserver/secrets.yaml
+sops hosts/nixos/wagoulab/secrets.yaml
 # Or in Neovim (sops.nvim auto-decrypts):
-nvim hosts/nixos/homeserver/secrets.yaml
+nvim hosts/nixos/wagoulab/secrets.yaml
 ```
 
 ### Adding a new secret
 
-1. Edit `hosts/nixos/homeserver/secrets.yaml` with `sops` — add a new key-value pair
+1. Edit `hosts/nixos/wagoulab/secrets.yaml` with `sops` — add a new key-value pair
 2. Declare it in `services/secrets.nix` under `sops.secrets`
 3. If the service needs `KEY=VALUE` env format, create a `sops.templates` entry:
    ```nix
@@ -148,7 +148,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 ### Important notes about sops
 
 - The admin age private key (`~/.config/sops/age/keys.txt`) is NOT in Git or chezmoi — it lives only on the Mac
-- If you lose it, generate a new key with `age-keygen`, update `.sops.yaml` with the new public key, and re-encrypt all secrets with `sops updatekeys hosts/nixos/homeserver/secrets.yaml`
+- If you lose it, generate a new key with `age-keygen`, update `.sops.yaml` with the new public key, and re-encrypt all secrets with `sops updatekeys hosts/nixos/wagoulab/secrets.yaml`
 - The standalone age key was used instead of SSH-derived key because the SSH key is passphrase-protected (ssh-to-age can't handle passphrase-protected keys)
 
 ## Network configuration
@@ -219,7 +219,7 @@ SSH is hardened — key-only authentication, no passwords, no root login.
 ### SSH config on Mac (`~/.ssh/config`, managed by chezmoi)
 
 ```
-Host homeserver
+Host wagoulab
     HostName 192.168.68.65
     User wagou
     IdentityFile ~/.ssh/id_ed25519_homeserver
@@ -227,7 +227,7 @@ Host homeserver
     UseKeychain yes
 ```
 
-Connect with: `ssh homeserver`
+Connect with: `ssh wagoulab`
 
 ### Authorized key
 
@@ -271,7 +271,7 @@ If the service needs `X-Forwarded-Proto` (because its URL is configured as https
 
 ### Step 4 — Add subdomain to variables
 
-Add the subdomain to `tunnelSubdomains` in `hosts/nixos/homeserver/variables.nix`:
+Add the subdomain to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
 
 ```nix
 tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" "newservice" ];
@@ -296,17 +296,17 @@ sops.templates."newservice.env" = {
 };
 ```
 
-Then edit `hosts/nixos/homeserver/secrets.yaml` with `sops` to add the secret value.
+Then edit `hosts/nixos/wagoulab/secrets.yaml` with `sops` to add the secret value.
 
 ### Step 6 — Add Cloudflare DNS route
 
-Run `cloudflared tunnel route dns homeserver newservice.wagou.fr` once from your Mac (requires `cert.pem` from `cloudflared login`).
+Run `cloudflared tunnel route dns wagoulab newservice.wagou.fr` once from your Mac (requires `cert.pem` from `cloudflared login`).
 
 ### Step 7 — Deploy
 
 ```bash
 git add -A && git commit -m "feat: add newservice" && git push
-sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 ```
 
 ## Troubleshooting
@@ -353,29 +353,29 @@ If IPv6 is enabled on the Deco and the Beelink's IPv6 DNS is configured, this sh
 
 ### Can't decrypt sops secrets (on Mac)
 
-Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. If not, regenerate with `age-keygen -o ~/.config/sops/age/keys.txt` and update the public key in `.sops.yaml`, then re-encrypt with `sops updatekeys hosts/nixos/homeserver/secrets.yaml`.
+Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. If not, regenerate with `age-keygen -o ~/.config/sops/age/keys.txt` and update the public key in `.sops.yaml`, then re-encrypt with `sops updatekeys hosts/nixos/wagoulab/secrets.yaml`.
 
 ## Key commands
 
 | Action | Command |
 |---|---|
-| SSH into server | `ssh homeserver` |
-| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#homeserver --refresh` |
+| SSH into server | `ssh wagoulab` |
+| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh` |
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
-| Edit secrets | `sops hosts/nixos/homeserver/secrets.yaml` |
-| Test build | `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath` |
+| Edit secrets | `sops hosts/nixos/wagoulab/secrets.yaml` |
+| Test build | `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath` |
 
 ## Important rules
 
 - Each service gets its own file in `services/` — one service per file
-- Secrets go in `hosts/nixos/homeserver/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
+- Secrets go in `hosts/nixos/wagoulab/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
 - AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
 - Caddy serves HTTPS with Let's Encrypt wildcard cert
 - Cloudflare Tunnel routes use HTTPS with `localhost:443` and `originServerName`
 - AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare
 - `system.stateVersion = "25.05"` — never change this
 - `hardware.nix` was generated by `nixos-generate-config` — only regenerate if hardware changes
-- Always test builds before pushing: `nix eval .#nixosConfigurations.homeserver.config.system.build.toplevel.drvPath`
+- Always test builds before pushing: `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath`
 - SSH uses a dedicated key (`id_ed25519_homeserver`), separate from work SSH key

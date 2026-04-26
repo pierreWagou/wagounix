@@ -1,7 +1,7 @@
 rec {
   username = "wagou";
   homeDir = "/home/${username}";
-  hostname = "homeserver";
+  hostname = "wagoulab";
   domain = "wagou.fr";
   serverIP = "192.168.68.65";
   acmeEmail = "pierre.romon@gmail.com";
