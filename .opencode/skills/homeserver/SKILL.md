@@ -180,6 +180,7 @@ nvim hosts/nixos/homeserver/secrets.yaml
 | DNS | Cloudflare (OVH nameservers pointed to Cloudflare) |
 | TLS certificates | Let's Encrypt (wildcard via DNS-01, Cloudflare DNS) |
 | Email | OVH Zimbra (MX records in Cloudflare) |
+| Bare domain redirect | Cloudflare redirect rule: `wagou.fr` -> `https://dash.wagou.fr` (configured in Cloudflare dashboard, not in NixOS) |
 
 ## AdGuard Home configuration
 
