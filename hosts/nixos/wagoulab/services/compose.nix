@@ -66,7 +66,7 @@ in
       WorkingDirectory = composeDir;
       TimeoutStartSec = "5min";
       TimeoutStopSec = "2min";
-      KillMode = "mixed";
+      KillMode = "none";
 
       # Copy config files and clean up stale containers before starting
       ExecStartPre = "${pkgs.writeShellScript "wagoulab-compose-pre" ''
