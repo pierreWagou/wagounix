@@ -18,6 +18,11 @@ services:
     volumes:
       - /var/lib/adguardhome/work:/opt/adguardhome/work
       - /var/lib/adguardhome/conf:/opt/adguardhome/conf
+      - /etc/wagoulab/AdGuardHome.yaml:/opt/adguardhome/AdGuardHome.seed.yaml:ro
+    entrypoint:
+      - /bin/sh
+      - -c
+      - "cp /opt/adguardhome/AdGuardHome.seed.yaml /opt/adguardhome/conf/AdGuardHome.yaml && exec /opt/adguardhome/AdGuardHome --no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work"
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard.rule=Host(`guard.wagou.fr`)
