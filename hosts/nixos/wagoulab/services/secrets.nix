@@ -7,7 +7,7 @@
 
     secrets = {
       # Cloudflare credentials file — mounted directly into the cloudflared container
-      cloudflare-credentials.mode = "0400";
+      cloudflare-credentials.mode = "0444";
 
       # Compose service secrets (referenced in env templates below)
       cloudflare-dns-token.mode = "0400";
