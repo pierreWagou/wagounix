@@ -6,9 +6,11 @@
     podman-compose
   ];
 
-  # All application services are managed by podman-compose (see compose/docker-compose.yml).
-  # NixOS manages: Podman runtime, secrets (sops-nix), firewall, fail2ban, hardware drivers,
-  # and the systemd service that runs podman-compose on boot.
+  # All application services are managed by podman-compose.
+  # Compose files live in the git repo at hosts/nixos/wagoulab/compose/,
+  # cloned to /opt/wagounix on the server.
+  # NixOS manages: Podman runtime, secrets (sops-nix), firewall, fail2ban,
+  # hardware drivers, and per-service systemd units.
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
@@ -19,7 +21,6 @@
   imports = [
     ./secrets.nix
     ./compose.nix
-    ./cloudflared.nix
     ./hardware-gpu.nix
     ./fail2ban.nix
     ./firewall.nix

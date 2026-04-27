@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     command: tunnel --config /etc/cloudflared/config.yml --no-autoupdate run
     volumes:
-      - /var/lib/cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/cloudflared/config.yml:/etc/cloudflared/config.yml:ro
       - /run/secrets/cloudflare-credentials:/etc/cloudflared/credentials.json:ro
     networks:
       - proxy

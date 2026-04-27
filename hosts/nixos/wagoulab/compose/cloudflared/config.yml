@@ -1,0 +1,32 @@
+tunnel: 77f1d05e-ce21-4a09-8229-13f173b38525
+credentials-file: /etc/cloudflared/credentials.json
+ingress:
+  - hostname: vault.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: pixel.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: cloud.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: dash.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: guard.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: home.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - hostname: tape.wagou.fr
+    service: https://traefik:443
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404

@@ -18,7 +18,7 @@ services:
     volumes:
       - /var/lib/adguardhome/work:/opt/adguardhome/work
       - /var/lib/adguardhome/conf:/opt/adguardhome/conf
-      - /etc/wagoulab/AdGuardHome.yaml:/opt/adguardhome/AdGuardHome.seed.yaml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/AdGuardHome.yaml:/opt/adguardhome/AdGuardHome.seed.yaml:ro
     entrypoint:
       - /bin/sh
       - -c
