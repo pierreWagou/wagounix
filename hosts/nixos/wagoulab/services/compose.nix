@@ -38,6 +38,7 @@ in
     "wagoulab/homepage/bookmarks.yaml".source = ../compose/homepage/bookmarks.yaml;
     "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
     "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
+    "wagoulab/traefik-dynamic.yml".source = ../compose/traefik-dynamic.yml;
   };
 
   # Systemd service — runs podman-compose on boot
@@ -63,6 +64,9 @@ in
       Type = "oneshot";
       RemainAfterExit = true;
       WorkingDirectory = composeDir;
+      TimeoutStartSec = "5min";
+      TimeoutStopSec = "2min";
+      KillMode = "mixed";
 
       # Copy compose file from /etc to working directory on each start
       ExecStartPre = "${pkgs.writeShellScript "wagoulab-compose-pre" ''
@@ -79,6 +83,9 @@ in
         # Cloudflared tunnel config (routes *.wagou.fr -> traefik:80)
         mkdir -p /var/lib/cloudflared
         cp /etc/wagoulab/cloudflared-config.yml /var/lib/cloudflared/config.yml
+
+        # Traefik dynamic config (middleware definitions)
+        cp /etc/wagoulab/traefik-dynamic.yml /var/lib/traefik/dynamic.yml
       ''}";
 
       ExecStart = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} up -d --remove-orphans";
