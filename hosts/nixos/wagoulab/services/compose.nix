@@ -5,10 +5,10 @@ let
   composeFile = "${composeDir}/docker-compose.yml";
 in
 {
-  # Deploy the compose file and homepage config to the server
+  # Persistent data directories for containers
   systemd.tmpfiles.rules = [
     "d ${composeDir} 0755 root root -"
-    "d ${composeDir}/homepage 0755 root root -"
+    "d ${composeDir}/homepage-logs 0755 root root -"
     "d /var/lib/traefik/letsencrypt 0755 root root -"
     "d /var/lib/vaultwarden 0755 root root -"
     "d /var/lib/opencloud 0755 1000 1000 -"
@@ -20,18 +20,15 @@ in
     "d /var/lib/home-assistant 0755 root root -"
     "d /var/lib/adguardhome 0755 root root -"
     "d /var/lib/adguardhome/work 0755 root root -"
-    "d /var/lib/adguardhome/conf 0755 root root -"
     "d /var/lib/immich 0755 root root -"
     "d /var/lib/immich-ml-cache 0755 root root -"
     "d /var/lib/immich-postgres 0755 root root -"
+    "d /var/lib/cloudflared 0755 root root -"
   ];
 
-  # Copy compose file and homepage config from the Nix store to the server
+  # Config files deployed to /etc/wagoulab/ — containers mount them directly (read-only)
   environment.etc = {
-    "wagoulab/docker-compose.yml" = {
-      source = ../compose/docker-compose.yml;
-      target = "wagoulab/docker-compose.yml";
-    };
+    "wagoulab/docker-compose.yml".source = ../compose/docker-compose.yml;
     "wagoulab/homepage/settings.yaml".source = ../compose/homepage/settings.yaml;
     "wagoulab/homepage/widgets.yaml".source = ../compose/homepage/widgets.yaml;
     "wagoulab/homepage/services.yaml".source = ../compose/homepage/services.yaml;
@@ -69,27 +66,19 @@ in
       TimeoutStopSec = "2min";
       KillMode = "none";
 
-      # Copy config files and clean up stale containers before starting
       ExecStartPre = "${pkgs.writeShellScript "wagoulab-compose-pre" ''
         # Clean up any stale containers from previous runs
         ${pkgs.podman}/bin/podman rm -af 2>/dev/null || true
         ${pkgs.podman}/bin/podman pod rm -af 2>/dev/null || true
 
+        # Deploy compose file (the only file that needs copying — containers
+        # mount everything else directly from /etc/wagoulab/)
         cp /etc/wagoulab/docker-compose.yml ${composeFile}
 
-        # Homepage config
-        mkdir -p ${composeDir}/homepage
-        cp /etc/wagoulab/homepage/* /var/lib/wagoulab/homepage/
-
-        # AdGuard Home config (immutable — overwritten on each deploy)
-        mkdir -p /var/lib/adguardhome/conf
-        cp /etc/wagoulab/AdGuardHome.yaml /var/lib/adguardhome/conf/AdGuardHome.yaml
-
-        # Cloudflared tunnel config (routes *.wagou.fr -> traefik:80)
-        mkdir -p /var/lib/cloudflared
+        # Deploy cloudflared tunnel config
         cp /etc/wagoulab/cloudflared-config.yml /var/lib/cloudflared/config.yml
 
-        # Traefik dynamic config (middleware definitions)
+        # Deploy traefik dynamic config (middleware definitions)
         cp /etc/wagoulab/traefik-dynamic.yml /var/lib/traefik/dynamic.yml
       ''}";
 
