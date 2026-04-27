@@ -1,4 +1,6 @@
 ---
+schema_version: 34
+
 users:
   - name: admin
     password: "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6"
@@ -12,8 +14,8 @@ dns:
     - "::"
   port: 53
   bootstrap_dns:
-    - 1.1.1.1
-    - 8.8.8.8
+    - 1.1.1.1:53
+    - 8.8.8.8:53
   upstream_dns:
     - https://dns.cloudflare.com/dns-query
     - https://dns.google/dns-query
