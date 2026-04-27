@@ -23,7 +23,7 @@ in
       entrypoint = "/bin/sh";
       exec = [
         "-c"
-        "opencloud init --force-overwrite 2>/dev/null; exec opencloud server"
+        "opencloud init 2>/dev/null; exec opencloud server"
       ];
       labels = {
         "traefik.enable" = "true";
