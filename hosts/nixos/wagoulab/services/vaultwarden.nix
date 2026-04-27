@@ -1,21 +1,35 @@
 { config, host, ... }:
 
+let
+  inherit (config.virtualisation.quadlet) networks;
+in
 {
-  services.vaultwarden = {
-    enable = true;
-    dbBackend = "sqlite";
-    backupDir = "/var/backup/vaultwarden";
-    environmentFile = config.sops.templates."vaultwarden.env".path;
-    config = {
-      DOMAIN = "https://vault.${host.domain}";
-      SIGNUPS_ALLOWED = false;
-      ROCKET_ADDRESS = "127.0.0.1";
-      ROCKET_PORT = 8222;
-      IP_HEADER = "X-Real-IP";
+  virtualisation.quadlet.containers.vaultwarden = {
+    containerConfig = {
+      image = "vaultwarden/server:latest";
+      networks = [ networks.proxy.ref ];
+      volumes = [
+        "/var/lib/vaultwarden:/data"
+      ];
+      environments = {
+        DOMAIN = "https://vault.${host.domain}";
+        SIGNUPS_ALLOWED = "false";
+        IP_HEADER = "X-Real-IP";
+      };
+      environmentFiles = [ config.sops.templates."vaultwarden.env".path ];
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.vaultwarden.rule" = "Host(`vault.${host.domain}`)";
+        "traefik.http.routers.vaultwarden.entrypoints" = "websecure";
+        "traefik.http.routers.vaultwarden.tls" = "true";
+        "traefik.http.routers.vaultwarden.middlewares" = "secure-headers@file";
+        "traefik.http.services.vaultwarden.loadbalancer.server.port" = "80";
+      };
     };
   };
 
-  systemd.services.vaultwarden.restartTriggers = [
-    config.sops.templates."vaultwarden.env".content
+  systemd.tmpfiles.rules = [
+    "d /var/lib/vaultwarden 0755 root root -"
+    "d /var/backup/vaultwarden 0755 root root -"
   ];
 }
