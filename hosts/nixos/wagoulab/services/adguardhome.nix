@@ -7,57 +7,72 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
+  yamlFormat = pkgs.formats.yaml { };
 
-  # AdGuard config — schema_version: 34 prevents the broken migration.
+  # AdGuard config — generated as proper YAML from a Nix attrset.
+  # schema_version: 34 prevents the broken migration.
   # bootstrap_dns uses :53 port suffix per the v34 schema.
   # trusted_proxies includes the Podman network ranges so Traefik requests aren't rejected.
-  adguardConfig = pkgs.writeText "AdGuardHome.yaml" ''
-      schema_version: 34
-      users:
-        - name: admin
-          password: "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6"
-      http:
-        address: 0.0.0.0:3000
-      dns:
-        bind_hosts:
-          - 0.0.0.0
-          - "::"
-        port: 53
-        bootstrap_dns:
-          - 1.1.1.1:53
-          - 8.8.8.8:53
-        upstream_dns:
-          - https://dns.cloudflare.com/dns-query
-          - https://dns.google/dns-query
-        upstream_mode: load_balance
-      trusted_proxies:
-        - 10.89.0.0/16
-        - 127.0.0.0/8
-        - 172.16.0.0/12
-      filtering:
-        protection_enabled: true
-        filtering_enabled: true
-        rewrites:
-    ${builtins.concatStringsSep "\n" (
-      map (sub: ''
-        - domain: ${sub}.${host.domain}
-          answer: ${host.serverIP}
-          enabled: true'') host.tunnelSubdomains
-    )}
-      filters:
-        - enabled: true
-          id: 1
-          name: AdGuard DNS filter
-          url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt
-        - enabled: true
-          id: 2
-          name: Steven Black's Unified Hosts
-          url: https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-        - enabled: true
-          id: 3
-          name: Malicious URL Blocklist
-          url: https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt
-  '';
+  adguardConfig = yamlFormat.generate "AdGuardHome.yaml" {
+    schema_version = 34;
+    users = [
+      {
+        name = "admin";
+        password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
+      }
+    ];
+    http.address = "0.0.0.0:3000";
+    dns = {
+      bind_hosts = [
+        "0.0.0.0"
+        "::"
+      ];
+      port = 53;
+      bootstrap_dns = [
+        "1.1.1.1:53"
+        "8.8.8.8:53"
+      ];
+      upstream_dns = [
+        "https://dns.cloudflare.com/dns-query"
+        "https://dns.google/dns-query"
+      ];
+      upstream_mode = "load_balance";
+    };
+    trusted_proxies = [
+      "10.89.0.0/16"
+      "127.0.0.0/8"
+      "172.16.0.0/12"
+    ];
+    filtering = {
+      protection_enabled = true;
+      filtering_enabled = true;
+      rewrites = map (sub: {
+        domain = "${sub}.${host.domain}";
+        answer = host.serverIP;
+        enabled = true;
+      }) host.tunnelSubdomains;
+    };
+    filters = [
+      {
+        enabled = true;
+        id = 1;
+        name = "AdGuard DNS filter";
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt";
+      }
+      {
+        enabled = true;
+        id = 2;
+        name = "Steven Black's Unified Hosts";
+        url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
+      }
+      {
+        enabled = true;
+        id = 3;
+        name = "Malicious URL Blocklist";
+        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt";
+      }
+    ];
+  };
 in
 {
   virtualisation.quadlet.containers.adguard = {
