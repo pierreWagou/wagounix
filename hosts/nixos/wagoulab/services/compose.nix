@@ -58,7 +58,6 @@ let
 
         ExecStartPre = pkgs.writeShellScript "wagoulab-${name}-pre" ''
           set -euo pipefail
-          mkdir -p "${workDir}"
 
           # Stop old stack if running
           if [ -f "${composeFile}" ]; then
@@ -88,6 +87,10 @@ in
   systemd.tmpfiles.rules = [
     "d ${baseDir} 0755 root root -"
     "d ${baseDir}/homepage-logs 0755 root root -"
+  ]
+  # Per-service working directories (must exist before systemd starts the units)
+  ++ (map (name: "d ${baseDir}/${name} 0755 root root -") services)
+  ++ [
     "d /var/lib/traefik/letsencrypt 0755 root root -"
     "d /var/lib/vaultwarden 0755 root root -"
     "d /var/lib/opencloud 0755 1000 1000 -"
