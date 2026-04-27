@@ -168,6 +168,7 @@ in
         else if name == "adguard" then
           {
             extraPreStart = ''
+              rm -rf /var/lib/adguardhome/conf/*
               cp "/etc/wagoulab/AdGuardHome.yaml" "/var/lib/adguardhome/conf/AdGuardHome.yaml"
             '';
           }
