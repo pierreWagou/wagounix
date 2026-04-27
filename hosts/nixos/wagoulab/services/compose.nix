@@ -39,6 +39,7 @@ in
     "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
     "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
     "wagoulab/traefik-dynamic.yml".source = ../compose/traefik-dynamic.yml;
+    "wagoulab/AdGuardHome.yaml".source = ../compose/AdGuardHome.yaml;
   };
 
   # Systemd service — runs podman-compose on boot
@@ -80,7 +81,7 @@ in
         mkdir -p ${composeDir}/homepage
         cp /etc/wagoulab/homepage/* /var/lib/wagoulab/homepage/
 
-        # AdGuard Home config (immutable — regenerated from Nix on each deploy)
+        # AdGuard Home config (immutable — overwritten on each deploy)
         mkdir -p /var/lib/adguardhome/conf
         cp /etc/wagoulab/AdGuardHome.yaml /var/lib/adguardhome/conf/AdGuardHome.yaml
 

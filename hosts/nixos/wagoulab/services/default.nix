@@ -21,7 +21,6 @@
     ./compose.nix
     ./cloudflared.nix
     ./hardware-gpu.nix
-    ./adguardhome.nix
     ./fail2ban.nix
     ./firewall.nix
   ];
