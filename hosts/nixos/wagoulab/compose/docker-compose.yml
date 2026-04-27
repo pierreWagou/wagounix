@@ -37,7 +37,7 @@ services:
       # Global
       - --global.sendanonymoususage=false
       - --global.checknewversion=false
-      - --log.level=DEBUG
+      - --log.level=INFO
       - --api.dashboard=false
       # Providers
       - --providers.docker=true
@@ -70,10 +70,6 @@ services:
       - /run/podman/podman.sock:/run/podman/podman.sock:ro
       - /var/lib/traefik/letsencrypt:/letsencrypt
       - /var/lib/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
-    healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 30s
-      retries: 5
     labels:
       - traefik.enable=true
 
