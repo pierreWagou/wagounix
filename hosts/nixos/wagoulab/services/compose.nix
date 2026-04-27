@@ -37,7 +37,6 @@ in
     "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
     "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
     "wagoulab/traefik-dynamic.yml".source = ../compose/traefik-dynamic.yml;
-    "wagoulab/AdGuardHome.yaml".source = ../compose/AdGuardHome.yaml;
   };
 
   # Systemd service — runs podman-compose on boot
@@ -81,12 +80,9 @@ in
 
         # Deploy traefik dynamic config (middleware definitions)
         cp /etc/wagoulab/traefik-dynamic.yml /var/lib/traefik/dynamic.yml
-
-        # Deploy AdGuard config (must be done while container is stopped — per official docs)
-        cp /etc/wagoulab/AdGuardHome.yaml /var/lib/adguardhome/conf/AdGuardHome.yaml
       ''}";
 
-      ExecStart = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} up -d --remove-orphans";
+      ExecStart = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} up -d --force-recreate --remove-orphans";
       ExecStop = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} down";
     };
   };
