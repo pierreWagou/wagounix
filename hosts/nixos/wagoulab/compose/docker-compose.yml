@@ -202,7 +202,7 @@ services:
     networks:
       - proxy
     volumes:
-      - /var/lib/wagoulab/homepage:/app/config:ro
+      - /var/lib/wagoulab/homepage:/app/config
     environment:
       HOMEPAGE_ALLOWED_HOSTS: wagou.fr,dash.wagou.fr
     env_file:
