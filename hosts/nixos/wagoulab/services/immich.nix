@@ -1,28 +1,94 @@
-{ host, ... }:
+{ config, host, ... }:
 
+let
+  inherit (config.virtualisation.quadlet) networks containers;
+in
 {
-  services.immich = {
-    enable = true;
-    host = "127.0.0.1";
-    port = 2283;
-    mediaLocation = "/var/lib/immich";
+  # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
+  virtualisation.quadlet.networks.immich-internal = { };
 
-    database.enable = true;
-    redis.enable = true;
-
-    machine-learning.enable = true;
-
-    settings = {
-      server.externalDomain = "https://pixel.${host.domain}";
-      newVersionCheck.enabled = false;
+  virtualisation.quadlet.containers = {
+    immich-server = {
+      containerConfig = {
+        image = "ghcr.io/immich-app/immich-server:release";
+        networks = [
+          networks.proxy.ref
+          networks.immich-internal.ref
+        ];
+        volumes = [
+          "/var/lib/immich:/usr/src/app/upload"
+          "/etc/localtime:/etc/localtime:ro"
+        ];
+        environments = {
+          DB_HOSTNAME = "immich-postgres";
+          DB_PORT = "5432";
+          DB_USERNAME = "postgres";
+          DB_PASSWORD = "postgres";
+          DB_DATABASE_NAME = "immich";
+          REDIS_HOSTNAME = "immich-redis";
+          REDIS_PORT = "6379";
+          IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
+        };
+        labels = {
+          "traefik.enable" = "true";
+          "traefik.http.routers.immich.rule" = "Host(`pixel.${host.domain}`)";
+          "traefik.http.routers.immich.entrypoints" = "websecure";
+          "traefik.http.routers.immich.tls" = "true";
+          "traefik.http.routers.immich.middlewares" = "secure-headers@file";
+          "traefik.http.services.immich.loadbalancer.server.port" = "2283";
+        };
+      };
+      unitConfig = {
+        Requires = [
+          containers.immich-postgres.ref
+          containers.immich-redis.ref
+        ];
+        After = [
+          containers.immich-postgres.ref
+          containers.immich-redis.ref
+        ];
+      };
     };
 
-    accelerationDevices = [ "/dev/dri/renderD128" ];
+    immich-ml = {
+      containerConfig = {
+        image = "ghcr.io/immich-app/immich-machine-learning:release-openvino";
+        networks = [ networks.immich-internal.ref ];
+        volumes = [ "/var/lib/immich-ml-cache:/cache" ];
+        devices = [ "/dev/dri:/dev/dri" ];
+        addGroups = [ "303" ]; # render group GID on NixOS
+      };
+    };
+
+    immich-postgres = {
+      containerConfig = {
+        image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
+        networks = [ networks.immich-internal.ref ];
+        volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
+        environments = {
+          POSTGRES_PASSWORD = "postgres";
+          POSTGRES_USER = "postgres";
+          POSTGRES_DB = "immich";
+          POSTGRES_INITDB_ARGS = "--data-checksums";
+        };
+        shmSize = "128m";
+      };
+    };
+
+    immich-redis = {
+      containerConfig = {
+        image = "docker.io/valkey/valkey:9";
+        networks = [ networks.immich-internal.ref ];
+      };
+    };
   };
 
+  # GPU drivers shared with Jellyfin
   hardware.graphics.enable = true;
-  users.users.immich.extraGroups = [
-    "video"
-    "render"
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/immich 0755 root root -"
+    "d /var/lib/immich-ml-cache 0755 root root -"
+    "d /var/lib/immich-postgres 0755 root root -"
   ];
 }
