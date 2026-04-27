@@ -54,6 +54,11 @@ in
     ];
     wantedBy = [ "multi-user.target" ];
 
+    path = [
+      pkgs.podman
+      pkgs.podman-compose
+    ];
+
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
