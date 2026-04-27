@@ -2,8 +2,9 @@
 
 let
   inherit (host) serverIP domain;
-  webPort = host.adguardWebPort;
 
+  # AdGuard Home configuration — deployed to the server and mounted into the compose container.
+  # Replicates the immutable (mutableSettings = false) behavior of the native NixOS module.
   configFile = pkgs.writeText "AdGuardHome.yaml" (
     builtins.toJSON {
       users = [
@@ -15,9 +16,7 @@ let
         }
       ];
 
-      http = {
-        address = "0.0.0.0:${toString webPort}";
-      };
+      http.address = "0.0.0.0:3000";
 
       dns = {
         bind_hosts = [
@@ -25,24 +24,20 @@ let
           "::"
         ];
         port = 53;
-
         bootstrap_dns = [
           "1.1.1.1"
           "8.8.8.8"
         ];
-
         upstream_dns = [
           "https://dns.cloudflare.com/dns-query"
           "https://dns.google/dns-query"
         ];
-
         upstream_mode = "load_balance";
       };
 
       filtering = {
         protection_enabled = true;
         filtering_enabled = true;
-
         rewrites = map (sub: {
           domain = "${sub}.${domain}";
           answer = serverIP;
@@ -74,23 +69,6 @@ let
   );
 in
 {
-  virtualisation.oci-containers.containers.adguard = {
-    image = "adguard/adguardhome:latest";
-    ports = [
-      "0.0.0.0:53:53/tcp"
-      "0.0.0.0:53:53/udp"
-      "127.0.0.1:${toString webPort}:${toString webPort}"
-    ];
-    volumes = [
-      "/var/lib/adguardhome/work:/opt/adguardhome/work"
-      "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
-      "${configFile}:/opt/adguardhome/conf/AdGuardHome.yaml:ro"
-    ];
-  };
-
-  systemd.tmpfiles.rules = [
-    "d /var/lib/adguardhome 0755 root root -"
-    "d /var/lib/adguardhome/work 0755 root root -"
-    "d /var/lib/adguardhome/conf 0755 root root -"
-  ];
+  # Deploy AdGuard config to the server — the compose container mounts /var/lib/adguardhome/conf/
+  environment.etc."wagoulab/AdGuardHome.yaml".source = configFile;
 }

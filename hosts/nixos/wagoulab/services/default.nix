@@ -3,16 +3,14 @@
 {
   environment.systemPackages = with pkgs; [
     ghostty.terminfo
+    podman-compose
   ];
 
-  # Service policy:
-  # - Application services run as Podman OCI containers.
-  # - Infrastructure services (Caddy, Cloudflared, Fail2ban, Firewall) stay native
-  #   because they need direct host network/filesystem access.
-  # - Secrets are managed by sops-nix on the host and mounted into containers.
-  virtualisation.oci-containers.backend = "podman";
-
+  # All application services are managed by podman-compose (see compose/docker-compose.yml).
+  # NixOS manages: Podman runtime, secrets (sops-nix), firewall, fail2ban, hardware drivers,
+  # and the systemd service that runs podman-compose on boot.
   virtualisation.podman = {
+    enable = true;
     dockerCompat = true;
     autoPrune.enable = true;
     defaultNetwork.settings.dns_enabled = true;
@@ -20,15 +18,10 @@
 
   imports = [
     ./secrets.nix
-    ./vaultwarden.nix
-    ./caddy.nix
-    ./adguardhome.nix
+    ./compose.nix
     ./cloudflared.nix
-    ./immich.nix
-    ./opencloud.nix
-    ./homepage.nix
-    ./home-assistant.nix
-    ./jellyfin.nix
+    ./hardware-gpu.nix
+    ./adguardhome.nix
     ./fail2ban.nix
     ./firewall.nix
   ];
