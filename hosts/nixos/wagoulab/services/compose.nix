@@ -68,8 +68,12 @@ in
       TimeoutStopSec = "2min";
       KillMode = "mixed";
 
-      # Copy compose file from /etc to working directory on each start
+      # Copy config files and clean up stale containers before starting
       ExecStartPre = "${pkgs.writeShellScript "wagoulab-compose-pre" ''
+        # Clean up any stale containers from previous runs
+        ${pkgs.podman}/bin/podman rm -af 2>/dev/null || true
+        ${pkgs.podman}/bin/podman pod rm -af 2>/dev/null || true
+
         cp /etc/wagoulab/docker-compose.yml ${composeFile}
 
         # Homepage config

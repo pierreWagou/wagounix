@@ -166,7 +166,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     group_add:
-      - render
+      - "303"
     labels:
       - traefik.enable=true
       - traefik.http.routers.jellyfin.rule=Host(`tape.wagou.fr`)
@@ -229,8 +229,10 @@ services:
     networks:
       - proxy
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
+      - "192.168.68.65:53:53/tcp"
+      - "192.168.68.65:53:53/udp"
+      - "127.0.0.1:53:53/tcp"
+      - "127.0.0.1:53:53/udp"
     volumes:
       - /var/lib/adguardhome/work:/opt/adguardhome/work
       - /var/lib/adguardhome/conf:/opt/adguardhome/conf
@@ -286,7 +288,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     group_add:
-      - render
+      - "303"
 
   immich-postgres:
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
