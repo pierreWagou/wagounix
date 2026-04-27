@@ -37,7 +37,7 @@ services:
       # Global
       - --global.sendanonymoususage=false
       - --global.checknewversion=false
-      - --log.level=INFO
+      - --log.level=DEBUG
       - --api.dashboard=false
       # Providers
       - --providers.docker=true
