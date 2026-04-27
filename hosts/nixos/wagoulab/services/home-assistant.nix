@@ -39,7 +39,6 @@ in
       TZ = "Europe/Paris";
     };
     ports = [ "127.0.0.1:${toString port}:8123" ];
-    extraOptions = [ "--log-driver=journald" ];
   };
 
   systemd.tmpfiles.rules = [
