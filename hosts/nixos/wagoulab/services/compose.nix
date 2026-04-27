@@ -122,7 +122,7 @@ in
           ExecStart = pkgs.writeShellScript "wagoulab-repo-start" ''
             set -euo pipefail
             if [ ! -d "${repoDir}/.git" ]; then
-              git clone "${repoUrl}" "${repoDir}"
+              git clone --branch docker "${repoUrl}" "${repoDir}"
             else
               git -C "${repoDir}" fetch --all --prune
               git -C "${repoDir}" reset --hard origin/docker
