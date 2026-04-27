@@ -202,7 +202,13 @@ services:
     networks:
       - proxy
     volumes:
-      - /var/lib/wagoulab/homepage:/app/config
+      - /etc/wagoulab/homepage/settings.yaml:/app/config/settings.yaml:ro
+      - /etc/wagoulab/homepage/services.yaml:/app/config/services.yaml:ro
+      - /etc/wagoulab/homepage/widgets.yaml:/app/config/widgets.yaml:ro
+      - /etc/wagoulab/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro
+      - /etc/wagoulab/homepage/custom.css:/app/config/custom.css:ro
+      - /etc/wagoulab/homepage/custom.js:/app/config/custom.js:ro
+      - /var/lib/wagoulab/homepage-logs:/app/config/logs
     environment:
       HOMEPAGE_ALLOWED_HOSTS: wagou.fr,dash.wagou.fr
     env_file:
@@ -231,7 +237,7 @@ services:
       - "127.0.0.1:53:53/udp"
     volumes:
       - /var/lib/adguardhome/work:/opt/adguardhome/work
-      - /var/lib/adguardhome/conf:/opt/adguardhome/conf
+      - /etc/wagoulab/AdGuardHome.yaml:/opt/adguardhome/conf/AdGuardHome.yaml:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard.rule=Host(`guard.wagou.fr`)
