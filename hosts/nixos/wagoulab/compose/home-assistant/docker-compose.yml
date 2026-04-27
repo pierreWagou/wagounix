@@ -1,0 +1,22 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  home-assistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: home-assistant
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /var/lib/home-assistant:/config
+    environment:
+      TZ: Europe/Paris
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homeassistant.rule=Host(`home.wagou.fr`)
+      - traefik.http.routers.homeassistant.entrypoints=websecure
+      - traefik.http.routers.homeassistant.tls=true
+      - traefik.http.routers.homeassistant.middlewares=secure-headers@file
+      - traefik.http.services.homeassistant.loadbalancer.server.port=8123

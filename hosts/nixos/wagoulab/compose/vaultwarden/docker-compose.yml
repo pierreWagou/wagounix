@@ -1,0 +1,26 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /var/lib/vaultwarden:/data
+    environment:
+      DOMAIN: https://vault.wagou.fr
+      SIGNUPS_ALLOWED: "false"
+      IP_HEADER: X-Real-IP
+    env_file:
+      - /run/secrets/rendered/vaultwarden.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.vaultwarden.rule=Host(`vault.wagou.fr`)
+      - traefik.http.routers.vaultwarden.entrypoints=websecure
+      - traefik.http.routers.vaultwarden.tls=true
+      - traefik.http.routers.vaultwarden.middlewares=secure-headers@file
+      - traefik.http.services.vaultwarden.loadbalancer.server.port=80

@@ -1,0 +1,49 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  traefik:
+    image: ghcr.io/traefik/traefik:v3
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - "443:443"
+      - "80:80"
+    env_file:
+      - /run/secrets/rendered/traefik.env
+    command:
+      - --global.sendanonymoususage=false
+      - --global.checknewversion=false
+      - --log.level=INFO
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///run/podman/podman.sock
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=proxy
+      - --providers.file.filename=/etc/traefik/dynamic.yml
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --entrypoints.websecure.http.tls.certresolver=letsencrypt
+      - --entrypoints.websecure.http.tls.domains[0].main=wagou.fr
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.wagou.fr
+      - --entrypoints.websecure.forwardedHeaders.trustedIPs=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,172.64.0.0/13,131.0.72.0/22,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
+      - --certificatesresolvers.letsencrypt.acme.email=pierre.romon@gmail.com
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge=true
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --ping=true
+    volumes:
+      - /run/podman/podman.sock:/run/podman/podman.sock:ro
+      - /var/lib/traefik/letsencrypt:/letsencrypt
+      - /var/lib/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+    labels:
+      - traefik.enable=true

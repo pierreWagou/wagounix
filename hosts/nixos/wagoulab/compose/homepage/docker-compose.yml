@@ -1,0 +1,30 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /etc/wagoulab/homepage/settings.yaml:/app/config/settings.yaml:ro
+      - /etc/wagoulab/homepage/services.yaml:/app/config/services.yaml:ro
+      - /etc/wagoulab/homepage/widgets.yaml:/app/config/widgets.yaml:ro
+      - /etc/wagoulab/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro
+      - /etc/wagoulab/homepage/custom.css:/app/config/custom.css:ro
+      - /etc/wagoulab/homepage/custom.js:/app/config/custom.js:ro
+      - /var/lib/wagoulab/homepage-logs:/app/config/logs
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: wagou.fr,dash.wagou.fr
+    env_file:
+      - /run/secrets/rendered/homepage.env
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.homepage.rule=Host(`dash.wagou.fr`)
+      - traefik.http.routers.homepage.entrypoints=websecure
+      - traefik.http.routers.homepage.tls=true
+      - traefik.http.routers.homepage.middlewares=secure-headers@file
+      - traefik.http.services.homepage.loadbalancer.server.port=3000
