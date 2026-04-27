@@ -1,0 +1,17 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --config /etc/cloudflared/config.yml --no-autoupdate run
+    volumes:
+      - /var/lib/cloudflared/config.yml:/etc/cloudflared/config.yml:ro
+      - /run/secrets/cloudflare-credentials:/etc/cloudflared/credentials.json:ro
+    networks:
+      - proxy
+    security_opt:
+      - no-new-privileges:true

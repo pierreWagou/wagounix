@@ -1,0 +1,30 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  opencloud:
+    image: opencloudeu/opencloud-rolling:latest
+    container_name: opencloud
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /var/lib/opencloud/config:/etc/opencloud
+      - /var/lib/opencloud/data:/var/lib/opencloud
+    environment:
+      OC_URL: https://cloud.wagou.fr
+      OC_INSECURE: "true"
+      PROXY_TLS: "false"
+      PROXY_HTTP_ADDR: 0.0.0.0:9200
+      PROXY_ENABLE_BASIC_AUTH: "true"
+    env_file:
+      - /run/secrets/rendered/opencloud.env
+    entrypoint: ["/bin/sh", "-c", "opencloud init --force-overwrite 2>/dev/null; exec opencloud server"]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.opencloud.rule=Host(`cloud.wagou.fr`)
+      - traefik.http.routers.opencloud.entrypoints=websecure
+      - traefik.http.routers.opencloud.tls=true
+      - traefik.http.routers.opencloud.middlewares=secure-headers@file
+      - traefik.http.services.opencloud.loadbalancer.server.port=9200

@@ -1,0 +1,27 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - /var/lib/jellyfin/config:/config
+      - /var/lib/jellyfin/cache:/cache
+    environment:
+      LIBVA_DRIVER_NAME: iHD
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - "303"
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jellyfin.rule=Host(`tape.wagou.fr`)
+      - traefik.http.routers.jellyfin.entrypoints=websecure
+      - traefik.http.routers.jellyfin.tls=true
+      - traefik.http.routers.jellyfin.middlewares=secure-headers@file
+      - traefik.http.services.jellyfin.loadbalancer.server.port=8096

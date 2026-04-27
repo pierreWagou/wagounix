@@ -1,14 +1,93 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
-  composeDir = "/var/lib/wagoulab";
-  composeFile = "${composeDir}/docker-compose.yml";
+  baseDir = "/var/lib/wagoulab";
+
+  # All services managed by podman-compose.
+  # Each gets its own compose file, working directory, and systemd unit.
+  services = [
+    "traefik"
+    "cloudflared"
+    "vaultwarden"
+    "opencloud"
+    "jellyfin"
+    "home-assistant"
+    "homepage"
+    "adguard"
+    "immich"
+  ];
+
+  # Generate a systemd service for one compose stack.
+  mkComposeService =
+    name:
+    {
+      extraPreStart ? "",
+    }:
+    let
+      workDir = "${baseDir}/${name}";
+      composeFile = "${workDir}/docker-compose.yml";
+      after = [
+        "network-online.target"
+        "podman.socket"
+        "wagoulab-network.service"
+      ]
+      ++ lib.optional (name != "traefik" && name != "adguard") "wagoulab-traefik.service";
+    in
+    {
+      description = "wagoulab: ${name}";
+      inherit after;
+      wants = [
+        "network-online.target"
+        "podman.socket"
+      ];
+      requires = [ "wagoulab-network.service" ];
+      wantedBy = [ "multi-user.target" ];
+
+      path = [
+        pkgs.podman
+        pkgs.podman-compose
+      ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        WorkingDirectory = workDir;
+        TimeoutStartSec = "5min";
+        TimeoutStopSec = "2min";
+        KillMode = "none";
+
+        ExecStartPre = pkgs.writeShellScript "wagoulab-${name}-pre" ''
+          set -euo pipefail
+          mkdir -p "${workDir}"
+
+          # Stop old stack if running
+          if [ -f "${composeFile}" ]; then
+            podman-compose -f "${composeFile}" down --remove-orphans 2>/dev/null || true
+          fi
+
+          # Deploy new compose file
+          cp "/etc/wagoulab/${name}/docker-compose.yml" "${composeFile}"
+
+          # Service-specific setup
+          ${extraPreStart}
+        '';
+
+        ExecStart = pkgs.writeShellScript "wagoulab-${name}-start" ''
+          set -euo pipefail
+          podman-compose -f "${composeFile}" up -d --remove-orphans
+        '';
+
+        ExecStop = pkgs.writeShellScript "wagoulab-${name}-stop" ''
+          podman-compose -f "${composeFile}" down --remove-orphans 2>/dev/null || true
+        '';
+      };
+    };
 in
 {
-  # Persistent data directories for containers
+  # Persistent data directories
   systemd.tmpfiles.rules = [
-    "d ${composeDir} 0755 root root -"
-    "d ${composeDir}/homepage-logs 0755 root root -"
+    "d ${baseDir} 0755 root root -"
+    "d ${baseDir}/homepage-logs 0755 root root -"
     "d /var/lib/traefik/letsencrypt 0755 root root -"
     "d /var/lib/vaultwarden 0755 root root -"
     "d /var/lib/opencloud 0755 1000 1000 -"
@@ -27,63 +106,64 @@ in
     "d /var/lib/cloudflared 0755 root root -"
   ];
 
-  # Config files deployed to /etc/wagoulab/ — containers mount them directly (read-only)
-  environment.etc = {
-    "wagoulab/docker-compose.yml".source = ../compose/docker-compose.yml;
-    "wagoulab/homepage/settings.yaml".source = ../compose/homepage/settings.yaml;
-    "wagoulab/homepage/widgets.yaml".source = ../compose/homepage/widgets.yaml;
-    "wagoulab/homepage/services.yaml".source = ../compose/homepage/services.yaml;
-    "wagoulab/homepage/bookmarks.yaml".source = ../compose/homepage/bookmarks.yaml;
-    "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
-    "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
-    "wagoulab/traefik-dynamic.yml".source = ../compose/traefik-dynamic.yml;
-  };
-
-  # Systemd service — runs podman-compose on boot
-  systemd.services.wagoulab-compose = {
-    description = "wagoulab service stack (podman-compose)";
-    after = [
-      "network-online.target"
-      "podman.socket"
-      "sops-nix.service"
-    ];
-    wants = [
-      "network-online.target"
-      "podman.socket"
-    ];
-    wantedBy = [ "multi-user.target" ];
-
-    path = [
-      pkgs.podman
-      pkgs.podman-compose
-    ];
-
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      WorkingDirectory = composeDir;
-      TimeoutStartSec = "5min";
-      TimeoutStopSec = "2min";
-      KillMode = "none";
-
-      ExecStartPre = "${pkgs.writeShellScript "wagoulab-compose-pre" ''
-        # Clean up any stale containers from previous runs
-        ${pkgs.podman}/bin/podman rm -af 2>/dev/null || true
-        ${pkgs.podman}/bin/podman pod rm -af 2>/dev/null || true
-
-        # Deploy compose file (the only file that needs copying — containers
-        # mount everything else directly from /etc/wagoulab/)
-        cp /etc/wagoulab/docker-compose.yml ${composeFile}
-
-        # Deploy cloudflared tunnel config
-        cp /etc/wagoulab/cloudflared-config.yml /var/lib/cloudflared/config.yml
-
-        # Deploy traefik dynamic config (middleware definitions)
-        cp /etc/wagoulab/traefik-dynamic.yml /var/lib/traefik/dynamic.yml
-      ''}";
-
-      ExecStart = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} up -d --force-recreate --remove-orphans";
-      ExecStop = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} down";
+  # Deploy compose files and static configs to /etc/wagoulab/
+  environment.etc =
+    (lib.listToAttrs (
+      map (name: {
+        name = "wagoulab/${name}/docker-compose.yml";
+        value.source = ../compose/${name}/docker-compose.yml;
+      }) services
+    ))
+    // {
+      "wagoulab/traefik-dynamic.yml".source = ../compose/traefik-dynamic.yml;
+      "wagoulab/homepage/settings.yaml".source = ../compose/homepage/settings.yaml;
+      "wagoulab/homepage/widgets.yaml".source = ../compose/homepage/widgets.yaml;
+      "wagoulab/homepage/services.yaml".source = ../compose/homepage/services.yaml;
+      "wagoulab/homepage/bookmarks.yaml".source = ../compose/homepage/bookmarks.yaml;
+      "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
+      "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
     };
-  };
+
+  # Systemd services: shared network + per-service compose units
+  systemd.services = {
+    # Shared Podman network
+    wagoulab-network = {
+      description = "wagoulab: shared proxy network";
+      after = [ "podman.socket" ];
+      wants = [ "podman.socket" ];
+      wantedBy = [ "multi-user.target" ];
+      path = [ pkgs.podman ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = pkgs.writeShellScript "wagoulab-network-start" ''
+          podman network exists proxy || podman network create proxy
+        '';
+        ExecStop = pkgs.writeShellScript "wagoulab-network-stop" ''
+          podman network rm proxy 2>/dev/null || true
+        '';
+      };
+    };
+  }
+  // lib.listToAttrs (
+    map (name: {
+      name = "wagoulab-${name}";
+      value = mkComposeService name (
+        if name == "traefik" then
+          {
+            extraPreStart = ''
+              cp "/etc/wagoulab/traefik-dynamic.yml" "/var/lib/traefik/dynamic.yml"
+            '';
+          }
+        else if name == "cloudflared" then
+          {
+            extraPreStart = ''
+              cp "/etc/wagoulab/cloudflared-config.yml" "/var/lib/cloudflared/config.yml"
+            '';
+          }
+        else
+          { }
+      );
+    }) services
+  );
 }
