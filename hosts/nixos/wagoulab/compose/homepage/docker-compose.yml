@@ -10,12 +10,12 @@ services:
     networks:
       - proxy
     volumes:
-      - /etc/wagoulab/homepage/settings.yaml:/app/config/settings.yaml:ro
-      - /etc/wagoulab/homepage/services.yaml:/app/config/services.yaml:ro
-      - /etc/wagoulab/homepage/widgets.yaml:/app/config/widgets.yaml:ro
-      - /etc/wagoulab/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro
-      - /etc/wagoulab/homepage/custom.css:/app/config/custom.css:ro
-      - /etc/wagoulab/homepage/custom.js:/app/config/custom.js:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/settings.yaml:/app/config/settings.yaml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/services.yaml:/app/config/services.yaml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/widgets.yaml:/app/config/widgets.yaml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/bookmarks.yaml:/app/config/bookmarks.yaml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/custom.css:/app/config/custom.css:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/homepage/custom.js:/app/config/custom.js:ro
       - /var/lib/wagoulab/homepage-logs:/app/config/logs
     environment:
       HOMEPAGE_ALLOWED_HOSTS: wagou.fr,dash.wagou.fr

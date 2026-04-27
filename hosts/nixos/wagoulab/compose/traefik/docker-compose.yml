@@ -44,6 +44,6 @@ services:
     volumes:
       - /run/podman/podman.sock:/run/podman/podman.sock:ro
       - /var/lib/traefik/letsencrypt:/letsencrypt
-      - /var/lib/traefik/dynamic.yml:/etc/traefik/dynamic.yml:ro
+      - /opt/wagounix/hosts/nixos/wagoulab/compose/traefik-dynamic.yml:/etc/traefik/dynamic.yml:ro
     labels:
       - traefik.enable=true
