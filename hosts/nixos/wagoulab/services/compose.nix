@@ -20,6 +20,7 @@ in
     "d /var/lib/home-assistant 0755 root root -"
     "d /var/lib/adguardhome 0755 root root -"
     "d /var/lib/adguardhome/work 0755 root root -"
+    "d /var/lib/adguardhome/conf 0755 root root -"
     "d /var/lib/immich 0755 root root -"
     "d /var/lib/immich-ml-cache 0755 root root -"
     "d /var/lib/immich-postgres 0755 root root -"
@@ -80,6 +81,9 @@ in
 
         # Deploy traefik dynamic config (middleware definitions)
         cp /etc/wagoulab/traefik-dynamic.yml /var/lib/traefik/dynamic.yml
+
+        # Deploy AdGuard config (must be done while container is stopped — per official docs)
+        cp /etc/wagoulab/AdGuardHome.yaml /var/lib/adguardhome/conf/AdGuardHome.yaml
       ''}";
 
       ExecStart = "${pkgs.podman-compose}/bin/podman-compose -f ${composeFile} up -d --remove-orphans";

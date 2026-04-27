@@ -237,7 +237,7 @@ services:
       - "127.0.0.1:53:53/udp"
     volumes:
       - /var/lib/adguardhome/work:/opt/adguardhome/work
-      - /etc/wagoulab/AdGuardHome.yaml:/opt/adguardhome/conf/AdGuardHome.yaml:ro
+      - /var/lib/adguardhome/conf:/opt/adguardhome/conf
     labels:
       - traefik.enable=true
       - traefik.http.routers.adguard.rule=Host(`guard.wagou.fr`)
