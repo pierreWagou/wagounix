@@ -43,6 +43,11 @@ let
       requires = [ "wagoulab-network.service" ];
       wantedBy = [ "multi-user.target" ];
 
+      # Force restart when the compose file changes
+      restartTriggers = [
+        (builtins.hashFile "sha256" ../compose/${name}/docker-compose.yml)
+      ];
+
       path = [
         pkgs.podman
         pkgs.podman-compose
