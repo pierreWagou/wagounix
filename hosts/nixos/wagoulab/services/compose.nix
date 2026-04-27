@@ -125,6 +125,7 @@ in
       "wagoulab/homepage/bookmarks.yaml".source = ../compose/homepage/bookmarks.yaml;
       "wagoulab/homepage/custom.css".source = ../compose/homepage/custom.css;
       "wagoulab/homepage/custom.js".source = ../compose/homepage/custom.js;
+      "wagoulab/AdGuardHome.yaml".source = ../compose/AdGuardHome.yaml;
     };
 
   # Systemd services: shared network + per-service compose units
@@ -162,6 +163,12 @@ in
           {
             extraPreStart = ''
               cp "/etc/wagoulab/cloudflared-config.yml" "/var/lib/cloudflared/config.yml"
+            '';
+          }
+        else if name == "adguard" then
+          {
+            extraPreStart = ''
+              cp "/etc/wagoulab/AdGuardHome.yaml" "/var/lib/adguardhome/conf/AdGuardHome.yaml"
             '';
           }
         else
