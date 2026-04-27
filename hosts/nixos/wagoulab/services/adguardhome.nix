@@ -1,17 +1,11 @@
-{ host, ... }:
+{ pkgs, host, ... }:
 
 let
   inherit (host) serverIP domain;
-in
-{
-  services.adguardhome = {
-    enable = true;
-    mutableSettings = false;
-    host = "127.0.0.1";
-    port = 3000;
-    openFirewall = false;
+  webPort = host.adguardWebPort;
 
-    settings = {
+  configFile = pkgs.writeText "AdGuardHome.yaml" (
+    builtins.toJSON {
       users = [
         {
           name = "admin";
@@ -20,6 +14,10 @@ in
           password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
         }
       ];
+
+      http = {
+        address = "0.0.0.0:${toString webPort}";
+      };
 
       dns = {
         bind_hosts = [
@@ -72,6 +70,27 @@ in
           url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt";
         }
       ];
-    };
+    }
+  );
+in
+{
+  virtualisation.oci-containers.containers.adguard = {
+    image = "adguard/adguardhome:latest";
+    ports = [
+      "0.0.0.0:53:53/tcp"
+      "0.0.0.0:53:53/udp"
+      "127.0.0.1:${toString webPort}:${toString webPort}"
+    ];
+    volumes = [
+      "/var/lib/adguardhome/work:/opt/adguardhome/work"
+      "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
+      "${configFile}:/opt/adguardhome/conf/AdGuardHome.yaml:ro"
+    ];
   };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/adguardhome 0755 root root -"
+    "d /var/lib/adguardhome/work 0755 root root -"
+    "d /var/lib/adguardhome/conf 0755 root root -"
+  ];
 }

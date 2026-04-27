@@ -23,19 +23,19 @@ let
     vault = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.vaultwarden.config.ROCKET_PORT} {
+      reverse_proxy 127.0.0.1:${toString host.vaultwardenPort} {
         header_up X-Real-IP {remote_host}
       }
     '';
     pixel = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.immich.port}
+      reverse_proxy 127.0.0.1:${toString host.immichPort}
     '';
     cloud = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.opencloud.port} {
+      reverse_proxy 127.0.0.1:${toString host.opencloudPort} {
         header_up X-Forwarded-Proto https
       }
     '';
@@ -51,13 +51,13 @@ let
         root * ${homepageImages}
       }
       handle {
-        reverse_proxy 127.0.0.1:${toString config.services.homepage-dashboard.listenPort}
+        reverse_proxy 127.0.0.1:${toString host.homepagePort}
       }
     '';
     guard = ''
       ${hsts}
       ${faviconRedirect}
-      reverse_proxy 127.0.0.1:${toString config.services.adguardhome.port}
+      reverse_proxy 127.0.0.1:${toString host.adguardWebPort}
     '';
     tape = ''
       ${hsts}

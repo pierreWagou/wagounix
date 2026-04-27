@@ -6,11 +6,17 @@
   ];
 
   # Service policy:
-  # - Default to NixOS native services (module system, systemd, sops integration).
-  # - OCI containers are exceptions for software that is impractical to run natively
-  #   (e.g. upstream only tests Docker, ecosystem assumes container environment).
-  #   Each container must document the justification in its service file.
-  virtualisation.oci-containers.backend = "docker";
+  # - Application services run as Podman OCI containers.
+  # - Infrastructure services (Caddy, Cloudflared, Fail2ban, Firewall) stay native
+  #   because they need direct host network/filesystem access.
+  # - Secrets are managed by sops-nix on the host and mounted into containers.
+  virtualisation.oci-containers.backend = "podman";
+
+  virtualisation.podman = {
+    dockerCompat = true;
+    autoPrune.enable = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
 
   imports = [
     ./secrets.nix

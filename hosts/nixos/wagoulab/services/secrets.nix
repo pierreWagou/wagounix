@@ -42,12 +42,12 @@
 
     templates = {
       "opencloud.env" = {
-        owner = "opencloud";
+        # Mounted into the container via environmentFiles
         content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
       };
 
       "vaultwarden.env" = {
-        owner = "vaultwarden";
+        # Mounted into the container via environmentFiles
         content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
       };
 
