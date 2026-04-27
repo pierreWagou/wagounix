@@ -1,58 +1,25 @@
-{
-  config,
-  pkgs,
-  host,
-  ...
-}:
+{ pkgs, host, ... }:
 
 let
-  configFile = pkgs.writeText "cloudflared-config.json" (
+  # Cloudflare Tunnel config — routes all subdomains to Traefik inside the compose network.
+  # The tunnel is locally-managed (credentials-file auth, not dashboard-token).
+  configFile = pkgs.writeText "cloudflared-config.yml" (
     builtins.toJSON {
       tunnel = host.cloudflareTunnelId;
-      credentials-file = config.sops.secrets.cloudflare-credentials.path;
+      credentials-file = "/etc/cloudflared/credentials.json";
       ingress =
         (map (sub: {
           hostname = "${sub}.${host.domain}";
-          service = "https://localhost:443";
-          originRequest.originServerName = host.domain;
+          service = "http://traefik:80";
         }) host.tunnelSubdomains)
         ++ [ { service = "http_status:404"; } ];
     }
   );
 in
 {
-  users.users.cloudflared = {
-    isSystemUser = true;
-    group = "cloudflared";
-  };
-  users.groups.cloudflared = { };
+  environment.etc."wagoulab/cloudflared-config.yml".source = configFile;
 
-  # Cloudflare Tunnel — secure remote access without opening ports
-  systemd.services.cloudflared-tunnel = {
-    description = "Cloudflare Tunnel";
-    after = [
-      "network-online.target"
-    ];
-    wants = [
-      "network-online.target"
-    ];
-    wantedBy = [
-      "multi-user.target"
-    ];
-    restartTriggers = [
-      config.sops.secrets.cloudflare-credentials.path
-      configFile
-    ];
-    serviceConfig = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared --config ${configFile} tunnel --no-autoupdate run";
-      Restart = "on-failure";
-      RestartSec = 5;
-      User = "cloudflared";
-      Group = "cloudflared";
-      NoNewPrivileges = true;
-      ProtectSystem = "strict";
-      ProtectHome = true;
-      PrivateTmp = true;
-    };
-  };
+  systemd.tmpfiles.rules = [
+    "d /var/lib/cloudflared 0755 root root -"
+  ];
 }

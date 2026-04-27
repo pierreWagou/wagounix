@@ -1,0 +1,26 @@
+---
+title: "wagoulab://dash"
+favicon: https://dash.wagou.fr/bg/favicon.svg
+logo: https://dash.wagou.fr/bg/favicon.svg
+theme: dark
+color: slate
+headerStyle: clean
+statusStyle: dot
+iconStyle: theme
+hideVersion: true
+cardBlur: sm
+background:
+  image: https://dash.wagou.fr/bg/bridge.jpg
+  blur: xl
+  brightness: 75
+  opacity: 75
+layout:
+  Services:
+    style: row
+    columns: 3
+  Media:
+    style: row
+    columns: 2
+  Infrastructure:
+    style: row
+    columns: 2
