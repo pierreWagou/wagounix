@@ -38,7 +38,6 @@
       "alt-tab"
       "bruno"
       "claude"
-      "cloudflare-warp"
       {
         name = "discord";
         args = {
