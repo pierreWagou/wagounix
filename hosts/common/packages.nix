@@ -17,6 +17,7 @@
     openssl
     ripgrep
     sops
+    tailscale
     tmux
     unzip
     wget

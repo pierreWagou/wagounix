@@ -5,7 +5,7 @@ description: Manage the NixOS homeserver (wagoulab) — add services, configure 
 
 ## Overview
 
-The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel.
+The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel and Tailscale.
 
 Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
@@ -13,10 +13,13 @@ Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
 ```
 Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service
+Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Beelink (subnet router) -> 192.168.68.0/24
 Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service
 ```
 
 All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network. Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Traefik over HTTPS (container-to-container, `noTLSVerify` since it's internal).
+
+Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere.
 
 IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Traefik HTTPS.
 
@@ -33,6 +36,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | Traefik | `services/traefik.nix` | 80, 443 (published to host) | - |
 | AdGuard Home | `services/adguardhome.nix` | 53 (published to host), 3000 (web UI) | `https://guard.wagou.fr` |
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
+| Tailscale | `services/tailscale.nix` | Native NixOS service (subnet router) | - |
 | Fail2ban | `services/fail2ban.nix` | - | - |
 
 ## Files
@@ -58,6 +62,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | `immich.nix` | Photo management (server, ML, PostgreSQL, Redis — 4 containers + internal network) |
 | `adguardhome.nix` | DNS server container, ad blocking, blocklists, local DNS rewrites |
 | `cloudflared.nix` | Cloudflare Tunnel container |
+| `tailscale.nix` | Tailscale VPN (native NixOS service, subnet router for `192.168.68.0/24`) |
 | `homepage.nix` | Homepage dashboard container (Catppuccin Mocha theme, service widgets, nginx image sidecar) |
 | `homepage-images/` | Background images and favicon for Homepage dashboard |
 | `home-assistant.nix` | Home automation container |

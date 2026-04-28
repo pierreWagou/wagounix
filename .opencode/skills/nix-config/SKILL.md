@@ -73,6 +73,7 @@ wagounix/
 │               ├── immich.nix
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
+│               ├── tailscale.nix
 │               ├── homepage.nix
 │               ├── home-assistant.nix
 │               ├── jellyfin.nix

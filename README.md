@@ -127,6 +127,7 @@ wagounix/
                 ├── immich.nix
                 ├── adguardhome.nix
                 ├── cloudflared.nix
+                ├── tailscale.nix
                 ├── homepage.nix
                 ├── homepage-images/
                 ├── home-assistant.nix

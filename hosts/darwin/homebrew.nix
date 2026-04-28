@@ -38,6 +38,7 @@
       "alt-tab"
       "bruno"
       "claude"
+      "cloudflare-warp"
       {
         name = "discord";
         args = {
@@ -68,6 +69,7 @@
         };
       }
       "synology-drive"
+      "tailscale-app"
       "thunderbird"
       "visual-studio-code"
       "vlc"
