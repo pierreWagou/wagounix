@@ -37,6 +37,11 @@ let
         "https://dns.google/dns-query"
       ];
       upstream_mode = "load_balance";
+      # Disable private reverse DNS — AdGuard runs in a container and has no
+      # useful local resolver for PTR queries. Without this, it tries the
+      # Podman gateway DNS (10.89.x.1) which times out on every reverse lookup.
+      use_private_ptr_resolvers = false;
+      local_ptr_upstreams = [ ];
     };
     trusted_proxies = [
       "10.89.0.0/16"
