@@ -96,12 +96,10 @@ wagounix/
     │   │   ├── wagou/
     │   │   │   ├── default.nix
     │   │   │   ├── variables.nix
-    │   │   │   ├── packages.nix
     │   │   │   └── homebrew.nix
     │   └── work/
     │       ├── default.nix
     │       ├── dock.nix
-    │       ├── packages.nix
     │       ├── homebrew.nix
     │       ├── sap/
     │       │   ├── default.nix
@@ -121,11 +119,12 @@ wagounix/
             ├── secrets.yaml
             └── services/
                 ├── default.nix
+                ├── podman.nix
                 ├── secrets.nix
+                ├── traefik.nix
                 ├── vaultwarden.nix
                 ├── opencloud.nix
                 ├── immich.nix
-                ├── caddy.nix
                 ├── adguardhome.nix
                 ├── cloudflared.nix
                 ├── homepage.nix
@@ -152,7 +151,7 @@ wagounix/
 
 | Profile | System | Description |
 |---|---|---|
-| `wagoulab` | x86_64-linux | Home server (Docker, services) |
+| `wagoulab` | x86_64-linux | Home server (Podman, services) |
 
 ## Getting Started
 

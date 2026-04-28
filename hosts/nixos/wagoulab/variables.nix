@@ -4,6 +4,7 @@ rec {
   hostname = "wagoulab";
   domain = "wagou.fr";
   serverIP = "192.168.68.65";
+  timezone = "Europe/Paris";
   acmeEmail = "pierre.romon@gmail.com";
   cloudflareAccountId = "65b2dca00576549f065820b1cd5c76c9";
   cloudflareTunnelId = "77f1d05e-ce21-4a09-8229-13f173b38525";

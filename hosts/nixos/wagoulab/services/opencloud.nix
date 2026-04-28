@@ -14,6 +14,9 @@ in
       ];
       environments = {
         OC_URL = "https://cloud.${host.domain}";
+        # OC_INSECURE: required because OC_URL is HTTPS but the service listens on
+        # plain HTTP behind Traefik. Without this, OpenCloud's internal health checks
+        # against its own URL would fail TLS verification.
         OC_INSECURE = "true";
         PROXY_TLS = "false";
         PROXY_HTTP_ADDR = "0.0.0.0:9200";
@@ -23,7 +26,7 @@ in
       entrypoint = "/bin/sh";
       exec = [
         "-c"
-        "opencloud init 2>/dev/null; exec opencloud server"
+        "opencloud init || true; exec opencloud server"
       ];
       labels = {
         "traefik.enable" = "true";
