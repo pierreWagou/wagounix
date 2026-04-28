@@ -78,6 +78,11 @@ in
   virtualisation.quadlet.containers.adguard = {
     containerConfig = {
       image = "adguard/adguardhome:latest";
+      # Override Podman's DNS injection — without this, Podman injects the
+      # network gateway (10.89.x.1:53) into the container's resolv.conf,
+      # and AdGuard tries to use it for reverse DNS lookups, causing 2s
+      # timeouts on every PTR query and massive latency.
+      dns = [ "127.0.0.1" ];
       networks = [ networks.proxy.ref ];
       publishPorts = [
         "${host.serverIP}:53:53/tcp"
