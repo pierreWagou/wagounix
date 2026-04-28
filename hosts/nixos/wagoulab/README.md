@@ -33,7 +33,8 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Jellyfin** | Media server (hardware transcoding) | `https://tape.wagou.fr` | 8096 |
 | **Traefik** | Reverse proxy + HTTPS termination | - | 80, 443 |
 | **AdGuard Home** | DNS server + ad blocker | `https://guard.wagou.fr` | 53, 3000 |
-| **Cloudflare Tunnel** | Secure remote access | - | Outbound only |
+| **Cloudflare Tunnel** | Secure remote access (web services) | - | Outbound only |
+| **Tailscale** | VPN + subnet router (SSH, LAN access) | - | Native NixOS service |
 | **Fail2ban** | Brute force protection | - | - |
 
 ## Hardware
@@ -75,6 +76,7 @@ hosts/nixos/wagoulab/
     ├── jellyfin.nix         # Media server
     ├── adguardhome.nix      # DNS server + ad blocker
     ├── cloudflared.nix      # Cloudflare Tunnel
+    ├── tailscale.nix        # Tailscale VPN (subnet router for LAN access)
     ├── homepage.nix         # Homepage dashboard
     ├── homepage-images/     # Background images and favicon for Homepage dashboard
     ├── fail2ban.nix         # Brute force protection
