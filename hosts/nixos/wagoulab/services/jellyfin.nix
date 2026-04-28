@@ -12,7 +12,7 @@ in
   virtualisation.quadlet.containers.jellyfin = {
     containerConfig = {
       image = "jellyfin/jellyfin:latest";
-      healthStartPeriod = "2m";
+      healthCmd = "none";
       networks = [ networks.proxy.ref ];
       volumes = [
         "/var/lib/jellyfin/config:/config"

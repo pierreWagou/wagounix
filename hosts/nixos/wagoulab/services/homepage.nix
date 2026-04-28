@@ -266,7 +266,7 @@ in
     homepage = {
       containerConfig = {
         image = "ghcr.io/gethomepage/homepage:latest";
-        healthStartPeriod = "2m";
+        healthCmd = "none";
         networks = [ networks.proxy.ref ];
         volumes = [
           "${settingsFile}:/app/config/settings.yaml:ro"
