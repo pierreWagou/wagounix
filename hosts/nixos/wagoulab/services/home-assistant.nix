@@ -14,7 +14,7 @@ let
     homeassistant:
       name: Home
       unit_system: metric
-      time_zone: Europe/Paris
+      time_zone: ${host.timezone}
       external_url: https://home.${host.domain}
       internal_url: https://home.${host.domain}
 
@@ -42,7 +42,7 @@ in
         "${configFile}:/config/configuration.yaml:ro"
       ];
       environments = {
-        TZ = "Europe/Paris";
+        TZ = host.timezone;
       };
       labels = {
         "traefik.enable" = "true";

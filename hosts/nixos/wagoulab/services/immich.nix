@@ -22,13 +22,12 @@ in
         environments = {
           DB_HOSTNAME = "immich-postgres";
           DB_PORT = "5432";
-          DB_USERNAME = "postgres";
-          DB_PASSWORD = "postgres";
           DB_DATABASE_NAME = "immich";
           REDIS_HOSTNAME = "immich-redis";
           REDIS_PORT = "6379";
           IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
         };
+        environmentFiles = [ config.sops.templates."immich.env".path ];
         labels = {
           "traefik.enable" = "true";
           "traefik.http.routers.immich.rule" = "Host(`pixel.${host.domain}`)";
@@ -56,7 +55,7 @@ in
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
-        addGroups = [ "303" ]; # render group GID on NixOS
+        addGroups = [ "303" ]; # render group GID on NixOS (also in jellyfin.nix)
       };
     };
 
@@ -66,11 +65,10 @@ in
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
         environments = {
-          POSTGRES_PASSWORD = "postgres";
-          POSTGRES_USER = "postgres";
           POSTGRES_DB = "immich";
           POSTGRES_INITDB_ARGS = "--data-checksums";
         };
+        environmentFiles = [ config.sops.templates."immich-postgres.env".path ];
         shmSize = "128m";
       };
     };

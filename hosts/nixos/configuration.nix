@@ -10,7 +10,7 @@
 
   system.stateVersion = "25.05";
 
-  time.timeZone = "Europe/Paris";
+  time.timeZone = host.timezone;
 
   i18n.defaultLocale = "en_US.UTF-8";
 

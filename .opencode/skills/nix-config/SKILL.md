@@ -35,31 +35,29 @@ wagounix/
 │   │   │   ├── keyboard.nix
 │   │   │   └── ...
 │   │   ├── personal/              # Personal Mac layer
-│   │   │   ├── default.nix        # Imports dock, packages, homebrew
+│   │   │   ├── default.nix        # Imports dock, homebrew
 │   │   │   ├── dock.nix           # Personal dock apps
 │   │   │   ├── packages.nix       # Personal nix packages (android-tools, mas)
 │   │   │   ├── homebrew.nix       # Personal casks (Steam, Ankama, etc.) + masApps
 │   │   │   ├── wagou/             # New personal Mac (aarch64-darwin)
 │   │   │   │   ├── default.nix
 │   │   │   │   ├── variables.nix
-│   │   │   │   ├── packages.nix
 │   │   │   │   └── homebrew.nix   # docker-desktop
 │   │   └── work/                  # Work Mac layer
-│   │       ├── default.nix        # Imports dock, packages, homebrew
+│   │       ├── default.nix        # Imports dock, homebrew
 │   │       ├── dock.nix           # Work dock apps (Outlook, Teams, etc.)
-│   │       ├── packages.nix       # Work nix packages
 │   │       ├── homebrew.nix       # Work casks (docker-desktop)
 │   │       ├── sap/               # SAP Mac (legacy — remove when returned)
 │   │       │   ├── default.nix
 │   │       │   ├── variables.nix
 │   │       │   ├── packages.nix   # databricks-cli
 │   │       │   └── homebrew.nix   # hai tap, btp, figma, etc.
-│   │       └── alan/              # New work Mac (aarch64-darwin, disabled)
+│   │       └── alan/              # New work Mac (aarch64-darwin, not in flake yet)
 │   │           ├── default.nix
 │   │           └── variables.nix
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration
-│       ├── configuration.nix      # NixOS system config (SSH, Docker, auto-updates, users)
+│       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
 │       └── wagoulab/              # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
@@ -67,11 +65,12 @@ wagounix/
 │           ├── secrets.yaml       # sops-encrypted secrets (age)
 │           └── services/          # Service modules (one file per service)
 │               ├── default.nix
+│               ├── podman.nix
 │               ├── secrets.nix
+│               ├── traefik.nix
 │               ├── vaultwarden.nix
 │               ├── opencloud.nix
 │               ├── immich.nix
-│               ├── caddy.nix
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
 │               ├── homepage.nix
@@ -114,6 +113,8 @@ sap = nix-darwin.lib.darwinSystem {
 # NixOS host
 wagoulab = nixpkgs.lib.nixosSystem {
   modules = [
+    inputs.sops-nix.nixosModules.sops      # secrets management
+    inputs.quadlet-nix.nixosModules.quadlet # declarative Podman containers
     ./hosts/common              # common
     ./hosts/nixos               # platform
     ./hosts/nixos/wagoulab      # host
@@ -137,6 +138,7 @@ rec {
   hostname = "wagoulab";              # NixOS only
   domain = "wagou.fr";                  # NixOS only
   serverIP = "192.168.68.65";           # NixOS only
+  timezone = "Europe/Paris";            # NixOS only
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
@@ -346,7 +348,7 @@ nix flake check      # runs all checks + builds
 - ALWAYS work in `~/.config/wagounix/` — this is the source of truth
 - Use `build` first to test, then `switch` to activate
 - When adding a package, check if it exists: `nix search nixpkgs <name>`
-- GUI apps → Homebrew casks; CLI tools → nix packages (prefer nix when available)
+- GUI apps -> Homebrew casks; CLI tools -> nix packages (prefer nix when available)
 - `onActivation.cleanup = "uninstall"` — removing a cask/brew from config WILL uninstall it
 - `mutableTaps = false` — add new taps as flake inputs
 - No home-manager — user dotfiles are managed by chezmoi separately
