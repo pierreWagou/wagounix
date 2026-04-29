@@ -57,5 +57,33 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/home-assistant 0755 root root -"
+    "d /var/lib/home-assistant/custom_components 0755 root root -"
   ];
+
+  systemd.services.hacs-install = {
+    description = "Install HACS into Home Assistant";
+    wantedBy = [ "multi-user.target" ];
+    after = [
+      "home-assistant.service"
+      "network-online.target"
+    ];
+    wants = [ "network-online.target" ];
+    requires = [ "home-assistant.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    path = with pkgs; [ podman ];
+    script = ''
+      HACS_DIR="/var/lib/home-assistant/custom_components/hacs"
+      if [ ! -d "$HACS_DIR" ]; then
+        echo "Installing HACS via official script inside container..."
+        podman exec home-assistant bash -c "wget -O - https://get.hacs.xyz | bash -"
+        echo "HACS installed. Restarting Home Assistant..."
+        systemctl restart home-assistant.service
+      else
+        echo "HACS already installed, skipping"
+      fi
+    '';
+  };
 }
