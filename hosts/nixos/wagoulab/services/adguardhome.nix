@@ -9,6 +9,16 @@ let
   inherit (config.virtualisation.quadlet) networks;
   yamlFormat = pkgs.formats.yaml { };
 
+  # Wrapper script to copy the seed config and launch AdGuard Home.
+  # Using a script file avoids shell quoting issues with quadlet's Exec= parsing,
+  # where && and other metacharacters get misinterpreted across the
+  # quadlet -> systemd -> podman exec chain.
+  entrypointScript = pkgs.writeScript "adguard-entrypoint.sh" ''
+    #!/bin/sh
+    cp /opt/adguardhome/AdGuardHome.seed.yaml /opt/adguardhome/conf/AdGuardHome.yaml
+    exec /opt/adguardhome/AdGuardHome --no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work
+  '';
+
   # AdGuard config — generated as proper YAML from a Nix attrset.
   # schema_version: 34 prevents the broken migration.
   # bootstrap_dns uses :53 port suffix per the v34 schema.
@@ -100,16 +110,10 @@ in
         "/var/lib/adguardhome/work:/opt/adguardhome/work"
         "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
         "${adguardConfig}:/opt/adguardhome/AdGuardHome.seed.yaml:ro"
+        "${entrypointScript}:/entrypoint.sh:ro"
       ];
-      # Copy the seed config on every start, then launch AdGuard.
-      # This ensures our config is always the starting point.
-      # AdGuard may migrate it (schema upgrades), which is fine — the seed
-      # is reapplied on each container restart.
-      entrypoint = "/bin/sh";
-      exec = [
-        "-c"
-        "cp /opt/adguardhome/AdGuardHome.seed.yaml /opt/adguardhome/conf/AdGuardHome.yaml && exec /opt/adguardhome/AdGuardHome --no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work"
-      ];
+      # Use a mounted script to avoid shell quoting issues with quadlet's Exec= parsing.
+      entrypoint = "/entrypoint.sh";
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.adguard.rule" = "Host(`guard.${host.domain}`)";
