@@ -12,14 +12,11 @@
     spotify-player
 
     # Workstation tools (not needed on the homeserver)
-    chezmoi
     copier
     delta
     ffmpeg
     fnm
-    gh
     git-lfs
-    gnupg
     imagemagick
     lazygit
     maven
@@ -33,17 +30,12 @@
     poetry
     R
     scala
-    sesh
-    sheldon
-    starship
     television
     terraform
-    tmuxinator
     tree-sitter
     uv
     vivid
     worktrunk
     yt-dlp
-    zoxide
   ];
 }

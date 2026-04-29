@@ -10,7 +10,7 @@
 
   system.stateVersion = "25.05";
 
-  time.timeZone = "Europe/Paris";
+  time.timeZone = host.timezone;
 
   i18n.defaultLocale = "en_US.UTF-8";
 
@@ -27,8 +27,6 @@
       PermitRootLogin = "no";
     };
   };
-
-  virtualisation.docker.enable = true;
 
   system.autoUpgrade = {
     enable = true;
@@ -47,7 +45,6 @@
     hashedPasswordFile = config.sops.secrets.wagou-password-hash.path;
     extraGroups = [
       "wheel"
-      "docker"
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAp8p16DEVrTkM0+e9Ch4nmzIgBky2+DVEGwimxYx/FV wagou@homeserver"

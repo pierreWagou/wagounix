@@ -68,6 +68,7 @@
         };
       }
       "synology-drive"
+      "tailscale-app"
       "thunderbird"
       "visual-studio-code"
       "vlc"

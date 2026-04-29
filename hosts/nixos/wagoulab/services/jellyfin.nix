@@ -1,25 +1,52 @@
-{ pkgs, ... }:
-
 {
-  services.jellyfin = {
-    enable = true;
-    openFirewall = false;
+  config,
+  pkgs,
+  host,
+  ...
+}:
+
+let
+  inherit (config.virtualisation.quadlet) networks;
+in
+{
+  virtualisation.quadlet.containers.jellyfin = {
+    containerConfig = {
+      image = "jellyfin/jellyfin:latest";
+      healthCmd = "none";
+      networks = [ networks.proxy.ref ];
+      volumes = [
+        "/var/lib/jellyfin/config:/config"
+        "/var/lib/jellyfin/cache:/cache"
+      ];
+      environments = {
+        LIBVA_DRIVER_NAME = "iHD";
+      };
+      devices = [ "/dev/dri:/dev/dri" ];
+      addGroups = [ "303" ]; # render group GID on NixOS (also in immich.nix)
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.jellyfin.rule" = "Host(`tape.${host.domain}`)";
+        "traefik.http.routers.jellyfin.entrypoints" = "websecure";
+        "traefik.http.routers.jellyfin.tls" = "true";
+        "traefik.http.routers.jellyfin.middlewares" = "secure-headers@file";
+        "traefik.http.services.jellyfin.loadbalancer.server.port" = "8096";
+      };
+    };
   };
 
   # Intel hardware transcoding (VAAPI/QSV)
-  # The Beelink EQI13 has a 12th/13th gen Intel CPU (Alder Lake / Raptor Lake N-series)
-  hardware.graphics.extraPackages = with pkgs; [
-    intel-media-driver # VA-API (iHD) — required for hardware decode/encode
-    vpl-gpu-rt # oneVPL (QSV) runtime — required for Quick Sync
-    intel-compute-runtime # OpenCL (NEO) — used by tone mapping
-  ];
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      vpl-gpu-rt
+      intel-compute-runtime
+    ];
+  };
 
-  # Use the modern iHD VA-API driver
-  systemd.services.jellyfin.environment.LIBVA_DRIVER_NAME = "iHD";
-
-  # Grant Jellyfin access to GPU devices
-  users.users.jellyfin.extraGroups = [
-    "video"
-    "render"
+  systemd.tmpfiles.rules = [
+    "d /var/lib/jellyfin 0755 root root -"
+    "d /var/lib/jellyfin/config 0755 root root -"
+    "d /var/lib/jellyfin/cache 0755 root root -"
   ];
 }
