@@ -1,12 +1,10 @@
 {
-  config,
   pkgs,
   host,
   ...
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
   yamlFormat = pkgs.formats.yaml { };
 
   # AdGuard config — generated as proper YAML from a Nix attrset.
@@ -83,6 +81,10 @@ let
 in
 {
   virtualisation.quadlet.containers.adguard = {
+    unitConfig = {
+      requires = [ "proxy-network.service" ];
+      after = [ "proxy-network.service" ];
+    };
     containerConfig = {
       image = "adguard/adguardhome:latest";
       # Override Podman's DNS injection — without this, Podman injects the
@@ -90,7 +92,11 @@ in
       # and AdGuard tries to use it for reverse DNS lookups, causing 2s
       # timeouts on every PTR query and massive latency.
       dns = [ "127.0.0.1" ];
-      networks = [ networks.proxy.ref ];
+      # Connect to proxy network with DNS disabled for this container.
+      # aardvark-dns binds port 53 inside the container's netns, which conflicts
+      # with AdGuard's own port 53 listener. Using podmanArgs to pass the network
+      # option because quadlet's Network= directive doesn't support :options syntax.
+      podmanArgs = [ "--network=proxy:dns=false" ];
       publishPorts = [
         "0.0.0.0:53:53/tcp"
         "0.0.0.0:53:53/udp"
