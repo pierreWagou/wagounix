@@ -55,7 +55,7 @@ in
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
-        addGroups = [ "303" ]; # render group GID on NixOS (also in jellyfin.nix)
+        addGroups = [ host.renderGroupGID ]; # render group GID on NixOS (also in jellyfin.nix)
       };
     };
 

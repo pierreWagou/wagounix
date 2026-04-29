@@ -4,6 +4,8 @@ rec {
   hostname = "wagoulab";
   domain = "wagou.fr";
   serverIP = "192.168.68.65";
+  tailscaleIP = "100.68.157.70";
+  renderGroupGID = "303";
   timezone = "Europe/Paris";
   acmeEmail = "pierre.romon@gmail.com";
   cloudflareAccountId = "65b2dca00576549f065820b1cd5c76c9";
