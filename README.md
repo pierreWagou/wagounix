@@ -35,7 +35,7 @@ Each configuration is assembled from layered modules — common packages are sha
   ├────────────┬────────────┼─────────────────────────────┤
   │  personal/ │   work/    │       wagoulab/             │  layer / host
   ├────────────┼──────┬─────┤                             │
-  │   wagou    │ sap  │alan │                             │
+  │   wagoumac │ sap  │alan │                             │
   └────────────┴──────┴─────┴─────────────────────────────┘
 ```
 
@@ -47,7 +47,7 @@ wagounix/
 └── hosts/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
-    │   ├── personal/  # Personal Macs (wagou)
+    │   ├── personal/  # Personal Macs (wagoumac)
     │   └── work/      # Work Macs (sap, alan)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
@@ -93,7 +93,7 @@ wagounix/
     │   │   ├── dock.nix
     │   │   ├── packages.nix
     │   │   ├── homebrew.nix
-    │   │   ├── wagou/
+    │   │   ├── wagoumac/
     │   │   │   ├── default.nix
     │   │   │   ├── variables.nix
     │   │   │   └── homebrew.nix
@@ -145,7 +145,7 @@ wagounix/
 | Profile | System | Layer | Description |
 |---|---|---|---|
 | `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
-| `wagou` | aarch64-darwin | personal | New personal Mac |
+| `wagoumac` | aarch64-darwin | personal | New personal Mac |
 | `alan` | aarch64-darwin | work | New work Mac (disabled) |
 
 ### NixOS
@@ -205,7 +205,7 @@ GitHub Actions runs on push to `main` and on PRs:
 | Job | Runner | Profiles |
 |---|---|---|
 | Lint | macos-15 | nixfmt, statix, deadnix |
-| Build darwin | macos-15 | sap, wagou (parallel) |
+| Build darwin | macos-15 | sap, wagoumac (parallel) |
 | Build NixOS | ubuntu-latest | wagoulab |
 
 ## Quick Reference

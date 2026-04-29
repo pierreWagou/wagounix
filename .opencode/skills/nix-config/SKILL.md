@@ -39,7 +39,7 @@ wagounix/
 │   │   │   ├── dock.nix           # Personal dock apps
 │   │   │   ├── packages.nix       # Personal nix packages (android-tools, mas)
 │   │   │   ├── homebrew.nix       # Personal casks (Steam, Ankama, etc.) + masApps
-│   │   │   ├── wagou/             # New personal Mac (aarch64-darwin)
+│   │   │   ├── wagoumac/             # New personal Mac (aarch64-darwin)
 │   │   │   │   ├── default.nix
 │   │   │   │   ├── variables.nix
 │   │   │   │   └── homebrew.nix   # docker-desktop
@@ -328,7 +328,7 @@ nix flake check      # runs all checks + builds
 ### CI (GitHub Actions)
 
 - **lint** — nixfmt, statix, deadnix (macos-15)
-- **build-darwin** — sap, wagou (macos-15, parallel)
+- **build-darwin** — sap, wagoumac (macos-15, parallel)
 - **build-nixos** — wagoulab (ubuntu-latest)
 
 ## Key commands

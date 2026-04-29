@@ -79,17 +79,17 @@
           };
         };
 
-        wagou = nix-darwin.lib.darwinSystem {
+        wagoumac = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
             ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
-            ./hosts/darwin/personal/wagou
+            ./hosts/darwin/personal/wagoumac
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/darwin/personal/wagou/variables.nix;
+            host = import ./hosts/darwin/personal/wagoumac/variables.nix;
           };
         };
 
