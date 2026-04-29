@@ -23,7 +23,7 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere. The Beelink's Tailscale IP is `100.68.157.70`.
 
 IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Traefik HTTPS.
-IMPORTANT: AdGuard Home DNS is published on `0.0.0.0:53` (all interfaces) so it's reachable via both LAN and Tailscale. The firewall restricts access to known interfaces only.
+IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tailscale IP, `127.0.0.1`) on port 53, mapped to container port 5353. This avoids conflicts with Podman's aardvark-dns which binds port 53 on bridge gateway IPs. The firewall restricts access to known interfaces only.
 
 ## Current services
 
@@ -36,7 +36,7 @@ IMPORTANT: AdGuard Home DNS is published on `0.0.0.0:53` (all interfaces) so it'
 | Home Assistant | `services/home-assistant.nix` | 8123 (Podman network) | `https://home.wagou.fr` |
 | Jellyfin | `services/jellyfin.nix` | 8096 (Podman network) | `https://tape.wagou.fr` |
 | Traefik | `services/traefik.nix` | 80, 443 (published to host) | - |
-| AdGuard Home | `services/adguardhome.nix` | 53 (published to host), 3000 (web UI) | `https://guard.wagou.fr` |
+| AdGuard Home | `services/adguardhome.nix` | 5353 (mapped to host:53 on LAN/Tailscale/lo), 3000 (web UI) | `https://guard.wagou.fr` |
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
 | Tailscale | `services/tailscale.nix` | Native NixOS service (subnet router) | - |
 | Fail2ban | `services/fail2ban.nix` | - | - |
@@ -48,7 +48,7 @@ IMPORTANT: AdGuard Home DNS is published on `0.0.0.0:53` (all interfaces) so it'
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `renderGroupGID`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/wagoulab/services/`
@@ -200,7 +200,7 @@ This means when Tailscale is connected:
 - All other DNS queries use the local network's DNS (no conflict with corporate VPN/DNS)
 - Ad blocking only applies to `wagou.fr` resolution when remote (not global)
 
-The `0.0.0.0:53` binding in `adguardhome.nix` ensures AdGuard responds on all interfaces (LAN + Tailscale). The firewall explicitly allows port 53 on the `tailscale0` interface.
+The specific IP bindings in `adguardhome.nix` (`serverIP:53`, `tailscaleIP:53`, `127.0.0.1:53`) ensure AdGuard responds on LAN, Tailscale, and localhost. Port 53 on the host is mapped to port 5353 inside the container to avoid conflicts with Podman's aardvark-dns. The firewall explicitly allows port 53 on the `tailscale0` interface.
 
 ### UDP GRO optimization
 
@@ -316,7 +316,7 @@ Add `./newservice.nix` to the imports in `services/default.nix`.
 Add the subdomain to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
 
 ```nix
-tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" "tape" "newservice" ];
+tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "newservice" ];
 ```
 
 This automatically wires up:

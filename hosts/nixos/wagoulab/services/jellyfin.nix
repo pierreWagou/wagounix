@@ -22,7 +22,7 @@ in
         LIBVA_DRIVER_NAME = "iHD";
       };
       devices = [ "/dev/dri:/dev/dri" ];
-      addGroups = [ "303" ]; # render group GID on NixOS (also in immich.nix)
+      addGroups = [ host.renderGroupGID ]; # render group GID on NixOS (also in immich.nix)
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.jellyfin.rule" = "Host(`tape.${host.domain}`)";

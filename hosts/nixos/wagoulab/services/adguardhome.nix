@@ -94,8 +94,8 @@ in
       publishPorts = [
         "${host.serverIP}:53:5353/tcp"
         "${host.serverIP}:53:5353/udp"
-        "100.68.157.70:53:5353/tcp"
-        "100.68.157.70:53:5353/udp"
+        "${host.tailscaleIP}:53:5353/tcp"
+        "${host.tailscaleIP}:53:5353/udp"
         "127.0.0.1:53:5353/tcp"
         "127.0.0.1:53:5353/udp"
         "127.0.0.1:3000:3000/tcp"
