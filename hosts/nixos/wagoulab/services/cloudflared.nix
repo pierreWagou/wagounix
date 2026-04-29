@@ -18,7 +18,7 @@ let
       ingress =
         (map (sub: {
           hostname = "${sub}.${host.domain}";
-          service = "https://${host.serverIP}:443";
+          service = "https://traefik:443";
           originRequest.noTLSVerify = true;
         }) host.tunnelSubdomains)
         ++ [ { service = "http_status:404"; } ];
