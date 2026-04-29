@@ -30,6 +30,6 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/vaultwarden 0755 root root -"
-    "d /var/backup/vaultwarden 0755 root root -"
+    "d /var/backup/vaultwarden 0755 root root -" # for planned borgbackup/restic service
   ];
 }

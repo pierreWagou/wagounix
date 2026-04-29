@@ -11,12 +11,18 @@ Remote (phone/laptop outside home)
 Local (home network)                                         │
   ── https://*.wagou.fr ──▶ AdGuard Home (DNS rewrite) ──────────────┤
                                                              ▼
-                                                        Traefik (HTTPS :443)
+Remote via Tailscale (split DNS)                        Traefik (HTTPS :443)
+  ── https://*.wagou.fr ──▶ AdGuard Home (100.68.157.70)     │
+       ──▶ resolves to 192.168.68.65                         │
+       ──▶ subnet route via Tailscale ───────────────────────┤
                                                              │
                                               ┌──────────────┼──────────────┐
                                               ▼              ▼              ▼
                                         Vaultwarden    OpenCloud        Immich
                                           (:80)         (:9200)        (:2283)
+
+Remote SSH/LAN access via Tailscale
+  ── Tailscale (WireGuard) ──▶ Beelink (subnet router) ──▶ 192.168.68.0/24
 ```
 
 All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network — no ports are published to the host except Traefik (80/443) and AdGuard Home (53). Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 challenge via Cloudflare). The Cloudflare Tunnel connects to Traefik over HTTPS (container-to-container). On the local network, AdGuard Home rewrites `*.wagou.fr` to the Beelink's IP, bypassing Cloudflare.

@@ -18,6 +18,8 @@ let
     users = [
       {
         name = "admin";
+        # bcrypt hash — not a secret (irreversible). Stored here because the AdGuard
+        # config is generated as a Nix derivation; sops-nix can't inject at build time.
         password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
       }
     ];
