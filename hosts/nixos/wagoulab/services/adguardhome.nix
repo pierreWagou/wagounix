@@ -87,30 +87,18 @@ in
     };
     containerConfig = {
       image = "adguard/adguardhome:latest";
-      # Override Podman's DNS injection — without this, Podman injects the
-      # network gateway (10.89.x.1:53) into the container's resolv.conf,
-      # and AdGuard tries to use it for reverse DNS lookups, causing 2s
-      # timeouts on every PTR query and massive latency.
+      # Use host network to avoid aardvark-dns port 53 conflict.
+      # With dns_enabled=true on the proxy network, aardvark-dns binds port 53
+      # inside the container's network namespace, preventing AdGuard from using it.
+      # Host networking sidesteps this entirely — AdGuard binds directly on the host.
+      podmanArgs = [ "--network=host" ];
       dns = [ "127.0.0.1" ];
-      # Connect to proxy network with DNS disabled for this container.
-      # aardvark-dns binds port 53 inside the container's netns, which conflicts
-      # with AdGuard's own port 53 listener. Using podmanArgs to pass the network
-      # option because quadlet's Network= directive doesn't support :options syntax.
-      podmanArgs = [ "--network=proxy:dns=false" ];
-      publishPorts = [
-        "0.0.0.0:53:53/tcp"
-        "0.0.0.0:53:53/udp"
-        "127.0.0.1:3000:3000/tcp"
-      ];
       volumes = [
         "/var/lib/adguardhome/work:/opt/adguardhome/work"
         "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
         "${adguardConfig}:/opt/adguardhome/AdGuardHome.seed.yaml:ro"
       ];
       # Copy the seed config on every start, then launch AdGuard.
-      # This ensures our config is always the starting point.
-      # AdGuard may migrate it (schema upgrades), which is fine — the seed
-      # is reapplied on each container restart.
       entrypoint = "/bin/sh";
       exec = [
         "-c"
