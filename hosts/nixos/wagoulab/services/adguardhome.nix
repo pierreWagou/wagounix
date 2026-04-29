@@ -24,8 +24,10 @@ let
     http.address = "0.0.0.0:3000";
     dns = {
       bind_hosts = [
-        "0.0.0.0"
-        "::"
+        host.serverIP
+        "100.68.157.70"
+        "127.0.0.1"
+        "::1"
       ];
       port = 53;
       bootstrap_dns = [
