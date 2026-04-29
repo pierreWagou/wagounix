@@ -8,19 +8,28 @@
     age
     bat
     bottom
+    chezmoi
     cloudflared
     eza
     fd
     fzf
     git
+    gh
+    gnupg
     neovim
     openssl
     ripgrep
+    sesh
+    sheldon
     sops
+    starship
+    tailscale
     tmux
+    tmuxinator
     unzip
     wget
     zip
+    zoxide
     zsh
   ];
 }

@@ -1,7 +1,12 @@
-{ pkgs, host, ... }:
+{
+  config,
+  pkgs,
+  host,
+  ...
+}:
 
 let
-  port = host.homeAssistantPort;
+  inherit (config.virtualisation.quadlet) networks;
 
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
     default_config:
@@ -9,7 +14,7 @@ let
     homeassistant:
       name: Home
       unit_system: metric
-      time_zone: Europe/Paris
+      time_zone: ${host.timezone}
       external_url: https://home.${host.domain}
       internal_url: https://home.${host.domain}
 
@@ -17,6 +22,7 @@ let
       use_x_forwarded_for: true
       trusted_proxies:
         - 172.16.0.0/12
+        - 10.89.0.0/16
 
     frontend:
       themes: !include_dir_merge_named themes
@@ -27,19 +33,26 @@ let
   '';
 in
 {
-  # OCI container exception: Home Assistant's ecosystem (HACS, custom integrations, add-ons)
-  # assumes the Docker environment. Upstream only tests against their container image.
-  virtualisation.oci-containers.containers.home-assistant = {
-    image = "ghcr.io/home-assistant/home-assistant:stable";
-    volumes = [
-      "/var/lib/home-assistant:/config"
-      "${configFile}:/config/configuration.yaml:ro"
-    ];
-    environment = {
-      TZ = "Europe/Paris";
+  virtualisation.quadlet.containers.home-assistant = {
+    containerConfig = {
+      image = "ghcr.io/home-assistant/home-assistant:stable";
+      networks = [ networks.proxy.ref ];
+      volumes = [
+        "/var/lib/home-assistant:/config"
+        "${configFile}:/config/configuration.yaml:ro"
+      ];
+      environments = {
+        TZ = host.timezone;
+      };
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.homeassistant.rule" = "Host(`home.${host.domain}`)";
+        "traefik.http.routers.homeassistant.entrypoints" = "websecure";
+        "traefik.http.routers.homeassistant.tls" = "true";
+        "traefik.http.routers.homeassistant.middlewares" = "secure-headers@file";
+        "traefik.http.services.homeassistant.loadbalancer.server.port" = "8123";
+      };
     };
-    ports = [ "127.0.0.1:${toString port}:8123" ];
-    extraOptions = [ "--log-driver=journald" ];
   };
 
   systemd.tmpfiles.rules = [

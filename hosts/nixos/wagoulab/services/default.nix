@@ -5,25 +5,24 @@
     ghostty.terminfo
   ];
 
-  # Service policy:
-  # - Default to NixOS native services (module system, systemd, sops integration).
-  # - OCI containers are exceptions for software that is impractical to run natively
-  #   (e.g. upstream only tests Docker, ecosystem assumes container environment).
-  #   Each container must document the justification in its service file.
-  virtualisation.oci-containers.backend = "docker";
-
+  # All application services run as Podman containers via quadlet-nix.
+  # NixOS manages: Podman runtime, container definitions, secrets (sops-nix),
+  # firewall, fail2ban, and hardware drivers.
+  # Single deploy: nixos-rebuild switch. Atomic rollback: nixos-rebuild --rollback.
   imports = [
+    ./podman.nix
     ./secrets.nix
-    ./vaultwarden.nix
-    ./caddy.nix
-    ./adguardhome.nix
+    ./traefik.nix
     ./cloudflared.nix
-    ./immich.nix
+    ./vaultwarden.nix
     ./opencloud.nix
-    ./homepage.nix
-    ./home-assistant.nix
     ./jellyfin.nix
+    ./home-assistant.nix
+    ./homepage.nix
+    ./adguardhome.nix
+    ./immich.nix
     ./fail2ban.nix
     ./firewall.nix
+    ./tailscale.nix
   ];
 }

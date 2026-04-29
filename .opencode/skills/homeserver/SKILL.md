@@ -1,38 +1,44 @@
 ---
 name: homeserver
-description: Manage the NixOS homeserver (wagoulab) — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Caddy reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
+description: Manage the NixOS homeserver (wagoulab) — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Traefik reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
 ---
 
 ## Overview
 
-The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel.
+The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel and Tailscale.
 
 Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
 ## Architecture
 
 ```
-Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Caddy (HTTPS :443) -> Service
-Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Caddy (HTTPS :443) -> Service
+Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service
+Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Beelink (subnet router) -> 192.168.68.0/24
+Remote access:  Browser -> Tailscale (split DNS) -> AdGuard Home -> 192.168.68.65 -> Traefik -> Service
+Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service
 ```
 
-Caddy serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Caddy over HTTPS with `originServerName` for SNI matching.
+All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network. Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Traefik over HTTPS (container-to-container, `noTLSVerify` since it's internal).
 
-IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Caddy HTTPS.
+Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere. The Beelink's Tailscale IP is `100.68.157.70`.
+
+IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Traefik HTTPS.
+IMPORTANT: AdGuard Home DNS is published on `0.0.0.0:53` (all interfaces) so it's reachable via both LAN and Tailscale. The firewall restricts access to known interfaces only.
 
 ## Current services
 
-| Service | NixOS config | Port | Remote URL |
+| Service | NixOS config | Container port | Remote URL |
 |---|---|---|---|
-| Vaultwarden | `services/vaultwarden.nix` | 8222 (localhost) | `https://vault.wagou.fr` |
-| OpenCloud | `services/opencloud.nix` | 9200 (localhost) | `https://cloud.wagou.fr` |
-| Immich | `services/immich.nix` | 2283 (localhost) | `https://pixel.wagou.fr` |
-| Homepage | `services/homepage.nix` | 8082 (localhost) | `https://dash.wagou.fr` |
-| Home Assistant | `services/home-assistant.nix` | 8123 (Docker, localhost) | `https://home.wagou.fr` |
-| Jellyfin | `services/jellyfin.nix` | 8096 (localhost) | `https://tape.wagou.fr` |
-| Caddy | `services/caddy.nix` | 443 | - |
-| AdGuard Home | `services/adguardhome.nix` | 53 (DNS), 3000 (web UI) | `https://guard.wagou.fr` |
+| Vaultwarden | `services/vaultwarden.nix` | 80 (Podman network) | `https://vault.wagou.fr` |
+| OpenCloud | `services/opencloud.nix` | 9200 (Podman network) | `https://cloud.wagou.fr` |
+| Immich | `services/immich.nix` | 2283 (Podman network) | `https://pixel.wagou.fr` |
+| Homepage | `services/homepage.nix` | 3000 (Podman network) | `https://dash.wagou.fr` |
+| Home Assistant | `services/home-assistant.nix` | 8123 (Podman network) | `https://home.wagou.fr` |
+| Jellyfin | `services/jellyfin.nix` | 8096 (Podman network) | `https://tape.wagou.fr` |
+| Traefik | `services/traefik.nix` | 80, 443 (published to host) | - |
+| AdGuard Home | `services/adguardhome.nix` | 53 (published to host), 3000 (web UI) | `https://guard.wagou.fr` |
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
+| Tailscale | `services/tailscale.nix` | Native NixOS service (subnet router) | - |
 | Fail2ban | `services/fail2ban.nix` | - | - |
 
 ## Files
@@ -42,7 +48,7 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/wagoulab/services/`
@@ -50,26 +56,28 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports all service modules + system packages (ghostty.terminfo) |
+| `podman.nix` | Podman runtime, quadlet-nix shared `proxy` network |
 | `secrets.nix` | sops-nix secret declarations and templates |
-| `vaultwarden.nix` | Password manager config |
-| `opencloud.nix` | File sync & sharing config |
-| `immich.nix` | Photo management config (PostgreSQL, Redis, ML auto-configured) |
-| `caddy.nix` | Reverse proxy with all virtual hosts |
-| `adguardhome.nix` | DNS server, ad blocking, blocklists, local DNS rewrites |
-| `cloudflared.nix` | Cloudflare Tunnel systemd service |
-| `homepage.nix` | Homepage dashboard (Catppuccin Mocha theme, service widgets) |
+| `traefik.nix` | Traefik reverse proxy container (Let's Encrypt, HSTS headers, Cloudflare trusted IPs) |
+| `vaultwarden.nix` | Password manager container |
+| `opencloud.nix` | File sync & sharing container |
+| `immich.nix` | Photo management (server, ML, PostgreSQL, Redis — 4 containers + internal network) |
+| `adguardhome.nix` | DNS server container, ad blocking, blocklists, local DNS rewrites |
+| `cloudflared.nix` | Cloudflare Tunnel container |
+| `tailscale.nix` | Tailscale VPN (native NixOS service, subnet router for `192.168.68.0/24`) |
+| `homepage.nix` | Homepage dashboard container (Catppuccin Mocha theme, service widgets, nginx image sidecar) |
 | `homepage-images/` | Background images and favicon for Homepage dashboard |
-| `home-assistant.nix` | Home automation (Docker OCI container) |
-| `jellyfin.nix` | Media server with Intel hardware transcoding |
+| `home-assistant.nix` | Home automation container |
+| `jellyfin.nix` | Media server container with Intel hardware transcoding |
 | `fail2ban.nix` | Brute force protection |
-| `firewall.nix` | Firewall rules (ports 22, 53, 443) |
+| `firewall.nix` | Firewall rules (ports 22, 53, 80, 443) |
 
 ### Platform-level NixOS config: `hosts/nixos/`
 
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports configuration.nix |
-| `configuration.nix` | SSH (hardened, key-only), Docker, user account, timezone, locale, auto-updates |
+| `configuration.nix` | SSH (hardened, key-only), user account, timezone, locale, auto-updates |
 
 ### Secrets: `hosts/nixos/wagoulab/`
 
@@ -89,12 +97,12 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 |---|---|
 | **SSH** | Key-only auth, password disabled, root login disabled (`hosts/nixos/configuration.nix`) |
 | **Fail2ban** | Bans IPs after 5 failed SSH attempts for 1 hour (`services/fail2ban.nix`) |
-| **Firewall** | Only ports 22 (SSH), 53 (DNS), 443 (HTTPS) open |
-| **Service binding** | All services on `127.0.0.1` only, behind Caddy reverse proxy |
+| **Firewall** | Only ports 22 (SSH), 53 (DNS), 80 (HTTP redirect), 443 (HTTPS) open |
+| **Service isolation** | All services on Podman internal network, behind Traefik reverse proxy |
 | **Secrets** | sops-nix with age encryption, decrypted to tmpfs (`/run/secrets/`) |
 | **Vaultwarden** | Signups disabled, admin panel protected with sops-managed token |
 | **Network** | No open ports on router, all external traffic through Cloudflare Tunnel |
-| **TLS** | Let's Encrypt wildcard certificate (DNS-01 via Cloudflare), served by Caddy |
+| **TLS** | Let's Encrypt wildcard certificate (DNS-01 via Cloudflare), served by Traefik |
 | **DNS** | AdGuard Home with DNS-over-HTTPS upstream |
 | **Rate limiting** | Cloudflare WAF rate limiting on `*.wagou.fr` |
 | **Auto-updates** | Daily rebuild at 4:00 AM from flake (`system.autoUpgrade`) |
@@ -110,12 +118,14 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `cloudflare-credentials` | `cloudflared.nix` | Credentials file for tunnel auth |
 | `opencloud-admin-password` | `opencloud.nix` | Via sops template `opencloud.env` |
 | `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` |
+| `immich-db-username` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
+| `immich-db-password` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
 | `wagou-password-hash` | `configuration.nix` | User password hash (neededForUsers) |
 | `root-password-hash` | `configuration.nix` | Root password hash (neededForUsers) |
 | `immich-api-key` | `homepage.nix` | Via sops template `homepage.env` |
 | `adguard-password` | `homepage.nix` | Via sops template `homepage.env` |
 | `cloudflare-tunnel-token` | `homepage.nix` | Via sops template `homepage.env` |
-| `cloudflare-dns-token` | `caddy.nix` (ACME) | Via sops template `caddy.env` |
+| `cloudflare-dns-token` | `traefik.nix` (ACME) | Via sops template `traefik.env` |
 | `jellyfin-api-key` | `homepage.nix` | Via sops template `homepage.env` |
 
 ### Encryption keys
@@ -142,7 +152,6 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 3. If the service needs `KEY=VALUE` env format, create a `sops.templates` entry:
    ```nix
    sops.templates."myservice.env" = {
-     owner = "myservice";
      content = "SECRET_KEY=${config.sops.placeholder.my-secret}\n";
    };
    ```
@@ -172,10 +181,30 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 | Scenario | Resolution path |
 |---|---|
-| `*.wagou.fr` (remote devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
+| `*.wagou.fr` (remote, no Tailscale) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
+| `*.wagou.fr` (remote, Tailscale) | Split DNS -> AdGuard Home (`100.68.157.70:53`) -> `192.168.68.65` -> Tailscale subnet route -> Traefik (direct HTTPS) |
 | `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTPS, bypasses Cloudflare) |
-| Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
+| Ad/tracker domains (local) | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> upstream DoH (Cloudflare/Google) -> Internet |
+
+### Tailscale DNS (split DNS)
+
+> Human-readable documentation: see `hosts/nixos/wagoulab/README.md` -> "Tailscale (remote access)" section.
+
+Tailscale is configured with **split DNS** in the admin console (admin.tailscale.com -> DNS):
+- Domain `wagou.fr` uses custom nameserver `100.68.157.70` (Beelink's Tailscale IP)
+- "Override local DNS" is **disabled** (so work/SAP network DNS still resolves corporate domains)
+
+This means when Tailscale is connected:
+- `*.wagou.fr` queries go to AdGuard Home via Tailscale -> resolves to `192.168.68.65` -> routed via subnet tunnel -> Traefik
+- All other DNS queries use the local network's DNS (no conflict with corporate VPN/DNS)
+- Ad blocking only applies to `wagou.fr` resolution when remote (not global)
+
+The `0.0.0.0:53` binding in `adguardhome.nix` ensures AdGuard responds on all interfaces (LAN + Tailscale). The firewall explicitly allows port 53 on the `tailscale0` interface.
+
+### UDP GRO optimization
+
+A systemd oneshot service (`tailscale-ethtool`) runs on boot to enable UDP GRO forwarding on the physical NIC (`enp170s0`), improving subnet router throughput. See `services/tailscale.nix`.
 
 ### Domain setup
 
@@ -189,7 +218,7 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 ## AdGuard Home configuration
 
-Runs with `mutableSettings = false` — fully declarative, config reset on every rebuild. Web UI changes are lost.
+Runs as a Podman container with a seed config. The declarative config from Nix is copied into the container on every start, ensuring it's always the starting point. AdGuard may migrate the schema at runtime, which is fine — the seed is reapplied on each container restart.
 
 ### Upstream DNS
 - `https://dns.cloudflare.com/dns-query` (DNS-over-HTTPS)
@@ -203,23 +232,26 @@ Runs with `mutableSettings = false` — fully declarative, config reset on every
 | Steven Black's Unified Hosts | `https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts` |
 | Malicious URL Blocklist | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt` |
 
-## Caddy virtual hosts
+## Traefik routing
 
-Each service gets a virtual host with `useACMEHost` for HTTPS. Caddy routes by hostname:
+Traefik discovers services via the Docker/Podman provider. Each container declares Traefik labels to configure its router, TLS, and middlewares. All services share the `secure-headers@file` middleware (HSTS, X-Content-Type-Options, XSS protection).
 
-| Virtual host | Proxies to | Special headers |
-|---|---|---|
-| `vault.wagou.fr` | `127.0.0.1:8222` | `X-Real-IP` (client IP for audit logs) |
-| `pixel.wagou.fr` | `127.0.0.1:2283` | - |
-| `cloud.wagou.fr` | `127.0.0.1:9200` | `X-Forwarded-Proto: https` (prevents HTTPS redirect loop) |
-| `guard.wagou.fr` | `127.0.0.1:3000` | AdGuard Home web UI |
-| `dash.wagou.fr` | `127.0.0.1:8082` | Homepage dashboard + `/bg/*` static images (including favicon) |
-| `home.wagou.fr` | `127.0.0.1:8123` | Home Assistant (Docker container) |
-| `tape.wagou.fr` | `127.0.0.1:8096` | Jellyfin media server |
+Routing is determined by `Host()` rules matching the subdomain:
 
-OpenCloud requires the `X-Forwarded-Proto: https` header because its configured URL is `https://cloud.wagou.fr` and it would otherwise redirect HTTP to HTTPS in a loop.
+| Subdomain | Container | Container port | Notes |
+|---|---|---|---|
+| `vault.wagou.fr` | vaultwarden | 80 | `IP_HEADER = "X-Real-IP"` for audit logs |
+| `pixel.wagou.fr` | immich-server | 2283 | - |
+| `cloud.wagou.fr` | opencloud | 9200 | `OC_INSECURE = "true"` (behind Traefik) |
+| `guard.wagou.fr` | adguard | 3000 | Web UI |
+| `dash.wagou.fr` | homepage-images (nginx) | 8090 | Static images at `/bg/*` |
+| `dash.wagou.fr` | homepage | 3000 | Dashboard (default route) |
+| `home.wagou.fr` | home-assistant | 8123 | - |
+| `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
 
 ## SSH access
+
+> Also documented in `hosts/nixos/wagoulab/README.md` -> "SSH access" section.
 
 SSH is hardened — key-only authentication, no passwords, no root login.
 
@@ -244,14 +276,34 @@ The homeserver SSH public key is declared in `hosts/nixos/configuration.nix` und
 
 ### Step 1 — Create the service file
 
-Create `services/<newservice>.nix`:
+Create `services/<newservice>.nix` with a Podman container definition:
 
 ```nix
-_: {
-  services.newservice = {
-    enable = true;
-    # service-specific options
+{ config, host, ... }:
+
+let
+  inherit (config.virtualisation.quadlet) networks;
+in
+{
+  virtualisation.quadlet.containers.newservice = {
+    containerConfig = {
+      image = "org/newservice:latest";
+      networks = [ networks.proxy.ref ];
+      volumes = [ "/var/lib/newservice:/data" ];
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.newservice.rule" = "Host(`newservice.${host.domain}`)";
+        "traefik.http.routers.newservice.entrypoints" = "websecure";
+        "traefik.http.routers.newservice.tls" = "true";
+        "traefik.http.routers.newservice.middlewares" = "secure-headers@file";
+        "traefik.http.services.newservice.loadbalancer.server.port" = "<port>";
+      };
+    };
   };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/newservice 0755 root root -"
+  ];
 }
 ```
 
@@ -259,37 +311,19 @@ _: {
 
 Add `./newservice.nix` to the imports in `services/default.nix`.
 
-### Step 3 — Add Caddy service config
-
-In `services/caddy.nix`, add a new entry to the `serviceConfigs` attrset with the subdomain as the key:
-
-```nix
-serviceConfigs = {
-  # ... existing entries ...
-  newservice = ''
-    ${hsts}
-    ${faviconRedirect}
-    reverse_proxy 127.0.0.1:${toString config.services.newservice.port}
-  '';
-};
-```
-
-If the service needs `X-Forwarded-Proto` (because its URL is configured as https), add `header_up X-Forwarded-Proto https`.
-
-### Step 4 — Add subdomain to variables
+### Step 3 — Add subdomain to variables
 
 Add the subdomain to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
 
 ```nix
-tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" "newservice" ];
+tunnelSubdomains = [ "vault" "pixel" "cloud" "home" "guard" "tape" "newservice" ];
 ```
 
 This automatically wires up:
 - DNS rewrite in AdGuard Home (local HTTPS bypass)
 - Tunnel ingress rule in cloudflared (remote access)
-- Caddy virtual host (HTTPS termination, using the `serviceConfigs` entry from Step 3)
 
-### Step 5 — Add secrets (if needed)
+### Step 4 — Add secrets (if needed)
 
 In `services/secrets.nix`:
 
@@ -298,18 +332,17 @@ sops.secrets.newservice-secret = { mode = "0400"; };
 
 # If the service needs KEY=VALUE env format:
 sops.templates."newservice.env" = {
-  owner = "newservice";
   content = "SECRET=${config.sops.placeholder.newservice-secret}\n";
 };
 ```
 
 Then edit `hosts/nixos/wagoulab/secrets.yaml` with `sops` to add the secret value.
 
-### Step 6 — Add Cloudflare DNS route
+### Step 5 — Add Cloudflare DNS route
 
 Run `cloudflared tunnel route dns wagoulab newservice.wagou.fr` once from your Mac (requires `cert.pem` from `cloudflared login`).
 
-### Step 7 — Deploy
+### Step 6 — Deploy
 
 ```bash
 git add -A && git commit -m "feat: add newservice" && git push
@@ -318,9 +351,11 @@ sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 
 ## Troubleshooting
 
+> Full troubleshooting guide: see `hosts/nixos/wagoulab/README.md` -> "Troubleshooting" section.
+
 ### OpenCloud "Permanent Redirect" loop
 
-OpenCloud redirects HTTP to HTTPS because its URL is configured as `https://cloud.wagou.fr`. The fix is the `X-Forwarded-Proto: https` header in Caddy's reverse proxy for OpenCloud.
+OpenCloud redirects HTTP to HTTPS because its URL is configured as `https://cloud.wagou.fr`. The fix is `OC_INSECURE = "true"` and `PROXY_TLS = "false"` in the container environment, which tells OpenCloud to accept plain HTTP behind Traefik.
 
 ### OpenCloud fails to start ("Failed to load environment files")
 
@@ -335,17 +370,17 @@ If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` pack
 
 ### Cloudflare Tunnel not connecting
 
-1. `systemctl status cloudflared-tunnel`
-2. `journalctl -u cloudflared-tunnel --no-pager -f`
+1. `systemctl status cloudflared` (quadlet-nix container unit)
+2. `journalctl -u cloudflared --no-pager -f`
 3. Common error: "couldn't read tunnel credentials" — check `cloudflare-credentials` sops secret and credentials-file path
 
 ### 502 Bad Gateway from Cloudflare
 
 Tunnel connected but service not responding:
-1. Is Caddy running? `systemctl status caddy`
+1. Is Traefik running? `systemctl status traefik`
 2. Is the service running? `systemctl status <service>`
-3. Test locally: `curl -H "Host: service.wagou.fr" https://localhost:443`
-4. Ensure tunnel route uses HTTPS with `localhost:443` and `originServerName` is set
+3. Check Traefik logs: `journalctl -u traefik --no-pager -f`
+4. Ensure the container is on the `proxy` network and has correct Traefik labels
 
 ### DNS not resolving locally
 
@@ -377,10 +412,12 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 ## Important rules
 
 - Each service gets its own file in `services/` — one service per file
+- All services run as Podman containers via quadlet-nix on the `proxy` network
+- Traefik discovers services via Docker/Podman labels — no manual routing config needed
 - Secrets go in `hosts/nixos/wagoulab/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
 - AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
-- Caddy serves HTTPS with Let's Encrypt wildcard cert
-- Cloudflare Tunnel routes use HTTPS with `localhost:443` and `originServerName`
+- Traefik serves HTTPS with Let's Encrypt wildcard cert
+- Cloudflare Tunnel routes use HTTPS to `traefik:443` (container network) with `noTLSVerify = true`
 - AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare
 - `system.stateVersion = "25.05"` — never change this
 - `hardware.nix` was generated by `nixos-generate-config` — only regenerate if hardware changes

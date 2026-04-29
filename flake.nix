@@ -23,6 +23,9 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    quadlet-nix = {
+      url = "github:SEIAROTg/quadlet-nix";
+    };
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
@@ -101,6 +104,7 @@
           system = "x86_64-linux";
           modules = [
             inputs.sops-nix.nixosModules.sops
+            inputs.quadlet-nix.nixosModules.quadlet
             ./hosts/common
             ./hosts/nixos
             ./hosts/nixos/wagoulab

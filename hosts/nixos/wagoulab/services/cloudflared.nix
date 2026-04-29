@@ -6,53 +6,42 @@
 }:
 
 let
-  configFile = pkgs.writeText "cloudflared-config.json" (
+  inherit (config.virtualisation.quadlet) networks;
+
+  # Tunnel config — routes all subdomains to Traefik inside the Podman network.
+  # Uses HTTPS to avoid the HTTP->HTTPS redirect loop.
+  # noTLSVerify is safe because the connection is internal (container-to-container).
+  configFile = pkgs.writeText "cloudflared-config.yml" (
     builtins.toJSON {
       tunnel = host.cloudflareTunnelId;
-      credentials-file = config.sops.secrets.cloudflare-credentials.path;
+      credentials-file = "/etc/cloudflared/credentials.json";
       ingress =
         (map (sub: {
           hostname = "${sub}.${host.domain}";
-          service = "https://localhost:443";
-          originRequest.originServerName = host.domain;
+          service = "https://traefik:443";
+          originRequest.noTLSVerify = true;
         }) host.tunnelSubdomains)
         ++ [ { service = "http_status:404"; } ];
     }
   );
 in
 {
-  users.users.cloudflared = {
-    isSystemUser = true;
-    group = "cloudflared";
-  };
-  users.groups.cloudflared = { };
-
-  # Cloudflare Tunnel — secure remote access without opening ports
-  systemd.services.cloudflared-tunnel = {
-    description = "Cloudflare Tunnel";
-    after = [
-      "network-online.target"
-    ];
-    wants = [
-      "network-online.target"
-    ];
-    wantedBy = [
-      "multi-user.target"
-    ];
-    restartTriggers = [
-      config.sops.secrets.cloudflare-credentials.path
-      configFile
-    ];
-    serviceConfig = {
-      ExecStart = "${pkgs.cloudflared}/bin/cloudflared --config ${configFile} tunnel --no-autoupdate run";
-      Restart = "on-failure";
-      RestartSec = 5;
-      User = "cloudflared";
-      Group = "cloudflared";
-      NoNewPrivileges = true;
-      ProtectSystem = "strict";
-      ProtectHome = true;
-      PrivateTmp = true;
+  virtualisation.quadlet.containers.cloudflared = {
+    containerConfig = {
+      image = "cloudflare/cloudflared:latest";
+      noNewPrivileges = true;
+      networks = [ networks.proxy.ref ];
+      volumes = [
+        "${configFile}:/etc/cloudflared/config.yml:ro"
+        "${config.sops.secrets.cloudflare-credentials.path}:/etc/cloudflared/credentials.json:ro"
+      ];
+      exec = [
+        "tunnel"
+        "--config"
+        "/etc/cloudflared/config.yml"
+        "--no-autoupdate"
+        "run"
+      ];
     };
   };
 }
