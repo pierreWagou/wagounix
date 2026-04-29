@@ -1,6 +1,12 @@
-{ config, host, ... }:
+{
+  config,
+  pkgs,
+  host,
+  ...
+}:
 
 {
+  programs.zsh.enable = true;
   nix.settings = {
     experimental-features = [
       "nix-command"
@@ -42,6 +48,7 @@
 
   users.users.${host.username} = {
     isNormalUser = true;
+    shell = pkgs.zsh;
     hashedPasswordFile = config.sops.secrets.wagou-password-hash.path;
     extraGroups = [
       "wheel"
