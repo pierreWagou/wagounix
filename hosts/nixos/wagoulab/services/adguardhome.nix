@@ -1,10 +1,12 @@
 {
+  config,
   pkgs,
   host,
   ...
 }:
 
 let
+  inherit (config.virtualisation.quadlet) networks;
   yamlFormat = pkgs.formats.yaml { };
 
   # AdGuard config — generated as proper YAML from a Nix attrset.
@@ -24,10 +26,8 @@ let
     http.address = "0.0.0.0:3000";
     dns = {
       bind_hosts = [
-        host.serverIP
-        "100.68.157.70"
-        "127.0.0.1"
-        "::1"
+        "0.0.0.0"
+        "::"
       ];
       port = 53;
       bootstrap_dns = [
@@ -83,24 +83,28 @@ let
 in
 {
   virtualisation.quadlet.containers.adguard = {
-    unitConfig = {
-      requires = [ "proxy-network.service" ];
-      after = [ "proxy-network.service" ];
-    };
     containerConfig = {
       image = "adguard/adguardhome:latest";
-      # Use host network to avoid aardvark-dns port 53 conflict.
-      # With dns_enabled=true on the proxy network, aardvark-dns binds port 53
-      # inside the container's network namespace, preventing AdGuard from using it.
-      # Host networking sidesteps this entirely — AdGuard binds directly on the host.
-      podmanArgs = [ "--network=host" ];
+      # Override Podman's DNS injection — without this, Podman injects the
+      # network gateway (10.89.x.1:53) into the container's resolv.conf,
+      # and AdGuard tries to use it for reverse DNS lookups, causing 2s
+      # timeouts on every PTR query and massive latency.
       dns = [ "127.0.0.1" ];
+      networks = [ networks.proxy.ref ];
+      publishPorts = [
+        "0.0.0.0:53:53/tcp"
+        "0.0.0.0:53:53/udp"
+        "127.0.0.1:3000:3000/tcp"
+      ];
       volumes = [
         "/var/lib/adguardhome/work:/opt/adguardhome/work"
         "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
         "${adguardConfig}:/opt/adguardhome/AdGuardHome.seed.yaml:ro"
       ];
       # Copy the seed config on every start, then launch AdGuard.
+      # This ensures our config is always the starting point.
+      # AdGuard may migrate it (schema upgrades), which is fine — the seed
+      # is reapplied on each container restart.
       entrypoint = "/bin/sh";
       exec = [
         "-c"
