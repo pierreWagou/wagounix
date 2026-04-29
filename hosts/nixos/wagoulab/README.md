@@ -173,10 +173,27 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 | Query | Resolution |
 |---|---|
-| `*.wagou.fr` (remote devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `*.wagou.fr` (remote, no Tailscale) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
+| `*.wagou.fr` (remote, Tailscale) | Split DNS -> AdGuard Home (`100.68.157.70:53`) -> `192.168.68.65` -> Tailscale subnet -> Traefik |
 | `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTPS, bypasses Cloudflare) |
 | Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> Cloudflare/Google DoH -> Internet |
+
+### Tailscale (remote access)
+
+Tailscale runs as a native NixOS service (subnet router) with IP `100.68.157.70`. It advertises `192.168.68.0/24`, giving remote devices access to the entire home LAN via WireGuard.
+
+**Split DNS** is configured in the Tailscale admin console (admin.tailscale.com -> DNS):
+- Domain `wagou.fr` -> custom nameserver `100.68.157.70`
+- "Override local DNS" is **disabled** (preserves work/corporate DNS resolution)
+
+This means when connected to Tailscale from outside:
+- `*.wagou.fr` resolves via AdGuard Home -> `192.168.68.65` -> routed through Tailscale subnet -> Traefik (bypasses Cloudflare, direct path)
+- SSH to `192.168.68.65` works from anywhere
+- All other DNS uses the local network's resolver (no conflict with corporate VPN)
+- Ad blocking applies only to `wagou.fr` domains when remote
+
+**Performance:** A systemd oneshot (`tailscale-ethtool`) enables UDP GRO forwarding on `enp170s0` at boot for improved subnet routing throughput.
 
 ### Domain
 
@@ -187,6 +204,24 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 | TLS certificates | Let's Encrypt (wildcard via DNS-01, Cloudflare DNS) |
 | Email | OVH Zimbra (MX records in Cloudflare) |
 | Tunnel | Cloudflare Zero Trust |
+| Bare domain redirect | `wagou.fr` -> `https://dash.wagou.fr` (Cloudflare redirect rule, not in NixOS) |
+
+## SSH access
+
+SSH is hardened — key-only authentication, no passwords, no root login.
+
+SSH config on Mac (`~/.ssh/config`, managed by chezmoi):
+
+```
+Host wagoulab
+    HostName 192.168.68.65
+    User wagou
+    IdentityFile ~/.ssh/id_ed25519_homeserver
+    AddKeysToAgent yes
+    UseKeychain yes
+```
+
+The homeserver uses a dedicated SSH key (`id_ed25519_homeserver`), separate from the work SSH key for identity separation. The public key is declared in `hosts/nixos/configuration.nix` under `users.users.wagou.openssh.authorizedKeys.keys`.
 
 ## Adding a new service
 
@@ -249,6 +284,51 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 | Immich | `https://pixel.wagou.fr` |
 | Home Assistant | `https://home.wagou.fr` |
 | Jellyfin | `https://tape.wagou.fr` |
+
+## Troubleshooting
+
+### OpenCloud "Permanent Redirect" loop
+
+OpenCloud redirects HTTP to HTTPS because its URL is `https://cloud.wagou.fr`. The fix is `OC_INSECURE = "true"` and `PROXY_TLS = "false"` in the container environment — tells OpenCloud to accept plain HTTP behind Traefik.
+
+### OpenCloud fails to start ("Failed to load environment files")
+
+sops-nix decrypts secrets during activation (before services start). Check:
+1. `sudo ls -la /run/secrets/rendered/opencloud.env` — should exist
+2. `journalctl -u opencloud --no-pager | tail -20`
+3. sops-nix does NOT use a systemd service — do NOT add `after = [ "sops-nix.service" ]`
+
+### Ghostty terminal error when SSHing
+
+If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` package is installed on the server. Workaround: `export TERM=xterm-256color`.
+
+### Cloudflare Tunnel not connecting
+
+1. `systemctl status cloudflared`
+2. `journalctl -u cloudflared --no-pager -f`
+3. Common: "couldn't read tunnel credentials" — check `cloudflare-credentials` sops secret
+
+### 502 Bad Gateway from Cloudflare
+
+1. Is Traefik running? `systemctl status traefik`
+2. Is the service running? `systemctl status <service>`
+3. Traefik logs: `journalctl -u traefik --no-pager -f`
+4. Ensure container is on `proxy` network with correct Traefik labels
+
+### DNS not resolving locally
+
+1. `scutil --dns | grep nameserver` — should show `192.168.68.65`
+2. Force DHCP renewal: `sudo ipconfig set en0 DHCP`
+3. Test directly: `nslookup vault.wagou.fr 192.168.68.65`
+4. Do NOT use `.local` domains — macOS intercepts them for mDNS
+
+### "Internet not available" on macOS
+
+Check if `captive.apple.com` is being blocked in AdGuard Home query log. If so, add an allowlist rule.
+
+### Can't decrypt sops secrets (on Mac)
+
+Ensure `~/.config/sops/age/keys.txt` exists. If lost, regenerate with `age-keygen`, update `.sops.yaml` with the new public key, re-encrypt with `sops updatekeys hosts/nixos/wagoulab/secrets.yaml`.
 
 ## Planned services
 

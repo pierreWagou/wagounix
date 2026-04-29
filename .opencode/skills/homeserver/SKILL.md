@@ -189,6 +189,8 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 ### Tailscale DNS (split DNS)
 
+> Human-readable documentation: see `hosts/nixos/wagoulab/README.md` -> "Tailscale (remote access)" section.
+
 Tailscale is configured with **split DNS** in the admin console (admin.tailscale.com -> DNS):
 - Domain `wagou.fr` uses custom nameserver `100.68.157.70` (Beelink's Tailscale IP)
 - "Override local DNS" is **disabled** (so work/SAP network DNS still resolves corporate domains)
@@ -248,6 +250,8 @@ Routing is determined by `Host()` rules matching the subdomain:
 | `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
 
 ## SSH access
+
+> Also documented in `hosts/nixos/wagoulab/README.md` -> "SSH access" section.
 
 SSH is hardened — key-only authentication, no passwords, no root login.
 
@@ -346,6 +350,8 @@ sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 ```
 
 ## Troubleshooting
+
+> Full troubleshooting guide: see `hosts/nixos/wagoulab/README.md` -> "Troubleshooting" section.
 
 ### OpenCloud "Permanent Redirect" loop
 
