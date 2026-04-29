@@ -1,10 +1,12 @@
 {
+  config,
   pkgs,
   host,
   ...
 }:
 
 let
+  inherit (config.virtualisation.quadlet) networks;
   yamlFormat = pkgs.formats.yaml { };
 
   # AdGuard config — generated as proper YAML from a Nix attrset.
@@ -27,7 +29,7 @@ let
         "0.0.0.0"
         "::"
       ];
-      port = 53;
+      port = 5353;
       bootstrap_dns = [
         "1.1.1.1:53"
         "8.8.8.8:53"
@@ -81,10 +83,6 @@ let
 in
 {
   virtualisation.quadlet.containers.adguard = {
-    unitConfig = {
-      requires = [ "proxy-network.service" ];
-      after = [ "proxy-network.service" ];
-    };
     containerConfig = {
       image = "adguard/adguardhome:latest";
       # Override Podman's DNS injection — without this, Podman injects the
@@ -92,12 +90,10 @@ in
       # and AdGuard tries to use it for reverse DNS lookups, causing 2s
       # timeouts on every PTR query and massive latency.
       dns = [ "127.0.0.1" ];
-      # Use proxy network for Traefik discovery, but disable DNS for this
-      # container to prevent aardvark-dns from binding port 53 in its namespace.
-      podmanArgs = [ "--network=proxy:dns=false" ];
+      networks = [ networks.proxy.ref ];
       publishPorts = [
-        "0.0.0.0:53:53/tcp"
-        "0.0.0.0:53:53/udp"
+        "0.0.0.0:53:5353/tcp"
+        "0.0.0.0:53:5353/udp"
         "127.0.0.1:3000:3000/tcp"
       ];
       volumes = [
