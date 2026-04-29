@@ -28,6 +28,7 @@
     openvpn
     pay-respects
     poetry
+    qrencode
     R
     scala
     television
