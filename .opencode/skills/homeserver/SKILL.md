@@ -14,14 +14,16 @@ Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 ```
 Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service
 Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Beelink (subnet router) -> 192.168.68.0/24
+Remote access:  Browser -> Tailscale (split DNS) -> AdGuard Home -> 192.168.68.65 -> Traefik -> Service
 Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service
 ```
 
 All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network. Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Traefik over HTTPS (container-to-container, `noTLSVerify` since it's internal).
 
-Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere.
+Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere. The Beelink's Tailscale IP is `100.68.157.70`.
 
 IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so LAN devices bypass Cloudflare and connect directly to Traefik HTTPS.
+IMPORTANT: AdGuard Home DNS is published on `0.0.0.0:53` (all interfaces) so it's reachable via both LAN and Tailscale. The firewall restricts access to known interfaces only.
 
 ## Current services
 
@@ -179,10 +181,28 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 | Scenario | Resolution path |
 |---|---|
-| `*.wagou.fr` (remote devices) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
+| `*.wagou.fr` (remote, no Tailscale) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink (HTTPS) |
+| `*.wagou.fr` (remote, Tailscale) | Split DNS -> AdGuard Home (`100.68.157.70:53`) -> `192.168.68.65` -> Tailscale subnet route -> Traefik (direct HTTPS) |
 | `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTPS, bypasses Cloudflare) |
-| Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
+| Ad/tracker domains (local) | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> upstream DoH (Cloudflare/Google) -> Internet |
+
+### Tailscale DNS (split DNS)
+
+Tailscale is configured with **split DNS** in the admin console (admin.tailscale.com -> DNS):
+- Domain `wagou.fr` uses custom nameserver `100.68.157.70` (Beelink's Tailscale IP)
+- "Override local DNS" is **disabled** (so work/SAP network DNS still resolves corporate domains)
+
+This means when Tailscale is connected:
+- `*.wagou.fr` queries go to AdGuard Home via Tailscale -> resolves to `192.168.68.65` -> routed via subnet tunnel -> Traefik
+- All other DNS queries use the local network's DNS (no conflict with corporate VPN/DNS)
+- Ad blocking only applies to `wagou.fr` resolution when remote (not global)
+
+The `0.0.0.0:53` binding in `adguardhome.nix` ensures AdGuard responds on all interfaces (LAN + Tailscale). The firewall explicitly allows port 53 on the `tailscale0` interface.
+
+### UDP GRO optimization
+
+A systemd oneshot service (`tailscale-ethtool`) runs on boot to enable UDP GRO forwarding on the physical NIC (`enp170s0`), improving subnet router throughput. See `services/tailscale.nix`.
 
 ### Domain setup
 
