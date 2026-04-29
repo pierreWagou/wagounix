@@ -92,8 +92,12 @@ in
       dns = [ "127.0.0.1" ];
       networks = [ networks.proxy.ref ];
       publishPorts = [
-        "0.0.0.0:53:5353/tcp"
-        "0.0.0.0:53:5353/udp"
+        "${host.serverIP}:53:5353/tcp"
+        "${host.serverIP}:53:5353/udp"
+        "100.68.157.70:53:5353/tcp"
+        "100.68.157.70:53:5353/udp"
+        "127.0.0.1:53:5353/tcp"
+        "127.0.0.1:53:5353/udp"
         "127.0.0.1:3000:3000/tcp"
       ];
       volumes = [
