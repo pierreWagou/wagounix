@@ -99,17 +99,9 @@ in
       volumes = [
         "/var/lib/adguardhome/work:/opt/adguardhome/work"
         "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
-        "${adguardConfig}:/opt/adguardhome/AdGuardHome.seed.yaml:ro"
       ];
-      # Copy the seed config on every start, then launch AdGuard.
-      # This ensures our config is always the starting point.
-      # AdGuard may migrate it (schema upgrades), which is fine — the seed
-      # is reapplied on each container restart.
-      entrypoint = "/bin/sh";
-      exec = [
-        "-c"
-        "cp /opt/adguardhome/AdGuardHome.seed.yaml /opt/adguardhome/conf/AdGuardHome.yaml && exec /opt/adguardhome/AdGuardHome --no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work"
-      ];
+      # Use the image's default entrypoint and CMD.
+      # The seed config is copied by ExecStartPre below.
       labels = {
         "traefik.enable" = "true";
         "traefik.http.routers.adguard.rule" = "Host(`guard.${host.domain}`)";
@@ -120,6 +112,13 @@ in
       };
     };
   };
+
+  # Copy the Nix-generated seed config before the container starts.
+  # This ensures our declarative config is always the starting point while
+  # allowing AdGuard to write runtime changes to the file.
+  systemd.services.adguard.serviceConfig.ExecStartPre = [
+    "${pkgs.coreutils}/bin/cp ${adguardConfig} /var/lib/adguardhome/conf/AdGuardHome.yaml"
+  ];
 
   systemd.tmpfiles.rules = [
     "d /var/lib/adguardhome 0755 root root -"
