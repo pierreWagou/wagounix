@@ -85,11 +85,12 @@ in
   virtualisation.quadlet.containers.adguard = {
     containerConfig = {
       image = "adguard/adguardhome:latest";
-      # Use the proxy network with DNS disabled for this container. Without this,
-      # aardvark-dns binds port 53 inside the container's namespace, preventing
-      # AdGuard from binding it.
-      networks = [ "${networks.proxy.ref}:dns=false" ];
+      # Override Podman's DNS injection — without this, Podman injects the
+      # network gateway (10.89.x.1:53) into the container's resolv.conf,
+      # and AdGuard tries to use it for reverse DNS lookups, causing 2s
+      # timeouts on every PTR query and massive latency.
       dns = [ "127.0.0.1" ];
+      networks = [ networks.proxy.ref ];
       publishPorts = [
         "0.0.0.0:53:53/tcp"
         "0.0.0.0:53:53/udp"
@@ -98,15 +99,16 @@ in
       volumes = [
         "/var/lib/adguardhome/work:/opt/adguardhome/work"
         "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
+        "${adguardConfig}:/opt/adguardhome/AdGuardHome.seed.yaml:ro"
       ];
-      # Use the default entrypoint (AdGuardHome binary) with CLI flags.
-      # The seed config is copied to the host conf dir by ExecStartPre below.
+      # Copy the seed config on every start, then launch AdGuard.
+      # This ensures our config is always the starting point.
+      # AdGuard may migrate it (schema upgrades), which is fine — the seed
+      # is reapplied on each container restart.
+      entrypoint = "/bin/sh";
       exec = [
-        "--no-check-update"
         "-c"
-        "/opt/adguardhome/conf/AdGuardHome.yaml"
-        "-w"
-        "/opt/adguardhome/work"
+        "cp /opt/adguardhome/AdGuardHome.seed.yaml /opt/adguardhome/conf/AdGuardHome.yaml && exec /opt/adguardhome/AdGuardHome --no-check-update -c /opt/adguardhome/conf/AdGuardHome.yaml -w /opt/adguardhome/work"
       ];
       labels = {
         "traefik.enable" = "true";
@@ -118,12 +120,6 @@ in
       };
     };
   };
-
-  # Copy the seed config before the container starts. This ensures the Nix-generated
-  # config is always the starting point, while AdGuard can still write runtime changes.
-  systemd.services.adguard.serviceConfig.ExecStartPre = [
-    "${pkgs.coreutils}/bin/cp ${adguardConfig} /var/lib/adguardhome/conf/AdGuardHome.yaml"
-  ];
 
   systemd.tmpfiles.rules = [
     "d /var/lib/adguardhome 0755 root root -"
