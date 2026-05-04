@@ -1,7 +1,5 @@
-{ pkgs, ... }:
+_:
 
 {
-  environment.systemPackages = with pkgs; [
-    databricks-cli
-  ];
+  environment.systemPackages = [ ];
 }
