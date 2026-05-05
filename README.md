@@ -181,15 +181,11 @@ Profiles: `wagoulab`
 ```bash
 # 1. Install NixOS with flake support enabled
 
-# 2. Clone this repo
-git clone https://github.com/pierreWagou/wagounix ~/.config/wagounix
-
-# 3. Generate hardware config and replace the placeholder
-sudo nixos-generate-config --show-hardware-config > ~/.config/wagounix/hosts/nixos/wagoulab/hardware.nix
-
-# 4. Apply the configuration
-sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab
+# 2. Apply the configuration
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 ```
+
+> Note: `hosts/nixos/<host>/hardware.nix` must be generated on the target machine (`sudo nixos-generate-config --show-hardware-config`) and committed to the repo before the first deploy.
 
 ### Rebuild
 
