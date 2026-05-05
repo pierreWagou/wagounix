@@ -161,9 +161,9 @@ wagounix/
 
 ## Getting Started
 
-### macOS (Apple Silicon)
+### macOS
 
-Profiles: `wagoumac`, `sap`, `alan`
+Profiles: `wagoumac`, `wagouintel`, `sap`, `alan`
 
 ```bash
 # 1. Install Lix (Nix)
@@ -172,19 +172,6 @@ curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 
 # 2. Apply the configuration
 sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
-```
-
-### macOS (Intel)
-
-Profiles: `wagouintel`
-
-```bash
-# 1. Install Lix (Nix)
-curl -sSf -L https://install.lix.systems/lix | sh -s -- install
-. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-
-# 2. Apply the configuration
-sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#wagouintel
 ```
 
 ### NixOS
