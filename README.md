@@ -179,7 +179,8 @@ sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 Profiles: `wagoulab`
 
 ```bash
-# 1. Install NixOS with flake support enabled
+# 1. Install NixOS with Lix
+sh <(curl -L https://install.lix.systems/lix) install
 
 # 2. Apply the configuration
 sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
