@@ -25,18 +25,19 @@ This repository manages multiple machines through a layered, reproducible config
 Each configuration is assembled from layered modules — common packages are shared across all machines, platform modules add OS-specific config, and each host can override further.
 
 ```
-  ┌───────────────────────────────────────────────────────┐
-  │                      flake.nix                        │
-  ├───────────────────────────────────────────────────────┤
-  │                   hosts/common/                       │  common
-  │             packages · fonts · users                  │
-  ├─────────────────────────┬─────────────────────────────┤
-  │      hosts/darwin/      │       hosts/nixos/          │  platform
-  ├────────────┬────────────┼─────────────────────────────┤
-  │  personal/ │   work/    │       wagoulab/             │  layer / host
-  ├────────────┼──────┬─────┤                             │
-  │   wagoumac │ sap  │alan │                             │
-  └────────────┴──────┴─────┴─────────────────────────────┘
+  ┌───────────────────────────────────────────────────────────────┐
+  │                         flake.nix                             │
+  ├───────────────────────────────────────────────────────────────┤
+  │                      hosts/common/                            │  common
+  │                packages · fonts · users                       │
+  ├──────────────────────────────────┬────────────────────────────┤
+  │         hosts/darwin/            │        hosts/nixos/        │  platform
+  ├────────────────┬─────────────────┼────────────────────────────┤
+  │   personal/    │     work/       │        wagoulab/           │  layer / host
+  ├────────┬───────┼──────┬──────────┤                            │
+  │wagoumac│wagou- │ sap  │  alan    │                            │
+  │        │ intel │      │          │                            │
+  └────────┴───────┴──────┴──────────┴────────────────────────────┘
 ```
 
 ## Structure
@@ -47,7 +48,7 @@ wagounix/
 └── hosts/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
-    │   ├── personal/  # Personal Macs (wagoumac)
+    │   ├── personal/  # Personal Macs (wagoumac, wagouintel)
     │   └── work/      # Work Macs (sap, alan)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
@@ -97,6 +98,9 @@ wagounix/
     │   │   │   ├── default.nix
     │   │   │   ├── variables.nix
     │   │   │   └── homebrew.nix
+    │   │   └── wagouintel/
+    │   │       ├── default.nix
+    │   │       └── variables.nix
     │   └── work/
     │       ├── default.nix
     │       ├── dock.nix
@@ -145,8 +149,9 @@ wagounix/
 | Profile | System | Layer | Description |
 |---|---|---|---|
 | `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
-| `wagoumac` | aarch64-darwin | personal | New personal Mac |
-| `alan` | aarch64-darwin | work | New work Mac (disabled) |
+| `wagoumac` | aarch64-darwin | personal | Personal Mac (Apple Silicon) |
+| `wagouintel` | x86_64-darwin | personal | Personal Mac (Intel) |
+| `alan` | aarch64-darwin | work | New work Mac (not yet active) |
 
 ### NixOS
 
@@ -156,23 +161,48 @@ wagounix/
 
 ## Getting Started
 
-### Bootstrap a fresh Mac
+### macOS (Apple Silicon)
+
+Profiles: `wagoumac`, `sap`, `alan`
 
 ```bash
+# 1. Install Lix (Nix)
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+# 2. Apply the configuration
 sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 ```
 
-<details>
-<summary>Bootstrap NixOS</summary>
+### macOS (Intel)
 
-1. Install NixOS with flake support enabled
-2. Clone this repo to `~/.config/wagounix`
-3. Replace `hosts/nixos/wagoulab/hardware.nix` with the output of `nixos-generate-config`
-4. Run `sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab`
+Profiles: `wagouintel`
 
-</details>
+```bash
+# 1. Install Lix (Nix)
+curl -sSf -L https://install.lix.systems/lix | sh -s -- install
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+
+# 2. Apply the configuration
+sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#wagouintel
+```
+
+### NixOS
+
+Profiles: `wagoulab`
+
+```bash
+# 1. Install NixOS with flake support enabled
+
+# 2. Clone this repo
+git clone https://github.com/pierreWagou/wagounix ~/.config/wagounix
+
+# 3. Generate hardware config and replace the placeholder
+sudo nixos-generate-config --show-hardware-config > ~/.config/wagounix/hosts/nixos/wagoulab/hardware.nix
+
+# 4. Apply the configuration
+sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab
+```
 
 ### Rebuild
 
@@ -180,8 +210,11 @@ sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 # macOS
 darwin-rebuild switch --flake ~/.config/wagounix#<profile>
 
-# NixOS
-sudo nixos-rebuild switch --flake ~/.config/wagounix#<profile>
+# NixOS (local)
+sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab
+
+# NixOS (from GitHub, on server)
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 ```
 
 ## Development
@@ -207,6 +240,8 @@ GitHub Actions runs on push to `main` and on PRs:
 | Lint | macos-15 | nixfmt, statix, deadnix |
 | Build darwin | macos-15 | sap, wagoumac (parallel) |
 | Build NixOS | ubuntu-latest | wagoulab |
+
+> Note: `wagouintel` (x86_64-darwin) is not built in CI — GitHub Actions no longer offers Intel macOS runners for free.
 
 ## Quick Reference
 
