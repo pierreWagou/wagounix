@@ -56,6 +56,7 @@
     let
       systems = [
         "aarch64-darwin"
+        "x86_64-darwin"
         "x86_64-linux"
       ];
     in
@@ -90,6 +91,20 @@
           specialArgs = {
             inherit inputs;
             host = import ./hosts/darwin/personal/wagoumac/variables.nix;
+          };
+        };
+
+        wagouintel = nix-darwin.lib.darwinSystem {
+          system = "x86_64-darwin";
+          modules = [
+            ./hosts/common
+            ./hosts/darwin
+            ./hosts/darwin/personal
+            ./hosts/darwin/personal/wagouintel
+          ];
+          specialArgs = {
+            inherit inputs;
+            host = import ./hosts/darwin/personal/wagouintel/variables.nix;
           };
         };
 
