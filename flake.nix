@@ -59,6 +59,22 @@
         "x86_64-darwin"
         "x86_64-linux"
       ];
+
+      # Overlay that patches television with the TTY fix from PR #1052
+      # (sesh connect fails with "can't use /dev/tty" on macOS)
+      # https://github.com/alexpasmantier/television/pull/1052
+      # Remove once television >= 0.15.7 includes the fix
+      televisionOverlay = final: prev: {
+        television = prev.television.overrideAttrs (_: {
+          version = "0.15.6-patched";
+          src = final.fetchFromGitHub {
+            owner = "joshmedeski";
+            repo = "television";
+            rev = "4ef7a9e98cdab3b129570d2af5569704a20b8666";
+            hash = "sha256-ECaM8vwQ1gtkSJEPMBwvUIa3rpP7QU62P2yYEhtEKmQ=";
+          };
+        });
+      };
     in
     {
       # -----------------------------------------------------------------------
@@ -69,6 +85,7 @@
         sap = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
+            { nixpkgs.overlays = [ televisionOverlay ]; }
             ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/work
@@ -83,6 +100,7 @@
         wagoumac = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
+            { nixpkgs.overlays = [ televisionOverlay ]; }
             ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
@@ -97,6 +115,7 @@
         wagouintel = nix-darwin.lib.darwinSystem {
           system = "x86_64-darwin";
           modules = [
+            { nixpkgs.overlays = [ televisionOverlay ]; }
             ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
@@ -118,6 +137,7 @@
         wagoulab = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
+            { nixpkgs.overlays = [ televisionOverlay ]; }
             inputs.sops-nix.nixosModules.sops
             inputs.quadlet-nix.nixosModules.quadlet
             ./hosts/common

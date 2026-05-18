@@ -8,7 +8,8 @@
 let
   inherit (config.virtualisation.quadlet) networks;
 
-  # Traefik dynamic config — defines the shared HSTS/security headers middleware.
+  # Traefik dynamic config — defines the shared HSTS/security headers middleware
+  # and static routes for native (non-container) services.
   # Loaded via the file provider so it's available immediately on startup
   # (before Traefik discovers any containers via the Docker provider).
   dynamicConfig = pkgs.writeText "traefik-dynamic.yml" ''
@@ -23,6 +24,20 @@ let
             contentTypeNosniff: true
             browserXssFilter: true
             referrerPolicy: strict-origin-when-cross-origin
+      routers:
+        ttyd:
+          rule: "Host(`dev.${host.domain}`)"
+          entrypoints:
+            - websecure
+          tls: {}
+          middlewares:
+            - secure-headers
+          service: ttyd
+      services:
+        ttyd:
+          loadBalancer:
+            servers:
+              - url: "http://${host.serverIP}:7681"
   '';
 in
 {

@@ -24,5 +24,6 @@
     ./fail2ban.nix
     ./firewall.nix
     ./tailscale.nix
+    ./ttyd.nix
   ];
 }
