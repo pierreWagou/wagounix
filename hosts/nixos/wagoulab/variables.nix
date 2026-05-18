@@ -20,5 +20,6 @@ rec {
     "guard"
     "home"
     "tape"
+    "dev"
   ];
 }

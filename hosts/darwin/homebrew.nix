@@ -49,6 +49,7 @@
       "google-chrome"
       "google-drive"
       "hiddenbar"
+      "logitune"
       "microsoft-excel"
       "microsoft-outlook"
       "microsoft-powerpoint"
