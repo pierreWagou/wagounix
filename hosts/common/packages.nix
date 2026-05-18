@@ -3,7 +3,7 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Minimal set of packages for all machines (including wagoulab)
+  # Packages for all machines (including wagoulab)
   environment.systemPackages = with pkgs; [
     age
     bat
@@ -16,14 +16,19 @@
     git
     gh
     gnupg
+    mise
+    mprocs
     neovim
+    opencode
     openssl
+    pinentry-curses
     ripgrep
     sesh
     sheldon
     sops
     starship
     tailscale
+    television
     tmux
     tmuxinator
     unzip
