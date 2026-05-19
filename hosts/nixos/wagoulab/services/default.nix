@@ -25,5 +25,6 @@
     ./firewall.nix
     ./tailscale.nix
     ./ttyd.nix
+    ./rbw.nix
   ];
 }

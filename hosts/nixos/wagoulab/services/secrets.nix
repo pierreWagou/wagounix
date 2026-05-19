@@ -25,6 +25,12 @@
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
       root-password-hash.neededForUsers = true;
+
+      # rbw master password — used by custom pinentry for zero-touch vault unlock
+      rbw-master-password = {
+        mode = "0400";
+        owner = "wagou";
+      };
     };
 
     # Rendered env files consumed by containers via environmentFiles
