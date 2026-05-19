@@ -7,7 +7,6 @@
   environment.systemPackages = with pkgs; [
     age
     bat
-    bitwarden-cli
     bottom
     chezmoi
     cloudflared
@@ -23,6 +22,7 @@
     opencode
     openssl
     pinentry-curses
+    rbw
     ripgrep
     sesh
     sheldon

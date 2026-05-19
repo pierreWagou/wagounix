@@ -20,9 +20,6 @@
 
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # Point Bitwarden CLI to self-hosted Vaultwarden instance
-  environment.variables.BW_URL = "https://vault.${host.domain}";
-
   networking = {
     hostName = host.hostname;
     firewall.enable = true;
