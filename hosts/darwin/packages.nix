@@ -31,6 +31,7 @@
     terraform
     tree-sitter
     uv
+
     vivid
     worktrunk
     yt-dlp

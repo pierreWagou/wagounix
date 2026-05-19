@@ -1,9 +1,4 @@
-{ pkgs, ... }:
-
-{
-  environment.systemPackages = with pkgs; [
-    ghostty.terminfo
-  ];
+_: {
 
   # All application services run as Podman containers via quadlet-nix.
   # NixOS manages: Podman runtime, container definitions, secrets (sops-nix),
