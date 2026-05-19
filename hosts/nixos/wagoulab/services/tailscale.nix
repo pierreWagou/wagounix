@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, host, ... }:
 
 {
   services.tailscale = {
@@ -6,7 +6,7 @@
     openFirewall = true;
     useRoutingFeatures = "server";
     extraUpFlags = [
-      "--advertise-routes=192.168.68.0/24"
+      "--advertise-routes=${host.lanSubnet}"
       "--accept-dns=false" # don't override DNS — the server runs AdGuard Home
     ];
   };
@@ -26,7 +26,7 @@
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.ethtool}/bin/ethtool -K enp170s0 rx-udp-gro-forwarding on rx-gro-list off";
+      ExecStart = "${pkgs.ethtool}/bin/ethtool -K ${host.networkInterface} rx-udp-gro-forwarding on rx-gro-list off";
       RemainAfterExit = true;
     };
   };
