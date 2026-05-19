@@ -40,6 +40,8 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Cloudflare Tunnel | `services/cloudflared.nix` | Outbound only | - |
 | Tailscale | `services/tailscale.nix` | Native NixOS service (subnet router) | - |
 | Fail2ban | `services/fail2ban.nix` | - | - |
+| ttyd | `services/ttyd.nix` | 7681 (native systemd service) | `https://dev.wagou.fr` |
+| rbw | `services/rbw.nix` | - (custom pinentry script) | - |
 
 ## Files
 
@@ -48,7 +50,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `renderGroupGID`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `networkInterface`, `lanSubnet`, `renderGroupGID`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/wagoulab/services/`
@@ -71,6 +73,8 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | `jellyfin.nix` | Media server container with Intel hardware transcoding |
 | `fail2ban.nix` | Brute force protection |
 | `firewall.nix` | Firewall rules (ports 22, 53, 80, 443) |
+| `ttyd.nix` | Web terminal for remote dev access (Catppuccin theme, Nerd Font, native systemd service) |
+| `rbw.nix` | Custom pinentry script for rbw (reads master password from sops secret) |
 
 ### Platform-level NixOS config: `hosts/nixos/`
 
@@ -127,6 +131,7 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `cloudflare-tunnel-token` | `homepage.nix` | Via sops template `homepage.env` |
 | `cloudflare-dns-token` | `traefik.nix` (ACME) | Via sops template `traefik.env` |
 | `jellyfin-api-key` | `homepage.nix` | Via sops template `homepage.env` |
+| `rbw-master-password` | `rbw.nix` | Raw secret file (owner: wagou, mode: 0400) |
 
 ### Encryption keys
 
@@ -248,6 +253,7 @@ Routing is determined by `Host()` rules matching the subdomain:
 | `dash.wagou.fr` | homepage | 3000 | Dashboard (default route) |
 | `home.wagou.fr` | home-assistant | 8123 | - |
 | `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
+| `dev.wagou.fr` | ttyd (host service) | 7681 | Routed via file provider dynamic config (not container labels) |
 
 ## SSH access
 

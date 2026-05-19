@@ -108,7 +108,6 @@ wagounix/
     │       ├── sap/
     │       │   ├── default.nix
     │       │   ├── variables.nix
-    │       │   ├── packages.nix
     │       │   └── homebrew.nix
     │       └── alan/
     │           ├── default.nix
@@ -137,7 +136,9 @@ wagounix/
                 ├── home-assistant.nix
                 ├── jellyfin.nix
                 ├── fail2ban.nix
-                └── firewall.nix
+                ├── firewall.nix
+                ├── ttyd.nix
+                └── rbw.nix
 ```
 
 </details>
@@ -151,7 +152,7 @@ wagounix/
 | `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
 | `wagoumac` | aarch64-darwin | personal | Personal Mac (Apple Silicon) |
 | `wagouintel` | x86_64-darwin | personal | Personal Mac (Intel) |
-| `alan` | aarch64-darwin | work | New work Mac (not yet active) |
+| `alan` | aarch64-darwin | work | New work Mac |
 
 ### NixOS
 

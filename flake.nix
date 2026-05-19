@@ -127,6 +127,21 @@
           };
         };
 
+        alan = nix-darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = [
+            { nixpkgs.overlays = [ televisionOverlay ]; }
+            ./hosts/common
+            ./hosts/darwin
+            ./hosts/darwin/work
+            ./hosts/darwin/work/alan
+          ];
+          specialArgs = {
+            inherit inputs;
+            host = import ./hosts/darwin/work/alan/variables.nix;
+          };
+        };
+
       };
 
       # -----------------------------------------------------------------------

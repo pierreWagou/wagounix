@@ -42,6 +42,8 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Cloudflare Tunnel** | Secure remote access (web services) | - | Outbound only |
 | **Tailscale** | VPN + subnet router (SSH, LAN access) | - | Native NixOS service |
 | **Fail2ban** | Brute force protection | - | - |
+| **ttyd** | Web-based terminal (remote dev access) | `https://dev.wagou.fr` | 7681 (native service) |
+| **rbw** | Bitwarden CLI (custom pinentry for zero-touch unlock) | - | - |
 
 ## Hardware
 
@@ -86,7 +88,9 @@ hosts/nixos/wagoulab/
     ├── homepage.nix         # Homepage dashboard
     ├── homepage-images/     # Background images and favicon for Homepage dashboard
     ├── fail2ban.nix         # Brute force protection
-    └── firewall.nix         # Firewall rules (ports 22, 53, 80, 443)
+    ├── firewall.nix         # Firewall rules (ports 22, 53, 80, 443)
+    ├── ttyd.nix             # Web terminal (remote dev access via dev.wagou.fr)
+    └── rbw.nix              # Bitwarden CLI custom pinentry (zero-touch vault unlock)
 ```
 
 Platform-level config at `hosts/nixos/`:
@@ -129,6 +133,7 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `cloudflare-tunnel-token` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 | `cloudflare-dns-token` | ACME DNS-01 challenge (via sops template) | `/run/secrets/rendered/traefik.env` |
 | `jellyfin-api-key` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
+| `rbw-master-password` | rbw custom pinentry (zero-touch vault unlock) | `/run/secrets/rbw-master-password` |
 
 ### Editing secrets
 

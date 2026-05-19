@@ -26,7 +26,7 @@ wagounix/
 │   │   ├── configuration.nix      # nix-darwin system config (stateVersion, PAM Touch ID)
 │   │   ├── homebrew.nix           # Common Homebrew brews, casks, taps
 │   │   ├── icons.nix              # Custom macOS app icons
-│   │   ├── packages.nix           # Darwin-only nix packages (cocoapods, opencode, etc.)
+│   │   ├── packages.nix           # Darwin-only nix packages (cocoapods, spicetify, etc.)
 │   │   ├── icons/                 # .icns icon files
 │   │   ├── settings/              # macOS system defaults
 │   │   │   ├── default.nix        # Imports all settings modules
@@ -43,6 +43,9 @@ wagounix/
 │   │   │   │   ├── default.nix
 │   │   │   │   ├── variables.nix
 │   │   │   │   └── homebrew.nix   # docker-desktop
+│   │   │   └── wagouintel/           # Intel personal Mac (x86_64-darwin)
+│   │   │       ├── default.nix
+│   │   │       └── variables.nix
 │   │   └── work/                  # Work Mac layer
 │   │       ├── default.nix        # Imports dock, homebrew
 │   │       ├── dock.nix           # Work dock apps (Outlook, Teams, etc.)
@@ -50,9 +53,8 @@ wagounix/
 │   │       ├── sap/               # SAP Mac (legacy — remove when returned)
 │   │       │   ├── default.nix
 │   │       │   ├── variables.nix
-│   │       │   ├── packages.nix   # databricks-cli
 │   │       │   └── homebrew.nix   # hai tap, btp, figma, etc.
-│   │       └── alan/              # New work Mac (aarch64-darwin, not in flake yet)
+│   │       └── alan/              # New work Mac (aarch64-darwin)
 │   │           ├── default.nix
 │   │           └── variables.nix
 │   └── nixos/                     # NixOS platform base
@@ -79,7 +81,9 @@ wagounix/
 │               ├── jellyfin.nix
 │               ├── homepage-images/
 │               ├── fail2ban.nix
-│               └── firewall.nix
+│               ├── firewall.nix
+│               ├── ttyd.nix
+│               └── rbw.nix
 │
 └── .github/workflows/check.yml   # CI: lint + build darwin + build NixOS
 ```
@@ -143,7 +147,7 @@ rec {
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
-  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" ]; # NixOS only
+  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "dev" ]; # NixOS only
 }
 ```
 
