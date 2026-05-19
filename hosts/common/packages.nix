@@ -13,6 +13,7 @@
     eza
     fd
     fzf
+    gcc
     git
     gh
     gnupg
