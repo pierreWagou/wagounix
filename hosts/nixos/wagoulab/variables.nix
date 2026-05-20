@@ -23,5 +23,6 @@ rec {
     "home"
     "tape"
     "dev"
+    "creneau"
   ];
 }

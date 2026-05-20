@@ -21,5 +21,6 @@ _: {
     ./tailscale.nix
     ./ttyd.nix
     ./rbw.nix
+    ./creneau.nix
   ];
 }
