@@ -28,6 +28,7 @@
     qrencode
     R
     scala
+    sketchybar
     terraform
     tree-sitter
     uv
