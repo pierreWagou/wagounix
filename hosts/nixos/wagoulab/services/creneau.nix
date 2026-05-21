@@ -10,7 +10,7 @@ in
       podmanArgs = [ "--pull=always" ];
       networks = [ networks.proxy.ref ];
       volumes = [
-        "/var/lib/creneau:/app/ data"
+        "/var/lib/creneau:/app/data"
       ];
       labels = {
         "traefik.enable" = "true";
