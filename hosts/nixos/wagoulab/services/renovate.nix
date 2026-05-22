@@ -21,8 +21,12 @@ let
       set -euo pipefail
 
       APP_ID=$(cat "${config.sops.secrets.renovate-github-app-id.path}")
-      PRIVATE_KEY="${config.sops.secrets.renovate-github-app-key.path}"
       INSTALLATION_ID=$(cat "${config.sops.secrets.renovate-installation-id.path}")
+
+      # Decode the base64-encoded PEM key to a temp file
+      PRIVATE_KEY="/run/renovate/app-key.pem"
+      base64 -d < "${config.sops.secrets.renovate-github-app-key.path}" > "$PRIVATE_KEY"
+      chmod 600 "$PRIVATE_KEY"
 
       # Base64url encode (no padding, URL-safe)
       b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
