@@ -1,6 +1,5 @@
 {
   config,
-  pkgs,
   host,
   ...
 }:
@@ -16,7 +15,7 @@
       rebuild = ''
         {
           "id": "rebuild",
-          "execute-command": "${pkgs.sudo}/bin/sudo",
+          "execute-command": "/run/wrappers/bin/sudo",
           "pass-arguments-to-command": [
             { "source": "string", "name": "systemctl" },
             { "source": "string", "name": "start" },
@@ -45,7 +44,7 @@
       renovate = ''
         {
           "id": "renovate",
-          "execute-command": "${pkgs.sudo}/bin/sudo",
+          "execute-command": "/run/wrappers/bin/sudo",
           "pass-arguments-to-command": [
             { "source": "string", "name": "systemctl" },
             { "source": "string", "name": "start" },
