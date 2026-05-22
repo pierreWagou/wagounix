@@ -33,11 +33,23 @@ let
           middlewares:
             - secure-headers
           service: ttyd
+        webhook:
+          rule: "Host(`relay.${host.domain}`)"
+          entrypoints:
+            - websecure
+          tls: {}
+          middlewares:
+            - secure-headers
+          service: webhook
       services:
         ttyd:
           loadBalancer:
             servers:
               - url: "http://${host.serverIP}:7681"
+        webhook:
+          loadBalancer:
+            servers:
+              - url: "http://${host.serverIP}:9000"
   '';
 in
 {

@@ -21,6 +21,7 @@
       immich-db-password.mode = "0400";
       adguard-password.mode = "0400";
       jellyfin-api-key.mode = "0400";
+      github-webhook-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -69,6 +70,10 @@
           "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
           "HOMEPAGE_VAR_JELLYFIN_API_KEY=${config.sops.placeholder.jellyfin-api-key}"
         ];
+      };
+
+      "webhook.env" = {
+        content = "WEBHOOK_SECRET=${config.sops.placeholder.github-webhook-secret}\n";
       };
     };
   };

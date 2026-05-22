@@ -24,5 +24,6 @@ rec {
     "tape"
     "dev"
     "creneau"
+    "relay"
   ];
 }
