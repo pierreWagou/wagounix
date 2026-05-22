@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v30
       - uses: cachix/cachix-action@v15
         with:
@@ -31,7 +31,7 @@ jobs:
       matrix:
         profile: [sap, wagoumac]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v30
       - uses: cachix/cachix-action@v15
         with:
@@ -46,7 +46,7 @@ jobs:
   build-nixos:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v30
       - uses: cachix/cachix-action@v15
         with:
