@@ -14,7 +14,10 @@ _: {
       # Allow DNS resolution between Podman containers on custom networks
       "podman+".allowedUDPPorts = [ 53 ];
       # Allow Traefik container to reach ttyd on the host
-      "podman+".allowedTCPPorts = [ 7681 ];
+      "podman+".allowedTCPPorts = [
+        7681
+        9000
+      ];
       # Allow DNS queries from Tailscale clients (remote ad blocking via AdGuard Home)
       "tailscale0".allowedTCPPorts = [ 53 ];
       "tailscale0".allowedUDPPorts = [ 53 ];
