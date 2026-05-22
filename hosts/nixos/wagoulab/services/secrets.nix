@@ -22,6 +22,9 @@
       adguard-password.mode = "0400";
       jellyfin-api-key.mode = "0400";
       github-webhook-secret.mode = "0400";
+      renovate-github-app-id.mode = "0400";
+      renovate-github-app-key.mode = "0400";
+      renovate-installation-id.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;

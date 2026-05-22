@@ -23,5 +23,6 @@ _: {
     ./rbw.nix
     ./creneau.nix
     ./webhook.nix
+    ./renovate.nix
   ];
 }

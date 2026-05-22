@@ -42,19 +42,41 @@
           }
         }
       '';
+      renovate = ''
+        {
+          "id": "renovate",
+          "execute-command": "${pkgs.sudo}/bin/sudo",
+          "pass-arguments-to-command": [
+            { "source": "string", "name": "systemctl" },
+            { "source": "string", "name": "start" },
+            { "source": "string", "name": "renovate.service" }
+          ],
+          "trigger-rule": {
+            "match": {
+              "type": "payload-hmac-sha256",
+              "secret": "{{ getenv "WEBHOOK_SECRET" }}",
+              "parameter": { "source": "header", "name": "X-Hub-Signature-256" }
+            }
+          }
+        }
+      '';
     };
   };
 
   # Load HMAC secret from sops at runtime
   systemd.services.webhook.serviceConfig.EnvironmentFile = config.sops.templates."webhook.env".path;
 
-  # Allow webhook user to only start nixos-upgrade.service
+  # Allow webhook user to start specific services
   security.sudo.extraRules = [
     {
       users = [ "webhook" ];
       commands = [
         {
           command = "/run/current-system/sw/bin/systemctl start nixos-upgrade.service";
+          options = [ "NOPASSWD" ];
+        }
+        {
+          command = "/run/current-system/sw/bin/systemctl start renovate.service";
           options = [ "NOPASSWD" ];
         }
       ];
