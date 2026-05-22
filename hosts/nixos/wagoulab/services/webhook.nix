@@ -17,7 +17,7 @@
           "id": "rebuild",
           "execute-command": "/run/wrappers/bin/sudo",
           "pass-arguments-to-command": [
-            { "source": "string", "name": "systemctl" },
+            { "source": "string", "name": "/run/current-system/sw/bin/systemctl" },
             { "source": "string", "name": "start" },
             { "source": "string", "name": "nixos-upgrade.service" }
           ],
@@ -46,7 +46,7 @@
           "id": "renovate",
           "execute-command": "/run/wrappers/bin/sudo",
           "pass-arguments-to-command": [
-            { "source": "string", "name": "systemctl" },
+            { "source": "string", "name": "/run/current-system/sw/bin/systemctl" },
             { "source": "string", "name": "start" },
             { "source": "string", "name": "renovate.service" }
           ],
