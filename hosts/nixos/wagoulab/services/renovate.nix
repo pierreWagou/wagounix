@@ -86,7 +86,10 @@ in
       # Hardening
       PrivateTmp = true;
       ProtectSystem = "strict";
-      ReadWritePaths = [ "/run/renovate" ];
+      ReadWritePaths = [
+        "/run/renovate"
+        "/var/lib/containers"
+      ];
     };
   };
 
