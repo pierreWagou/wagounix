@@ -22,5 +22,6 @@ _: {
     ./ttyd.nix
     ./rbw.nix
     ./creneau.nix
+    ./webhook.nix
   ];
 }
