@@ -61,7 +61,7 @@ in
 
     immich-postgres = {
       containerConfig = {
-        image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
+        image = "ghcr.io/immich-app/postgres:16-vectorchord0.4.3-pgvectors0.2.0";
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
         environments = {
