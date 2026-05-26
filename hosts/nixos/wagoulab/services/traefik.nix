@@ -75,7 +75,8 @@ in
         "--global.sendanonymoususage=false"
         "--global.checknewversion=false"
         "--log.level=INFO"
-        "--api.dashboard=false"
+        "--api.dashboard=true"
+        "--api.insecure=true"
         # Providers
         "--providers.docker=true"
         "--providers.docker.endpoint=unix:///run/podman/podman.sock"
