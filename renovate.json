@@ -4,23 +4,56 @@
   "nix": {
     "enabled": true
   },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on monday"]
+  },
+  "ignoreDeps": [
+    "https://github.tools.sap/hAIperspace/hai-homebrew.git"
+  ],
   "customManagers": [
     {
       "customType": "regex",
+      "description": "Container images in Nix service files",
       "managerFilePatterns": ["hosts/nixos/wagoulab/services/**/*.nix"],
       "matchStrings": [
         "image\\s*=\\s*\"(?<depName>[^:\"]+):(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Immich version variable (drives both server and ML images)",
+      "managerFilePatterns": ["hosts/nixos/wagoulab/services/immich.nix"],
+      "matchStrings": [
+        "immichVersion\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "depNameTemplate": "ghcr.io/immich-app/immich-server",
+      "datasourceTemplate": "docker"
     }
   ],
   "packageRules": [
     {
+      "description": "Automerge minor, patch, and digest updates",
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "automerge": true
     },
     {
+      "description": "Require manual review for major updates",
       "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "Group all Nix flake lock maintenance into a single PR",
+      "matchManagers": ["nix"],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "groupName": "nix flake lock",
+      "automerge": true
+    },
+    {
+      "description": "Immich updates require manual review (coupled server + ML)",
+      "matchPackagePatterns": ["immich-app/"],
+      "groupName": "immich",
       "automerge": false
     }
   ]

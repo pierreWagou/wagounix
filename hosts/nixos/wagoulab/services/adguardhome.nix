@@ -84,7 +84,7 @@ in
 {
   virtualisation.quadlet.containers.adguard = {
     containerConfig = {
-      image = "adguard/adguardhome:latest";
+      image = "adguard/adguardhome:v0.99.3";
       # Override Podman's DNS injection — without this, Podman injects the
       # network gateway (10.89.x.1:53) into the container's resolv.conf,
       # and AdGuard tries to use it for reverse DNS lookups, causing 2s

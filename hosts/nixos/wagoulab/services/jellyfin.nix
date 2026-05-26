@@ -11,7 +11,7 @@ in
 {
   virtualisation.quadlet.containers.jellyfin = {
     containerConfig = {
-      image = "jellyfin/jellyfin:latest";
+      image = "jellyfin/jellyfin:10.11.10";
       healthCmd = "none";
       networks = [ networks.proxy.ref ];
       volumes = [

@@ -265,7 +265,7 @@ in
   virtualisation.quadlet.containers = {
     homepage = {
       containerConfig = {
-        image = "ghcr.io/gethomepage/homepage:latest";
+        image = "ghcr.io/gethomepage/homepage:v1.4.5";
         healthCmd = "none";
         networks = [ networks.proxy.ref ];
         volumes = [
@@ -295,7 +295,7 @@ in
     # Lightweight nginx sidecar to serve background images at /bg/*
     homepage-images = {
       containerConfig = {
-        image = "docker.io/library/nginx:alpine";
+        image = "docker.io/library/nginx:1.31.1-alpine";
         networks = [ networks.proxy.ref ];
         volumes = [
           "${homepageImages}:/usr/share/nginx/html/bg:ro"

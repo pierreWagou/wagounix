@@ -35,7 +35,7 @@ in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
-      image = "ghcr.io/home-assistant/home-assistant:stable";
+      image = "homeassistant/home-assistant:2026.5.4";
       networks = [ networks.proxy.ref ];
       volumes = [
         "/var/lib/home-assistant:/config"
