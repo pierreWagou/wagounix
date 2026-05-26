@@ -87,8 +87,8 @@ let
       {
         enabled = true;
         id = 5;
-        name = "HaGeZi Multi Pro";
-        url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.txt";
+        name = "HaGeZi Multi Ultimate";
+        url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt";
       }
       {
         enabled = true;
