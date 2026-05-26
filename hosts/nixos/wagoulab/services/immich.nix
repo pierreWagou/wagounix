@@ -2,6 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
+  immichVersion = "v1.95.1";
 in
 {
   # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
@@ -10,7 +11,7 @@ in
   virtualisation.quadlet.containers = {
     immich-server = {
       containerConfig = {
-        image = "ghcr.io/immich-app/immich-server:release";
+        image = "ghcr.io/immich-app/immich-server:${immichVersion}";
         networks = [
           networks.proxy.ref
           networks.immich-internal.ref
@@ -51,7 +52,7 @@ in
 
     immich-ml = {
       containerConfig = {
-        image = "ghcr.io/immich-app/immich-machine-learning:release-openvino";
+        image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}-openvino";
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
