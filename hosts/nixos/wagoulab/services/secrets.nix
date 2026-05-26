@@ -25,6 +25,7 @@
       renovate-github-app-id.mode = "0400";
       renovate-github-app-key.mode = "0400";
       renovate-installation-id.mode = "0400";
+      kitchenowl-jwt-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -77,6 +78,10 @@
 
       "webhook.env" = {
         content = "WEBHOOK_SECRET=${config.sops.placeholder.github-webhook-secret}\n";
+      };
+
+      "kitchenowl.env" = {
+        content = "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}\n";
       };
     };
   };
