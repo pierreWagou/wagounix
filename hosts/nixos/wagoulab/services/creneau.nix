@@ -6,7 +6,7 @@ in
 {
   virtualisation.quadlet.containers.creneau = {
     containerConfig = {
-      image = "ghcr.io/pierrewagou/creneau:1.1.0";
+      image = "ghcr.io/pierrewagou/creneau:1.0.0";
       networks = [ networks.proxy.ref ];
       volumes = [
         "/var/lib/creneau:/app/data"
