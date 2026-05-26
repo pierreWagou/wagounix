@@ -26,7 +26,7 @@ jobs:
         run: nix develop --command deadnix --fail .
 
   build-darwin:
-    runs-on: macos-15
+    runs-on: macos-26
     strategy:
       matrix:
         profile: [sap, wagoumac]
