@@ -2,7 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
-  immichVersion = "v1.144.1";
+  immichVersion = "v2.7.5";
 in
 {
   # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
