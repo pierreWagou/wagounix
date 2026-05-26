@@ -24,5 +24,6 @@ _: {
     ./creneau.nix
     ./webhook.nix
     ./renovate.nix
+    ./kitchenowl.nix
   ];
 }

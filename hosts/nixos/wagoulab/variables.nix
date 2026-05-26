@@ -25,5 +25,6 @@ rec {
     "dev"
     "creneau"
     "relay"
+    "cabas"
   ];
 }
