@@ -46,7 +46,7 @@ let
       };
       Infrastructure = {
         style = "row";
-        columns = 2;
+        columns = 3;
       };
     };
   };
@@ -148,6 +148,16 @@ let
     }
     {
       "Infrastructure" = [
+        {
+          "Traefik" = {
+            icon = "traefik.svg";
+            description = "Reverse proxy";
+            widget = {
+              type = "traefik";
+              url = "http://traefik:8080";
+            };
+          };
+        }
         {
           "AdGuard Home" = {
             icon = "adguard-home.svg";
