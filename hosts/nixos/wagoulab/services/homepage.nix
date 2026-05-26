@@ -265,7 +265,7 @@ in
   virtualisation.quadlet.containers = {
     homepage = {
       containerConfig = {
-        image = "ghcr.io/gethomepage/homepage:v1.4.5";
+        image = "ghcr.io/gethomepage/homepage:v1.13.1";
         healthCmd = "none";
         networks = [ networks.proxy.ref ];
         volumes = [
