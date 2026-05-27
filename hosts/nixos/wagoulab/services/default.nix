@@ -26,5 +26,6 @@ _: {
     ./renovate.nix
     ./kitchenowl.nix
     ./authentik.nix
+    ./seafile.nix
   ];
 }
