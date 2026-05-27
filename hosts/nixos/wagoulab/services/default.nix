@@ -10,7 +10,6 @@ _: {
     ./traefik.nix
     ./cloudflared.nix
     ./vaultwarden.nix
-    ./opencloud.nix
     ./jellyfin.nix
     ./home-assistant.nix
     ./homepage.nix
