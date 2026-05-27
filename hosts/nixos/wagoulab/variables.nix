@@ -17,7 +17,6 @@ rec {
   tunnelSubdomains = [
     "vault"
     "pixel"
-    "cloud"
     "dash"
     "guard"
     "home"
