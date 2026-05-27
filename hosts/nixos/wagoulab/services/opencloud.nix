@@ -59,7 +59,7 @@ in
       volumes = [
         "/var/lib/opencloud/config:/etc/opencloud"
         "/var/lib/opencloud/data:/var/lib/opencloud"
-        "${cspConfig}:/etc/opencloud/csp.yaml:ro"
+        "${cspConfig}:/opt/opencloud-csp.yaml:ro"
       ];
       environments = {
         OC_URL = "https://cloud.${host.domain}";
@@ -74,7 +74,7 @@ in
         OC_OIDC_ISSUER = "https://cipher.${host.domain}/application/o/opencloud/";
         OC_EXCLUDE_RUN_SERVICES = "idp";
         PROXY_OIDC_REWRITE_WELLKNOWN = "true";
-        PROXY_CSP_CONFIG_FILE_LOCATION = "/etc/opencloud/csp.yaml";
+        PROXY_CSP_CONFIG_FILE_LOCATION = "/opt/opencloud-csp.yaml";
 
         # User provisioning
         PROXY_AUTOPROVISION_ACCOUNTS = "true";
