@@ -42,6 +42,10 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Fail2ban | `services/fail2ban.nix` | - | - |
 | ttyd | `services/ttyd.nix` | 7681 (native systemd service) | `https://dev.wagou.fr` |
 | rbw | `services/rbw.nix` | - (custom pinentry script) | - |
+| Creneau | `services/creneau.nix` | 3000 (Podman network) | `https://creneau.wagou.fr` |
+| Webhook | `services/webhook.nix` | 9000 (host service, native) | `https://relay.wagou.fr` |
+| Renovate | `services/renovate.nix` | - (systemd oneshot + timer) | - |
+| KitchenOwl | `services/kitchenowl.nix` | 8080 (Podman network) | `https://cabas.wagou.fr` |
 
 ## Files
 
@@ -57,7 +61,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 
 | File | Purpose |
 |---|---|
-| `default.nix` | Imports all service modules + system packages (ghostty.terminfo) |
+| `default.nix` | Imports all service modules |
 | `podman.nix` | Podman runtime, quadlet-nix shared `proxy` network |
 | `secrets.nix` | sops-nix secret declarations and templates |
 | `traefik.nix` | Traefik reverse proxy container (Let's Encrypt, HSTS headers, Cloudflare trusted IPs) |
@@ -75,6 +79,10 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | `firewall.nix` | Firewall rules (ports 22, 53, 80, 443) |
 | `ttyd.nix` | Web terminal for remote dev access (Catppuccin theme, Nerd Font, native systemd service) |
 | `rbw.nix` | Custom pinentry script for rbw (reads master password from sops secret) |
+| `creneau.nix` | Appointment scheduling container |
+| `webhook.nix` | GitHub webhook receiver (triggers rebuilds + Renovate) |
+| `renovate.nix` | Dependency update bot (systemd oneshot + timer + token script) |
+| `kitchenowl.nix` | Recipes & grocery lists container |
 
 ### Platform-level NixOS config: `hosts/nixos/`
 
@@ -132,6 +140,11 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `cloudflare-dns-token` | `traefik.nix` (ACME) | Via sops template `traefik.env` |
 | `jellyfin-api-key` | `homepage.nix` | Via sops template `homepage.env` |
 | `rbw-master-password` | `rbw.nix` | Raw secret file (owner: wagou, mode: 0400) |
+| `github-webhook-secret` | `webhook.nix` | Via sops template `webhook.env` |
+| `renovate-github-app-id` | `renovate.nix` | Raw secret file (token generation script) |
+| `renovate-github-app-key` | `renovate.nix` | Raw secret file (base64-encoded PEM) |
+| `renovate-installation-id` | `renovate.nix` | Raw secret file (token generation script) |
+| `kitchenowl-jwt-secret` | `kitchenowl.nix` | Via sops template `kitchenowl.env` |
 
 ### Encryption keys
 
@@ -236,6 +249,11 @@ Runs as a Podman container with a seed config. The declarative config from Nix i
 | AdGuard DNS filter | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt` |
 | Steven Black's Unified Hosts | `https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts` |
 | Malicious URL Blocklist | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt` |
+| OISD Big | `https://big.oisd.nl` |
+| HaGeZi Multi Ultimate | `https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt` |
+| AdGuard Tracking Protection | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_4.txt` |
+| Liste FR - French ads | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt` |
+| Peter Lowe's Ad and tracking server list | `https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=1&mimetype=plaintext` |
 
 ## Traefik routing
 
@@ -254,6 +272,9 @@ Routing is determined by `Host()` rules matching the subdomain:
 | `home.wagou.fr` | home-assistant | 8123 | - |
 | `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
 | `dev.wagou.fr` | ttyd (host service) | 7681 | Routed via file provider dynamic config (not container labels) |
+| `creneau.wagou.fr` | creneau | 3000 | - |
+| `relay.wagou.fr` | webhook (host service) | 9000 | File provider dynamic config (not container labels) |
+| `cabas.wagou.fr` | kitchenowl | 8080 | - |
 
 ## SSH access
 

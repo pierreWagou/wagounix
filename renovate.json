@@ -17,7 +17,7 @@
       "description": "Container images in Nix service files",
       "managerFilePatterns": ["hosts/nixos/wagoulab/services/**/*.nix"],
       "matchStrings": [
-        "image\\s*=\\s*\"(?<depName>[^:\"]+):(?<currentValue>[^\"]+)\""
+        "image\\s*=\\s*\"(?<depName>[^:\"$]+):(?<currentValue>[^\"$]+)\""
       ],
       "datasourceTemplate": "docker"
     },
@@ -29,6 +29,16 @@
         "immichVersion\\s*=\\s*\"(?<currentValue>[^\"]+)\""
       ],
       "depNameTemplate": "ghcr.io/immich-app/immich-server",
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Renovate CLI image in podman run command",
+      "managerFilePatterns": ["hosts/nixos/wagoulab/services/renovate.nix"],
+      "matchStrings": [
+        "ghcr\\.io/renovatebot/renovate:(?<currentValue>[^\\s\"]+)"
+      ],
+      "depNameTemplate": "ghcr.io/renovatebot/renovate",
       "datasourceTemplate": "docker"
     }
   ],

@@ -12,6 +12,7 @@ in
     immich-server = {
       containerConfig = {
         image = "ghcr.io/immich-app/immich-server:${immichVersion}";
+        noNewPrivileges = true;
         networks = [
           networks.proxy.ref
           networks.immich-internal.ref
@@ -63,6 +64,7 @@ in
     immich-postgres = {
       containerConfig = {
         image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
+        noNewPrivileges = true;
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
         environments = {
@@ -76,7 +78,8 @@ in
 
     immich-redis = {
       containerConfig = {
-        image = "docker.io/valkey/valkey:9";
+        image = "docker.io/valkey/valkey:9.1.0";
+        noNewPrivileges = true;
         networks = [ networks.immich-internal.ref ];
       };
     };
