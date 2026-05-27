@@ -44,6 +44,10 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Fail2ban** | Brute force protection | - | - |
 | **ttyd** | Web-based terminal (remote dev access) | `https://dev.wagou.fr` | 7681 (native service) |
 | **rbw** | Bitwarden CLI (custom pinentry for zero-touch unlock) | - | - |
+| **Creneau** | Appointment scheduling | `https://creneau.wagou.fr` | 3000 |
+| **Webhook** | GitHub webhook receiver | `https://relay.wagou.fr` | 9000 (native systemd service) |
+| **Renovate** | Dependency update bot | - | Podman oneshot (timer + webhook trigger) |
+| **KitchenOwl** | Recipes & grocery lists | `https://cabas.wagou.fr` | 8080 |
 
 ## Hardware
 
@@ -90,7 +94,11 @@ hosts/nixos/wagoulab/
     ├── fail2ban.nix         # Brute force protection
     ├── firewall.nix         # Firewall rules (ports 22, 53, 80, 443)
     ├── ttyd.nix             # Web terminal (remote dev access via dev.wagou.fr)
-    └── rbw.nix              # Bitwarden CLI custom pinentry (zero-touch vault unlock)
+    ├── rbw.nix              # Bitwarden CLI custom pinentry (zero-touch vault unlock)
+    ├── creneau.nix          # Appointment scheduling
+    ├── webhook.nix          # GitHub webhook receiver
+    ├── renovate.nix         # Dependency update bot
+    └── kitchenowl.nix       # Recipes & grocery lists
 ```
 
 Platform-level config at `hosts/nixos/`:
@@ -134,6 +142,11 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `cloudflare-dns-token` | ACME DNS-01 challenge (via sops template) | `/run/secrets/rendered/traefik.env` |
 | `jellyfin-api-key` | Homepage widget (via sops template) | `/run/secrets/rendered/homepage.env` |
 | `rbw-master-password` | rbw custom pinentry (zero-touch vault unlock) | `/run/secrets/rbw-master-password` |
+| `github-webhook-secret` | Webhook HMAC verification | `webhook.env` template |
+| `renovate-github-app-id` | GitHub App ID for Renovate | Raw secret file |
+| `renovate-github-app-key` | GitHub App private key (base64 PEM) | Raw secret file |
+| `renovate-installation-id` | GitHub App installation ID | Raw secret file |
+| `kitchenowl-jwt-secret` | JWT signing key for KitchenOwl | `kitchenowl.env` template |
 
 ### Editing secrets
 

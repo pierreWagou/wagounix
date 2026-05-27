@@ -7,6 +7,7 @@ in
   virtualisation.quadlet.containers.kitchenowl = {
     containerConfig = {
       image = "tombursch/kitchenowl:v0.7.8";
+      noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
       volumes = [
         "/var/lib/kitchenowl:/data"

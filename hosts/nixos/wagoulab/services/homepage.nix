@@ -284,6 +284,7 @@ in
     homepage = {
       containerConfig = {
         image = "ghcr.io/gethomepage/homepage:v1.13.1";
+        noNewPrivileges = true;
         healthCmd = "none";
         networks = [ networks.proxy.ref ];
         volumes = [
@@ -314,6 +315,7 @@ in
     homepage-images = {
       containerConfig = {
         image = "docker.io/library/nginx:1.31.1-alpine";
+        noNewPrivileges = true;
         networks = [ networks.proxy.ref ];
         volumes = [
           "${homepageImages}:/usr/share/nginx/html/bg:ro"

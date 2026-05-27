@@ -55,7 +55,7 @@ in
 {
   virtualisation.quadlet.containers.traefik = {
     containerConfig = {
-      image = "ghcr.io/traefik/traefik:v3";
+      image = "ghcr.io/traefik/traefik:v3.7.1";
       noNewPrivileges = true;
       publishPorts = [
         "443:443"

@@ -7,6 +7,7 @@ in
   virtualisation.quadlet.containers.vaultwarden = {
     containerConfig = {
       image = "vaultwarden/server:1.36.0";
+      noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
       volumes = [
         "/var/lib/vaultwarden:/data"

@@ -60,6 +60,7 @@ wagounix/
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
+│       ├── packages.nix           # NixOS-only packages (ghostty.terminfo, ventoy)
 │       └── wagoulab/              # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
@@ -79,6 +80,10 @@ wagounix/
 │               ├── homepage.nix
 │               ├── home-assistant.nix
 │               ├── jellyfin.nix
+│               ├── creneau.nix
+│               ├── kitchenowl.nix
+│               ├── renovate.nix
+│               ├── webhook.nix
 │               ├── homepage-images/
 │               ├── fail2ban.nix
 │               ├── firewall.nix
@@ -147,7 +152,7 @@ rec {
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
-  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "dev" ]; # NixOS only
+  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "dev" "creneau" "relay" "cabas" ]; # NixOS only
 }
 ```
 

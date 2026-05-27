@@ -138,7 +138,11 @@ wagounix/
                 ├── fail2ban.nix
                 ├── firewall.nix
                 ├── ttyd.nix
-                └── rbw.nix
+                ├── rbw.nix
+                ├── creneau.nix
+                ├── webhook.nix
+                ├── renovate.nix
+                └── kitchenowl.nix
 ```
 
 </details>
@@ -222,8 +226,8 @@ GitHub Actions runs on push to `main` and on PRs:
 
 | Job | Runner | Profiles |
 |---|---|---|
-| Lint | macos-15 | nixfmt, statix, deadnix |
-| Build darwin | macos-15 | sap, wagoumac (parallel) |
+| Lint | ubuntu-latest | nixfmt, statix, deadnix |
+| Build darwin | macos-15 | sap, wagoumac, alan (parallel) |
 | Build NixOS | ubuntu-latest | wagoulab |
 
 > Note: `wagouintel` (x86_64-darwin) is not built in CI — GitHub Actions no longer offers Intel macOS runners for free.
