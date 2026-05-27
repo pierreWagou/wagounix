@@ -601,7 +601,24 @@ let
     }
 
     /* === System Admin page === */
-    #right-panel {
+    #right-panel,
+    #main,
+    #base {
+      background-color: var(--ctp-base) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    #header {
+      background-color: var(--ctp-mantle) !important;
+      border-bottom: 1px solid var(--ctp-surface1) !important;
+    }
+
+    #logo,
+    #logo a {
+      background-color: var(--ctp-mantle) !important;
+    }
+
+    #wrapper {
       background-color: var(--ctp-base) !important;
       color: var(--ctp-text) !important;
     }
@@ -646,6 +663,16 @@ let
     .account-popup a.item:hover {
       background-color: var(--ctp-mauve) !important;
       color: var(--ctp-crust) !important;
+    }
+
+    #lang-context-selector,
+    #lang-context-selector .sf-popover-con {
+      background-color: var(--ctp-surface0) !important;
+    }
+
+    #lang-context,
+    #lang-context:hover {
+      color: var(--ctp-text) !important;
     }
 
     .narrow-panel,
