@@ -26,6 +26,9 @@
       renovate-github-app-key.mode = "0400";
       renovate-installation-id.mode = "0400";
       kitchenowl-jwt-secret.mode = "0400";
+      authentik-secret-key.mode = "0400";
+      authentik-postgres-password.mode = "0400";
+      kitchenowl-oidc-client-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -81,7 +84,21 @@
       };
 
       "kitchenowl.env" = {
-        content = "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}\n";
+        content = builtins.concatStringsSep "\n" [
+          "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}"
+          "OIDC_CLIENT_SECRET=${config.sops.placeholder.kitchenowl-oidc-client-secret}"
+        ];
+      };
+
+      "authentik.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "AUTHENTIK_SECRET_KEY=${config.sops.placeholder.authentik-secret-key}"
+          "AUTHENTIK_POSTGRESQL__PASSWORD=${config.sops.placeholder.authentik-postgres-password}"
+        ];
+      };
+
+      "authentik-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
       };
     };
   };

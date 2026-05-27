@@ -14,6 +14,9 @@ in
       ];
       environments = {
         OPEN_REGISTRATION = "true";
+        OIDC_ISSUER = "https://cipher.${host.domain}/application/o/kitchenowl/";
+        OIDC_CLIENT_ID = "kitchenowl";
+        FRONT_URL = "https://cabas.${host.domain}";
       };
       environmentFiles = [ config.sops.templates."kitchenowl.env".path ];
       labels = {

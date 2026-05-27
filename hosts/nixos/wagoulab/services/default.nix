@@ -25,5 +25,6 @@ _: {
     ./webhook.nix
     ./renovate.nix
     ./kitchenowl.nix
+    ./authentik.nix
   ];
 }
