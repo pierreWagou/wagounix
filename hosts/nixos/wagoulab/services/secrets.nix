@@ -29,6 +29,10 @@
       authentik-secret-key.mode = "0400";
       authentik-postgres-password.mode = "0400";
       kitchenowl-oidc-client-secret.mode = "0400";
+      seafile-mysql-root-password.mode = "0400";
+      seafile-mysql-password.mode = "0400";
+      seafile-jwt-key.mode = "0400";
+      seafile-oauth-client-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -95,6 +99,47 @@
 
       "authentik-postgres.env" = {
         content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
+      };
+
+      "seafile.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
+          "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
+          "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
+        ];
+      };
+
+      "seafile-db.env" = {
+        content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
+      };
+
+      "seahub_settings.py" = {
+        content = builtins.concatStringsSep "\n" [
+          "CSRF_TRUSTED_ORIGINS = ['https://disk.wagou.fr']"
+          ""
+          "# OAuth/OIDC via Authentik"
+          "ENABLE_OAUTH = True"
+          "OAUTH_CREATE_UNKNOWN_USER = True"
+          "OAUTH_ACTIVATE_USER_AFTER_CREATION = True"
+          "OAUTH_CLIENT_ID = 'seafile'"
+          "OAUTH_CLIENT_SECRET = '${config.sops.placeholder.seafile-oauth-client-secret}'"
+          "OAUTH_REDIRECT_URL = 'https://disk.wagou.fr/oauth/callback/'"
+          "OAUTH_PROVIDER_DOMAIN = 'https://cipher.wagou.fr'"
+          "OAUTH_AUTHORIZATION_URL = 'https://cipher.wagou.fr/application/o/authorize/'"
+          "OAUTH_TOKEN_URL = 'https://cipher.wagou.fr/application/o/token/'"
+          "OAUTH_USER_INFO_URL = 'https://cipher.wagou.fr/application/o/userinfo/'"
+          "OAUTH_SCOPE = ['openid', 'profile', 'email']"
+          "OAUTH_ATTRIBUTE_MAP = {"
+          "    'email': (True, 'contact_email'),"
+          "    'name': (False, 'name'),"
+          "}"
+          ""
+          "# SSO via system browser for desktop/mobile clients"
+          "CLIENT_SSO_VIA_LOCAL_BROWSER = True"
+          ""
+          "# SeaDoc"
+          "ENABLE_SEADOC = True"
+        ];
       };
     };
   };

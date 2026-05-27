@@ -27,5 +27,6 @@ rec {
     "relay"
     "cabas"
     "cipher"
+    "disk"
   ];
 }
