@@ -144,7 +144,7 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/seafile 0755 root root -"
     "d /var/lib/seafile-mysql 0755 root root -"
-    "d /var/lib/seafile-redis 0755 root root -"
+    "d /var/lib/seafile-redis 0755 999 999 -"
     "d /var/lib/seadoc 0755 root root -"
   ];
 
