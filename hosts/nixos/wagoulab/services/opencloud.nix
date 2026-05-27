@@ -8,46 +8,19 @@
 let
   inherit (config.virtualisation.quadlet) networks;
 
-  # Custom CSP to allow the browser to connect to Authentik for OIDC
-  cspConfig = pkgs.writeText "opencloud-csp.yaml" ''
+  # Custom CSP override to allow the browser to connect to Authentik for OIDC
+  cspConfig = pkgs.writeText "opencloud-csp-override.yaml" ''
     directives:
-      child-src:
-        - 'self'
       connect-src:
         - 'self'
         - blob:
         - https://cipher.${host.domain}/
         - https://raw.githubusercontent.com/opencloud-eu/awesome-apps/
         - https://update.opencloud.eu/
-      default-src:
-        - 'none'
-      font-src:
-        - 'self'
-      frame-ancestors:
-        - 'self'
-      frame-src:
-        - 'self'
-        - blob:
-        - https://embed.diagrams.net/
-      img-src:
-        - 'self'
-        - data:
-        - blob:
-        - https://raw.githubusercontent.com/opencloud-eu/awesome-apps/
-      manifest-src:
-        - 'self'
-      media-src:
-        - 'self'
-      object-src:
-        - 'self'
-        - blob:
       script-src:
         - 'self'
         - 'unsafe-inline'
         - 'unsafe-eval'
-      style-src:
-        - 'self'
-        - 'unsafe-inline'
   '';
 in
 {
@@ -59,7 +32,7 @@ in
       volumes = [
         "/var/lib/opencloud/config:/etc/opencloud"
         "/var/lib/opencloud/data:/var/lib/opencloud"
-        "${cspConfig}:/opt/opencloud-csp.yaml:ro"
+        "${cspConfig}:/opt/opencloud-csp-override.yaml:ro"
       ];
       environments = {
         OC_URL = "https://cloud.${host.domain}";
@@ -74,7 +47,7 @@ in
         OC_OIDC_ISSUER = "https://cipher.${host.domain}/application/o/opencloud/";
         OC_EXCLUDE_RUN_SERVICES = "idp";
         PROXY_OIDC_REWRITE_WELLKNOWN = "true";
-        PROXY_CSP_CONFIG_FILE_LOCATION = "/opt/opencloud-csp.yaml";
+        PROXY_CSP_CONFIG_FILE_OVERRIDE_LOCATION = "/opt/opencloud-csp-override.yaml";
 
         # User provisioning
         PROXY_AUTOPROVISION_ACCOUNTS = "true";
