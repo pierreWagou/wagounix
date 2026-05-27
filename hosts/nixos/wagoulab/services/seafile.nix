@@ -139,9 +139,187 @@ let
       color: var(--ctp-text) !important;
     }
 
-    .dropdown-item:hover {
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    .dropdown-item:active,
+    .dropdown-item.active {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    /* === Seafile Popover (custom component) === */
+    .sf-popover {
+      background-color: var(--ctp-surface0) !important;
+      border: 1px solid var(--ctp-surface1) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .sf-popover-hd,
+    .sf-popover-title {
+      color: var(--ctp-text) !important;
+      border-bottom: 1px solid var(--ctp-surface1) !important;
+    }
+
+    a.sf-popover-item {
+      color: var(--ctp-text) !important;
+    }
+
+    a.sf-popover-item:hover {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    .sf-popover-con {
+      background-color: var(--ctp-surface0) !important;
+    }
+
+    /* === Select elements === */
+    select,
+    select.form-control,
+    select.form-select {
+      background-color: var(--ctp-surface0) !important;
+      border-color: var(--ctp-surface1) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    select:focus,
+    select.form-control:focus,
+    select.form-select:focus {
+      background-color: var(--ctp-surface0) !important;
+      border-color: var(--ctp-mauve) !important;
+      box-shadow: 0 0 0 0.2rem rgba(203, 166, 247, 0.25) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    select option {
+      background-color: var(--ctp-surface0) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    /* === Seafile accent color override (replaces #ff9800 orange) === */
+    .custom-switch-input:checked ~ .custom-switch-indicator {
+      background: var(--ctp-mauve) !important;
+    }
+
+    .custom-switch-input:focus ~ .custom-switch-indicator {
+      border-color: var(--ctp-mauve) !important;
+      box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
+    }
+
+    .selectgroup-input:checked + .selectgroup-button {
+      background: rgba(203, 166, 247, 0.1) !important;
+      border-color: var(--ctp-mauve) !important;
+      color: var(--ctp-mauve) !important;
+    }
+
+    .selectgroup-input:focus + .selectgroup-button {
+      border-color: var(--ctp-mauve) !important;
+      box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
+      color: var(--ctp-mauve) !important;
+    }
+
+    .custom-control-input:checked ~ .custom-control-label:before {
+      background-color: var(--ctp-mauve) !important;
+      border-color: var(--ctp-mauve) !important;
+    }
+
+    .custom-control-input:focus ~ .custom-control-label:before {
+      box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
+    }
+
+    /* === Context menu / right-click menu === */
+    .contextmenu,
+    .context-menu,
+    [class*="context-menu"] {
+      background-color: var(--ctp-surface0) !important;
+      border: 1px solid var(--ctp-surface1) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    }
+
+    .contextmenu li,
+    .context-menu li,
+    [class*="context-menu"] li {
+      color: var(--ctp-text) !important;
+    }
+
+    .contextmenu li:hover,
+    .context-menu li:hover,
+    [class*="context-menu"] li:hover {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    /* === List group items === */
+    .list-group-item {
+      background-color: var(--ctp-surface0) !important;
+      border-color: var(--ctp-surface1) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    .list-group-item:hover {
+      background-color: var(--ctp-surface1) !important;
+    }
+
+    .list-group-item.active {
+      background-color: var(--ctp-mauve) !important;
+      border-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    .list-group-transparent .list-group-item.active {
+      background: rgba(203, 166, 247, 0.1) !important;
+      color: var(--ctp-mauve) !important;
+    }
+
+    /* === Tags / Chips === */
+    .tag {
+      background-color: var(--ctp-surface1) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    .tag-primary {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    /* === Pagination === */
+    .page-link {
+      background-color: var(--ctp-surface0) !important;
+      border-color: var(--ctp-surface1) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    .page-link:hover {
       background-color: var(--ctp-surface1) !important;
       color: var(--ctp-mauve) !important;
+    }
+
+    .page-item.active .page-link {
+      background-color: var(--ctp-mauve) !important;
+      border-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    /* === Progress bars === */
+    .progress {
+      background-color: var(--ctp-surface0) !important;
+    }
+
+    .progress-bar {
+      background-color: var(--ctp-mauve) !important;
+    }
+
+    /* === Custom range slider === */
+    .custom-range::-webkit-slider-runnable-track {
+      background: var(--ctp-mauve) !important;
+    }
+
+    .custom-range::-moz-range-progress {
+      background: var(--ctp-mauve) !important;
     }
 
     /* === File List / Tables === */
