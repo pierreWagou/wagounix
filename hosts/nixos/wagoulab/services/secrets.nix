@@ -33,6 +33,7 @@
       seafile-mysql-password.mode = "0400";
       seafile-jwt-key.mode = "0400";
       seafile-oauth-client-secret.mode = "0400";
+      seafile-secret-key.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;

@@ -68,6 +68,7 @@
           appdir = host.restrictedAppDir;
         };
       }
+      "seafile-client"
       "synology-drive"
       "tailscale-app"
       "thunderbird"

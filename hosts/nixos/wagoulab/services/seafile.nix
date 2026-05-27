@@ -12,13 +12,18 @@ in
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 
-  # OAuth config rendered by sops-nix
+  # Complete seahub_settings.py rendered by sops-nix
   # Deploy with: sudo seafile-deploy-oauth
-  sops.templates."seafile-oauth.py" = {
+  sops.templates."seahub_settings.py" = {
     content = builtins.concatStringsSep "\n" [
+      "SECRET_KEY = '${config.sops.placeholder.seafile-secret-key}'"
+      "SERVICE_URL = 'https://disk.${host.domain}'"
+      "FILE_SERVER_ROOT = 'https://disk.${host.domain}/seafhttp'"
+      "TIME_ZONE = '${host.timezone}'"
       ""
-      "# --- OAUTH START ---"
       "CSRF_TRUSTED_ORIGINS = ['https://disk.${host.domain}']"
+      ""
+      "# OAuth/OIDC via Authentik"
       "ENABLE_OAUTH = True"
       "OAUTH_CREATE_UNKNOWN_USER = True"
       "OAUTH_ACTIVATE_USER_AFTER_CREATION = True"
@@ -35,9 +40,12 @@ in
       "    'name': (False, 'name'),"
       "    'sub': (True, 'uid'),"
       "}"
+      ""
+      "# SSO via system browser for desktop/mobile clients"
       "CLIENT_SSO_VIA_LOCAL_BROWSER = True"
+      ""
+      "# SeaDoc"
       "ENABLE_SEADOC = True"
-      "# --- OAUTH END ---"
     ];
   };
 
@@ -149,24 +157,20 @@ in
     "d /var/lib/seadoc 0755 root root -"
   ];
 
-  # Idempotent script to deploy/update OAuth config into Seafile
+  # Idempotent script to deploy the complete seahub config
   # Run: sudo seafile-deploy-oauth
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "seafile-deploy-oauth" ''
       SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
-      if [ ! -f "$SETTINGS" ]; then
-        echo "Error: $SETTINGS not found. Is Seafile running?"
+      if [ ! -d "/var/lib/seafile/seafile/conf" ]; then
+        echo "Error: Seafile conf directory not found. Has Seafile been initialized?"
         exit 1
       fi
-      # Remove old OAuth block if present
-      if grep -q "# --- OAUTH START ---" "$SETTINGS"; then
-        sed -i '/^# --- OAUTH START ---$/,/^# --- OAUTH END ---$/d' "$SETTINGS"
-      fi
-      # Append fresh OAuth config from sops
-      cat /run/secrets/rendered/seafile-oauth.py >> "$SETTINGS"
-      # Restart seahub to pick up the new config
-      podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart
-      echo "Done. OAuth config deployed to Seafile."
+      cp ${config.sops.templates."seahub_settings.py".path} "$SETTINGS"
+      chmod 644 "$SETTINGS"
+      podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
+        podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
+      echo "Done. Seahub config deployed."
     '')
   ];
 }
