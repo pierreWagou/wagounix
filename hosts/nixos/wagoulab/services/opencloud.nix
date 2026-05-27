@@ -9,18 +9,19 @@ let
   inherit (config.virtualisation.quadlet) networks;
 
   # Custom CSP override to allow the browser to connect to Authentik for OIDC
+  # YAML double-quoted strings preserve literal single quotes needed by CSP keywords
   cspConfig = pkgs.writeText "opencloud-csp-override.yaml" ''
     directives:
       connect-src:
-        - 'self'
-        - 'blob:'
-        - 'https://cipher.${host.domain}/'
-        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
-        - 'https://update.opencloud.eu/'
+        - "'self'"
+        - "blob:"
+        - "https://cipher.${host.domain}/"
+        - "https://raw.githubusercontent.com/opencloud-eu/awesome-apps/"
+        - "https://update.opencloud.eu/"
       script-src:
-        - 'self'
-        - 'unsafe-inline'
-        - 'unsafe-eval'
+        - "'self'"
+        - "'unsafe-inline'"
+        - "'unsafe-eval'"
   '';
 in
 {
