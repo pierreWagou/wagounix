@@ -12,6 +12,35 @@ in
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 
+  # OAuth config rendered by sops-nix
+  # Deploy with: sudo seafile-deploy-oauth
+  sops.templates."seafile-oauth.py" = {
+    content = builtins.concatStringsSep "\n" [
+      ""
+      "# --- OAUTH START ---"
+      "CSRF_TRUSTED_ORIGINS = ['https://disk.${host.domain}']"
+      "ENABLE_OAUTH = True"
+      "OAUTH_CREATE_UNKNOWN_USER = True"
+      "OAUTH_ACTIVATE_USER_AFTER_CREATION = True"
+      "OAUTH_CLIENT_ID = 'seafile'"
+      "OAUTH_CLIENT_SECRET = '${config.sops.placeholder.seafile-oauth-client-secret}'"
+      "OAUTH_REDIRECT_URL = 'https://disk.${host.domain}/oauth/callback/'"
+      "OAUTH_PROVIDER_DOMAIN = 'https://cipher.${host.domain}'"
+      "OAUTH_AUTHORIZATION_URL = 'https://cipher.${host.domain}/application/o/authorize/'"
+      "OAUTH_TOKEN_URL = 'https://cipher.${host.domain}/application/o/token/'"
+      "OAUTH_USER_INFO_URL = 'https://cipher.${host.domain}/application/o/userinfo/'"
+      "OAUTH_SCOPE = ['openid', 'profile', 'email']"
+      "OAUTH_ATTRIBUTE_MAP = {"
+      "    'email': (True, 'email'),"
+      "    'name': (False, 'name'),"
+      "    'sub': (True, 'uid'),"
+      "}"
+      "CLIENT_SSO_VIA_LOCAL_BROWSER = True"
+      "ENABLE_SEADOC = True"
+      "# --- OAUTH END ---"
+    ];
+  };
+
   virtualisation.quadlet.containers = {
     seafile = {
       containerConfig = {
@@ -114,28 +143,29 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/seafile 0755 root root -"
-    "d /var/lib/seafile/seafile/conf 0755 root root -"
     "d /var/lib/seafile-mysql 0755 root root -"
     "d /var/lib/seafile-redis 0755 root root -"
     "d /var/lib/seadoc 0755 root root -"
   ];
 
-  # Copy the sops-rendered seahub_settings.py into the Seafile volume before the container starts
-  systemd.services.seafile-config = {
-    description = "Deploy Seafile OAuth config";
-    wantedBy = [ "seafile.service" ];
-    before = [ "seafile.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = toString (
-        pkgs.writeShellScript "seafile-config" ''
-          mkdir -p /var/lib/seafile/seafile/conf
-          cp ${
-            config.sops.templates."seahub_settings.py".path
-          } /var/lib/seafile/seafile/conf/seahub_settings.py
-          chmod 644 /var/lib/seafile/seafile/conf/seahub_settings.py
-        ''
-      );
-    };
-  };
+  # Idempotent script to deploy/update OAuth config into Seafile
+  # Run: sudo seafile-deploy-oauth
+  environment.systemPackages = [
+    (pkgs.writeShellScriptBin "seafile-deploy-oauth" ''
+      SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
+      if [ ! -f "$SETTINGS" ]; then
+        echo "Error: $SETTINGS not found. Is Seafile running?"
+        exit 1
+      fi
+      # Remove old OAuth block if present
+      if grep -q "# --- OAUTH START ---" "$SETTINGS"; then
+        sed -i '/^# --- OAUTH START ---$/,/^# --- OAUTH END ---$/d' "$SETTINGS"
+      fi
+      # Append fresh OAuth config from sops
+      cat /run/secrets/rendered/seafile-oauth.py >> "$SETTINGS"
+      # Restart seahub to pick up the new config
+      podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart
+      echo "Done. OAuth config deployed to Seafile."
+    '')
+  ];
 }
