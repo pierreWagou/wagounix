@@ -26,5 +26,6 @@ rec {
     "creneau"
     "relay"
     "cabas"
+    "cipher"
   ];
 }
