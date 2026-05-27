@@ -6,7 +6,7 @@ in
 {
   virtualisation.quadlet.containers.opencloud = {
     containerConfig = {
-      image = "opencloudeu/opencloud-rolling:6.1.0";
+      image = "opencloudeu/opencloud-rolling:7.0.0";
       noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
       volumes = [
