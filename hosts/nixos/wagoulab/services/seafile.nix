@@ -623,6 +623,35 @@ let
       color: var(--ctp-text) !important;
     }
 
+    /* SPA sidebar/main panel headers */
+    body .side-panel-north,
+    body .main-panel-north,
+    [class*="panel-north"] {
+      background-color: #181825 !important;
+      border-bottom: 1px solid #45475a !important;
+      color: #cdd6f4 !important;
+    }
+
+    /* Nav pills (sidebar navigation in SPA) */
+    .nav.nav-pills {
+      background-color: #181825 !important;
+    }
+
+    .nav-pills .nav-link {
+      color: #a6adc8 !important;
+    }
+
+    .nav-pills .nav-link:hover {
+      background-color: #313244 !important;
+      color: #cdd6f4 !important;
+    }
+
+    .nav-pills .nav-link.active,
+    .nav-pills .show > .nav-link {
+      background-color: #313244 !important;
+      color: #cba6f7 !important;
+    }
+
     #right-panel .hd {
       border-bottom-color: var(--ctp-surface1) !important;
     }
