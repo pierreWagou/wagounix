@@ -13,8 +13,62 @@ let
   # Catppuccin Mocha theme with Mauve accent
   customCss = pkgs.writeText "seafile-custom.css" ''
     /* Catppuccin Mocha — https://catppuccin.com
-       Accent: Mauve (#cba6f7) */
+       Accent: Mauve (#cba6f7)
+       Overrides Bootstrap 5 CSS variables used by Seafile v13 */
 
+    :root,
+    [data-bs-theme=light],
+    [data-bs-theme=dark] {
+      --bs-body-color: #cdd6f4;
+      --bs-body-secondary-color: #a6adc8;
+      --bs-body-bg: #1e1e2e;
+      --bs-body-secondary-bg: #313244;
+      --bs-emphasis-color: #cdd6f4;
+      --bs-border-color: #45475a;
+      --bs-border-secondary-color: #45475a;
+      --bs-border-tertiary-color: #313244;
+      --bs-secondary-color: #bac2de;
+      --bs-tertiary-color: #a6adc8;
+      --bs-header-bg: #181825;
+      --bs-header-secondary-bg: #181825;
+      --bs-header-tertiary-bg: #11111b;
+      --bs-toolbar-bg: #1e1e2e;
+      --bs-toolbar-secondary-bg: #181825;
+      --bs-nav-hover-bg: #313244;
+      --bs-nav-active-bg: #313244;
+      --bs-wiki-nav-hover-bg: #313244;
+      --bs-wiki-nav-active-bg: #45475a;
+      --bs-th-bg: #181825;
+      --bs-th-secondary-bg: #181825;
+      --bs-th-tertiary-bg: #1e1e2e;
+      --bs-th-quartus-bg: #313244;
+      --bs-th-fifth-bg: #45475a;
+      --bs-tr-active-bg: #313244;
+      --bs-tr-active-secondary-bg: rgba(203, 166, 247, 0.15);
+      --bs-tr-hover-bg: #313244;
+      --bs-icon-color: #a6adc8;
+      --bs-icon-secondary-color: #a6adc8;
+      --bs-icon-tertiary-color: #6c7086;
+      --bs-icon-hover-color: #cba6f7;
+      --bs-hover-bg: #313244;
+      --bs-hover-secondary-bg: #45475a;
+      --bs-hover-tertiary-bg: #585b70;
+      --bs-bg-color: #313244;
+      --bs-bg-secondary-color: #181825;
+      --bs-dropdown-link-bg: #cba6f7;
+      --bs-dropdown-secondary-bg: #313244;
+      --bs-dropdown-tertiary-bg: #313244;
+      --bs-popover-bg: #313244;
+      --bs-placeholder-color: #6c7086;
+      --bs-primary: #cba6f7;
+      --bs-primary-rgb: 203, 166, 247;
+      --bs-link-color: #cba6f7;
+      --bs-link-hover-color: #b4befe;
+    }
+
+    html { color-scheme: dark; }
+
+    /* === Catppuccin variables for non-Bootstrap selectors === */
     :root {
       --ctp-base: #1e1e2e;
       --ctp-mantle: #181825;
@@ -36,13 +90,26 @@ let
       --ctp-blue: #89b4fa;
     }
 
-    /* === Global === */
+    /* === Critical background overrides === */
     body,
+    .page,
+    .page-main,
+    .page-content,
+    .bg-white,
     #wrapper,
     .main-panel,
-    .main-panel-center {
+    .main-panel-center,
+    .main-con,
+    .page-single,
+    .container,
+    .container-fluid {
       background-color: var(--ctp-base) !important;
       color: var(--ctp-text) !important;
+    }
+
+    .aside {
+      background-color: var(--ctp-mantle) !important;
+      border-color: var(--ctp-surface1) !important;
     }
 
     /* === Header / Top Bar === */
@@ -531,6 +598,95 @@ let
       background-color: var(--ctp-mantle) !important;
       border-top: 1px solid var(--ctp-surface0) !important;
       color: var(--ctp-subtext0) !important;
+    }
+
+    /* === System Admin page === */
+    #right-panel {
+      background-color: var(--ctp-base) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    #right-panel .hd {
+      border-bottom-color: var(--ctp-surface1) !important;
+    }
+
+    #right-panel .hd .tab {
+      color: var(--ctp-subtext0) !important;
+    }
+
+    #right-panel .hd .tab:hover,
+    #right-panel .hd .tab.current {
+      color: var(--ctp-mauve) !important;
+      border-bottom-color: var(--ctp-mauve) !important;
+    }
+
+    .side-tabnav-tabs {
+      background-color: var(--ctp-mantle) !important;
+    }
+
+    .side-tabnav-tabs .tab a {
+      color: var(--ctp-subtext0) !important;
+    }
+
+    .side-tabnav-tabs .tab a:hover,
+    .side-tabnav-tabs .tab-cur a {
+      color: var(--ctp-mauve) !important;
+      background-color: var(--ctp-surface0) !important;
+    }
+
+    .account-popup,
+    .account-popup .sf-popover-con {
+      background-color: var(--ctp-surface0) !important;
+    }
+
+    .account-popup a.item {
+      color: var(--ctp-text) !important;
+    }
+
+    .account-popup a.item:hover {
+      background-color: var(--ctp-mauve) !important;
+      color: var(--ctp-crust) !important;
+    }
+
+    .narrow-panel,
+    .wide-panel,
+    .tfa-panel {
+      background-color: var(--ctp-surface0) !important;
+      color: var(--ctp-text) !important;
+    }
+
+    .narrow-panel h2,
+    .narrow-panel h3,
+    .wide-panel h2,
+    .wide-panel h3 {
+      color: var(--ctp-text) !important;
+    }
+
+    .hl {
+      background-color: rgba(203, 166, 247, 0.1) !important;
+    }
+
+    /* === Form fieldset (admin) === */
+    .form-fieldset {
+      background: var(--ctp-surface0) !important;
+      border-color: var(--ctp-surface1) !important;
+    }
+
+    /* === Code blocks === */
+    pre, code {
+      background-color: var(--ctp-surface0) !important;
+      color: var(--ctp-text) !important;
+      border-color: var(--ctp-surface1) !important;
+    }
+
+    /* === Ensure all text inherits === */
+    h1, h2, h3, h4, h5, h6,
+    p, span, label, div, li, th, td {
+      color: inherit;
+    }
+
+    .text-muted {
+      color: var(--ctp-overlay0) !important;
     }
   '';
 
