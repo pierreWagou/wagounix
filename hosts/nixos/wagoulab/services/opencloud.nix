@@ -58,6 +58,7 @@ in
 
         # Web client
         WEB_OIDC_CLIENT_ID = "web";
+        WEB_OIDC_SCOPE = "openid profile email roles";
 
         # Role assignment from Authentik groups
         PROXY_ROLE_ASSIGNMENT_DRIVER = "oidc";
