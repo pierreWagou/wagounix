@@ -21,9 +21,28 @@ in
         OC_INSECURE = "true";
         PROXY_TLS = "false";
         PROXY_HTTP_ADDR = "0.0.0.0:9200";
-        PROXY_ENABLE_BASIC_AUTH = "true";
+
+        # External OIDC (Authentik)
+        OC_OIDC_ISSUER = "https://cipher.${host.domain}/application/o/opencloud/";
+        OC_EXCLUDE_RUN_SERVICES = "idp";
+        PROXY_OIDC_REWRITE_WELLKNOWN = "true";
+
+        # User provisioning
+        PROXY_AUTOPROVISION_ACCOUNTS = "true";
+        PROXY_USER_OIDC_CLAIM = "preferred_username";
+        PROXY_USER_CS3_CLAIM = "username";
+        GRAPH_USERNAME_MATCH = "none";
+
+        # Web client
+        WEB_OIDC_CLIENT_ID = "web";
+
+        # Role assignment from Authentik groups
+        PROXY_ROLE_ASSIGNMENT_DRIVER = "oidc";
+        PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM = "roles";
+
+        # Admin (handled by Authentik, not internal bootstrap)
+        OC_ADMIN_USER_ID = "";
       };
-      environmentFiles = [ config.sops.templates."opencloud.env".path ];
       entrypoint = "/bin/sh";
       exec = [
         "-c"
