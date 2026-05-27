@@ -38,7 +38,7 @@ let
     layout = {
       Services = {
         style = "row";
-        columns = 3;
+        columns = 4;
       };
       Media = {
         style = "row";
@@ -115,6 +115,14 @@ let
               key = "{{HOMEPAGE_VAR_IMMICH_API_KEY}}";
               version = 2;
             };
+          };
+        }
+        {
+          "KitchenOwl" = {
+            icon = "kitchenowl.svg";
+            href = "https://cabas.${host.domain}";
+            description = "Recipes & grocery lists";
+            siteMonitor = "http://kitchenowl:8080";
           };
         }
       ];
