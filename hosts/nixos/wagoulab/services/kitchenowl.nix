@@ -11,6 +11,9 @@ in
       volumes = [
         "/var/lib/kitchenowl:/data"
       ];
+      environments = {
+        OPEN_REGISTRATION = "true";
+      };
       environmentFiles = [ config.sops.templates."kitchenowl.env".path ];
       labels = {
         "traefik.enable" = "true";
