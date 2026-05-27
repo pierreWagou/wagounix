@@ -13,10 +13,10 @@ let
     directives:
       connect-src:
         - 'self'
-        - blob:
-        - https://cipher.${host.domain}/
-        - https://raw.githubusercontent.com/opencloud-eu/awesome-apps/
-        - https://update.opencloud.eu/
+        - 'blob:'
+        - 'https://cipher.${host.domain}/'
+        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+        - 'https://update.opencloud.eu/'
       script-src:
         - 'self'
         - 'unsafe-inline'
