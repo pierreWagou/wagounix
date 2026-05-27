@@ -14,7 +14,7 @@
       # Compose service secrets (referenced in env templates below)
       cloudflare-dns-token.mode = "0400";
       cloudflare-tunnel-token.mode = "0400";
-      opencloud-admin-password.mode = "0400";
+
       vaultwarden-admin-token.mode = "0400";
       immich-api-key.mode = "0400";
       immich-db-username.mode = "0400";
@@ -45,10 +45,6 @@
     templates = {
       "traefik.env" = {
         content = "CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
-      };
-
-      "opencloud.env" = {
-        content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
       };
 
       "vaultwarden.env" = {
