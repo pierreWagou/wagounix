@@ -28,6 +28,9 @@ in
           SEAFILE_MYSQL_DB_HOST = "seafile-db";
           SEAFILE_MYSQL_DB_PORT = "3306";
           SEAFILE_MYSQL_DB_USER = "seafile";
+          SEAFILE_MYSQL_DB_CCNET_DB_NAME = "ccnet_db";
+          SEAFILE_MYSQL_DB_SEAFILE_DB_NAME = "seafile_db";
+          SEAFILE_MYSQL_DB_SEAHUB_DB_NAME = "seahub_db";
           TIME_ZONE = host.timezone;
           SEAFILE_SERVER_HOSTNAME = "disk.${host.domain}";
           SEAFILE_SERVER_PROTOCOL = "https";
