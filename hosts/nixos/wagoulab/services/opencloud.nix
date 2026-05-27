@@ -12,42 +12,42 @@ let
   cspConfig = pkgs.writeText "opencloud-csp.yaml" ''
     directives:
       child-src:
-        - '''self'''
+        - 'self'
       connect-src:
-        - '''self'''
-        - 'blob:'
-        - 'https://cipher.${host.domain}/'
-        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
-        - 'https://update.opencloud.eu/'
+        - 'self'
+        - blob:
+        - https://cipher.${host.domain}/
+        - https://raw.githubusercontent.com/opencloud-eu/awesome-apps/
+        - https://update.opencloud.eu/
       default-src:
-        - '''none'''
+        - 'none'
       font-src:
-        - '''self'''
+        - 'self'
       frame-ancestors:
-        - '''self'''
+        - 'self'
       frame-src:
-        - '''self'''
-        - 'blob:'
-        - 'https://embed.diagrams.net/'
+        - 'self'
+        - blob:
+        - https://embed.diagrams.net/
       img-src:
-        - '''self'''
-        - 'data:'
-        - 'blob:'
-        - 'https://raw.githubusercontent.com/opencloud-eu/awesome-apps/'
+        - 'self'
+        - data:
+        - blob:
+        - https://raw.githubusercontent.com/opencloud-eu/awesome-apps/
       manifest-src:
-        - '''self'''
+        - 'self'
       media-src:
-        - '''self'''
+        - 'self'
       object-src:
-        - '''self'''
-        - 'blob:'
+        - 'self'
+        - blob:
       script-src:
-        - '''self'''
-        - '''unsafe-inline'''
-        - '''unsafe-eval'''
+        - 'self'
+        - 'unsafe-inline'
+        - 'unsafe-eval'
       style-src:
-        - '''self'''
-        - '''unsafe-inline'''
+        - 'self'
+        - 'unsafe-inline'
   '';
 in
 {
