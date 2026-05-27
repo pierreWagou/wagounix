@@ -919,28 +919,34 @@ in
     "d /var/lib/seafile-redis 0750 999 999 -"
     "Z /var/lib/seafile-redis 0750 999 999 -"
     "d /var/lib/seadoc 0755 root root -"
-    # Branding assets
+    # Branding assets directory
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
-    "C+ /var/lib/seafile/seafile/seahub-data/custom/custom.css 0644 root root - ${customCss}"
-    "C+ /var/lib/seafile/seafile/seahub-data/custom/logo.svg 0644 root root - ${logoSvg}"
-    "C+ /var/lib/seafile/seafile/seahub-data/custom/favicon.svg 0644 root root - ${faviconSvg}"
-    "C+ /var/lib/seafile/seafile/seahub-data/custom/login-bg.jpg 0644 root root - ${loginBg}"
   ];
 
-  # Idempotent script to deploy the complete seahub config
+  # Idempotent script to deploy seahub config + branding
   # Run: sudo seafile-deploy
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "seafile-deploy" ''
       SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
+      CUSTOM="/var/lib/seafile/seafile/seahub-data/custom"
       if [ ! -d "/var/lib/seafile/seafile/conf" ]; then
         echo "Error: Seafile conf directory not found. Has Seafile been initialized?"
         exit 1
       fi
+      # Deploy seahub config
       cp ${config.sops.templates."seahub_settings.py".path} "$SETTINGS"
       chmod 644 "$SETTINGS"
+      # Deploy branding assets
+      mkdir -p "$CUSTOM"
+      cp ${customCss} "$CUSTOM/custom.css"
+      cp ${logoSvg} "$CUSTOM/logo.svg"
+      cp ${faviconSvg} "$CUSTOM/favicon.svg"
+      cp ${loginBg} "$CUSTOM/login-bg.jpg"
+      chmod 644 "$CUSTOM"/*
+      # Restart seahub
       podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
         podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
-      echo "Done. Seahub config deployed."
+      echo "Done. Seahub config + branding deployed."
     '')
   ];
 }
