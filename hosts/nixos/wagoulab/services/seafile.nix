@@ -282,6 +282,30 @@ let
     .table-calendar-link:hover { background: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
     .sf-icon, .op-icon, svg.icon { color: var(--ctp-subtext0) !important; }
     .sf-icon:hover, .op-icon:hover { color: var(--ctp-mauve) !important; }
+
+    /* Color variety — use other Catppuccin palette colors for visual interest */
+    /* Folder icons: Blue */
+    .sf3-font-folder, [class*="icon-folder"], .dir-icon { color: var(--ctp-blue) !important; }
+    /* File icons: Lavender */
+    .sf3-font-file, [class*="icon-file"] { color: var(--ctp-lavender) !important; }
+    /* Star/favorite: Peach */
+    .sf3-font-star, [class*="icon-star"], .star { color: var(--ctp-peach) !important; }
+    .starred { color: var(--ctp-peach) !important; }
+    /* Share icon: Blue */
+    .sf3-font-share, [class*="icon-share"] { color: var(--ctp-blue) !important; }
+    /* Notifications bell: Peach */
+    .sf3-font-bell, [class*="icon-bell"], [class*="notification"] .sf3-font { color: var(--ctp-peach) !important; }
+    /* User/avatar accent ring */
+    .avatar-ring, [class*="avatar"] { border-color: var(--ctp-lavender) !important; }
+    /* Library/repo icons: Blue */
+    .sf3-font-library, [class*="icon-lib"] { color: var(--ctp-blue) !important; }
+    /* Upload/download: Green */
+    .sf3-font-upload, .sf3-font-download, [class*="icon-upload"], [class*="icon-download"] { color: var(--ctp-green) !important; }
+    /* Delete/trash: Red */
+    .sf3-font-delete, .sf3-font-trash, [class*="icon-delete"], [class*="icon-trash"] { color: var(--ctp-red) !important; }
+    /* Settings gear: Overlay1 (neutral but distinct) */
+    .sf3-font-settings, [class*="icon-settings"], [class*="icon-gear"] { color: var(--ctp-overlay1) !important; }
+
     footer, .main-panel-south { background-color: var(--ctp-mantle) !important; border-top: 1px solid var(--ctp-surface0) !important; color: var(--ctp-subtext0) !important; }
     pre, code { background-color: var(--ctp-surface0) !important; color: var(--ctp-text) !important; border-color: var(--ctp-surface1) !important; }
     .text-muted { color: var(--ctp-overlay0) !important; }
