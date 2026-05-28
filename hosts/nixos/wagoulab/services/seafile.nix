@@ -635,6 +635,8 @@ let
     /* Nav pills (sidebar navigation in SPA) */
     .nav.nav-pills {
       background-color: #181825 !important;
+      --bs-nav-pills-link-active-bg: #cba6f7 !important;
+      --bs-nav-pills-link-active-color: #11111b !important;
     }
 
     .nav-pills .nav-link {
@@ -648,8 +650,106 @@ let
 
     .nav-pills .nav-link.active,
     .nav-pills .show > .nav-link {
-      background-color: #313244 !important;
+      background-color: #cba6f7 !important;
+      color: #11111b !important;
+    }
+
+    /* === Override ALL component-level orange (#ff9800) accent === */
+
+    /* Checkboxes & radio buttons */
+    .form-check-input:checked {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+    }
+
+    .form-check-input[type=checkbox]:indeterminate {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+    }
+
+    .form-check-input:focus {
+      box-shadow: 0 0 0 0.2rem rgba(203, 166, 247, 0.25) !important;
+      border-color: #cba6f7 !important;
+    }
+
+    /* Range sliders */
+    .form-range::-webkit-slider-thumb {
+      background-color: #cba6f7 !important;
+    }
+
+    .form-range::-moz-range-thumb {
+      background-color: #cba6f7 !important;
+    }
+
+    /* Primary buttons (component-level vars) */
+    .btn-primary {
+      --bs-btn-bg: #cba6f7 !important;
+      --bs-btn-border-color: #cba6f7 !important;
+      --bs-btn-hover-bg: #b4befe !important;
+      --bs-btn-hover-border-color: #b4befe !important;
+      --bs-btn-active-bg: #b4befe !important;
+      --bs-btn-active-border-color: #b4befe !important;
+      --bs-btn-disabled-bg: #cba6f7 !important;
+      --bs-btn-disabled-border-color: #cba6f7 !important;
+    }
+
+    .btn-outline-primary {
+      --bs-btn-color: #cba6f7 !important;
+      --bs-btn-border-color: #cba6f7 !important;
+      --bs-btn-hover-bg: #cba6f7 !important;
+      --bs-btn-hover-border-color: #cba6f7 !important;
+      --bs-btn-active-bg: #cba6f7 !important;
+      --bs-btn-active-border-color: #cba6f7 !important;
+      --bs-btn-disabled-color: #cba6f7 !important;
+      --bs-btn-disabled-border-color: #cba6f7 !important;
+    }
+
+    /* Dropdown active item */
+    .dropdown-menu {
+      --bs-dropdown-link-active-bg: #cba6f7 !important;
+      --bs-dropdown-link-active-color: #11111b !important;
+      --bs-dropdown-bg: #313244 !important;
+      --bs-dropdown-color: #cdd6f4 !important;
+      --bs-dropdown-link-color: #cdd6f4 !important;
+      --bs-dropdown-link-hover-bg: #45475a !important;
+      --bs-dropdown-link-hover-color: #cdd6f4 !important;
+      --bs-dropdown-border-color: #45475a !important;
+    }
+
+    /* Nav tabs active submenu */
+    .nav-tabs .nav-submenu .nav-item.active {
       color: #cba6f7 !important;
+    }
+
+    /* Link primary */
+    .link-primary {
+      color: #cba6f7 !important;
+    }
+
+    /* Pagination */
+    .pagination {
+      --bs-pagination-active-bg: #cba6f7 !important;
+      --bs-pagination-active-border-color: #cba6f7 !important;
+      --bs-pagination-active-color: #11111b !important;
+      --bs-pagination-focus-box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
+    }
+
+    /* Progress bars */
+    .progress {
+      --bs-progress-bar-bg: #cba6f7 !important;
+    }
+
+    /* List group active */
+    .list-group {
+      --bs-list-group-active-color: #cba6f7 !important;
+      --bs-list-group-active-bg: rgba(203, 166, 247, 0.1) !important;
+    }
+
+    /* Form help tooltip */
+    .form-help:hover,
+    .form-help[aria-describedby] {
+      background: #cba6f7 !important;
+      color: #11111b !important;
     }
 
     #right-panel .hd {
