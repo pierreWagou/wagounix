@@ -34,7 +34,7 @@ in
       "SITE_NAME = 'Wagou Disk'"
       "SITE_TITLE = 'Wagou Disk'"
       "LOGO_PATH = 'custom/logo.svg'"
-      "LOGO_WIDTH = 150"
+      "LOGO_WIDTH = 300"
       "LOGO_HEIGHT = 40"
       "FAVICON_PATH = 'custom/favicon.svg'"
       "LOGIN_BG_IMAGE_PATH = 'custom/login-bg.jpg'"
