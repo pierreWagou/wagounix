@@ -635,8 +635,6 @@ let
     /* Nav pills (sidebar navigation in SPA) */
     .nav.nav-pills {
       background-color: #181825 !important;
-      --bs-nav-pills-link-active-bg: #cba6f7 !important;
-      --bs-nav-pills-link-active-color: #11111b !important;
     }
 
     .nav-pills .nav-link {
@@ -654,7 +652,7 @@ let
       color: #11111b !important;
     }
 
-    /* === Override ALL component-level orange (#ff9800) accent === */
+    /* === Override ALL orange (#ff9800) accents with direct properties === */
 
     /* Checkboxes & radio buttons */
     .form-check-input:checked {
@@ -681,39 +679,51 @@ let
       background-color: #cba6f7 !important;
     }
 
-    /* Primary buttons (component-level vars) */
-    .btn-primary {
-      --bs-btn-bg: #cba6f7 !important;
-      --bs-btn-border-color: #cba6f7 !important;
-      --bs-btn-hover-bg: #b4befe !important;
-      --bs-btn-hover-border-color: #b4befe !important;
-      --bs-btn-active-bg: #b4befe !important;
-      --bs-btn-active-border-color: #b4befe !important;
-      --bs-btn-disabled-bg: #cba6f7 !important;
-      --bs-btn-disabled-border-color: #cba6f7 !important;
+    /* Primary buttons — override actual properties */
+    .btn-primary,
+    .btn-primary:focus {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+      color: #11111b !important;
+    }
+
+    .btn-primary:hover {
+      background-color: #b4befe !important;
+      border-color: #b4befe !important;
+      color: #11111b !important;
+    }
+
+    .btn-primary:active,
+    .btn-primary.active {
+      background-color: #b4befe !important;
+      border-color: #b4befe !important;
+      color: #11111b !important;
+    }
+
+    .btn-primary:disabled,
+    .btn-primary.disabled {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+      opacity: 0.5 !important;
     }
 
     .btn-outline-primary {
-      --bs-btn-color: #cba6f7 !important;
-      --bs-btn-border-color: #cba6f7 !important;
-      --bs-btn-hover-bg: #cba6f7 !important;
-      --bs-btn-hover-border-color: #cba6f7 !important;
-      --bs-btn-active-bg: #cba6f7 !important;
-      --bs-btn-active-border-color: #cba6f7 !important;
-      --bs-btn-disabled-color: #cba6f7 !important;
-      --bs-btn-disabled-border-color: #cba6f7 !important;
+      color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
     }
 
-    /* Dropdown active item */
-    .dropdown-menu {
-      --bs-dropdown-link-active-bg: #cba6f7 !important;
-      --bs-dropdown-link-active-color: #11111b !important;
-      --bs-dropdown-bg: #313244 !important;
-      --bs-dropdown-color: #cdd6f4 !important;
-      --bs-dropdown-link-color: #cdd6f4 !important;
-      --bs-dropdown-link-hover-bg: #45475a !important;
-      --bs-dropdown-link-hover-color: #cdd6f4 !important;
-      --bs-dropdown-border-color: #45475a !important;
+    .btn-outline-primary:hover,
+    .btn-outline-primary:active {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+      color: #11111b !important;
+    }
+
+    /* Dropdown active item — direct override */
+    .dropdown-item:active,
+    .dropdown-item.active {
+      background-color: #cba6f7 !important;
+      color: #11111b !important;
     }
 
     /* Nav tabs active submenu */
@@ -726,23 +736,31 @@ let
       color: #cba6f7 !important;
     }
 
-    /* Pagination */
-    .pagination {
-      --bs-pagination-active-bg: #cba6f7 !important;
-      --bs-pagination-active-border-color: #cba6f7 !important;
-      --bs-pagination-active-color: #11111b !important;
-      --bs-pagination-focus-box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
+    .link-primary:hover {
+      color: #b4befe !important;
+    }
+
+    /* Pagination active */
+    .page-item.active .page-link {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
+      color: #11111b !important;
+    }
+
+    .page-link:focus {
+      box-shadow: 0 0 0 2px rgba(203, 166, 247, 0.25) !important;
     }
 
     /* Progress bars */
-    .progress {
-      --bs-progress-bar-bg: #cba6f7 !important;
+    .progress-bar {
+      background-color: #cba6f7 !important;
     }
 
     /* List group active */
-    .list-group {
-      --bs-list-group-active-color: #cba6f7 !important;
-      --bs-list-group-active-bg: rgba(203, 166, 247, 0.1) !important;
+    .list-group-item.active {
+      color: #cba6f7 !important;
+      background-color: rgba(203, 166, 247, 0.1) !important;
+      border-color: #45475a !important;
     }
 
     /* Form help tooltip */
@@ -750,6 +768,29 @@ let
     .form-help[aria-describedby] {
       background: #cba6f7 !important;
       color: #11111b !important;
+    }
+
+    /* Calendar dot indicator */
+    .table-calendar-link:before {
+      background: #cba6f7 !important;
+    }
+
+    .table-calendar-link:hover {
+      background: #cba6f7 !important;
+      color: #11111b !important;
+    }
+
+    /* Nav item active indicator (::before pseudo-element) */
+    .nav-item::before,
+    .nav-item.active::before,
+    .nav-link::before,
+    .nav-link.active::before,
+    .side-nav .nav-item::before,
+    .side-nav .nav-item.active::before,
+    [class*="nav-item"]::before,
+    [class*="nav-item"].active::before {
+      background-color: #cba6f7 !important;
+      border-color: #cba6f7 !important;
     }
 
     #right-panel .hd {
