@@ -788,9 +788,14 @@ let
     .side-nav .nav-item::before,
     .side-nav .nav-item.active::before,
     [class*="nav-item"]::before,
-    [class*="nav-item"].active::before {
+    [class*="nav-item"].active::before,
+    [class*="nav-indicator"]::before,
+    [class*="indicator-container"]::before,
+    .nav-indicator-container::before,
+    .nav .nav-indicator-container::before {
       background-color: #cba6f7 !important;
       border-color: #cba6f7 !important;
+      background: #cba6f7 !important;
     }
 
     #right-panel .hd {
