@@ -26,5 +26,6 @@ _: {
     ./kitchenowl.nix
     ./authentik.nix
     ./seafile.nix
+    ./branding.nix
   ];
 }
