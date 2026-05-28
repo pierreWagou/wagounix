@@ -178,7 +178,7 @@ let
     .side-nav .nav-item:hover, .side-nav a:hover, .side-panel a:hover { color: var(--ctp-text) !important; background-color: var(--ctp-surface0) !important; }
     .side-nav .nav-item.active, .side-nav .nav-item.active a { color: var(--ctp-lavender) !important; background-color: var(--ctp-surface0) !important; }
 
-    a { color: var(--ctp-blue) !important; }
+    a { color: var(--ctp-mauve) !important; }
     a:hover { color: var(--ctp-lavender) !important; }
 
     /* Buttons */
@@ -253,7 +253,7 @@ let
     .contextmenu li:hover, .context-menu li:hover, [class*="context-menu"] li:hover { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
 
     /* Misc */
-    .link-primary { color: var(--ctp-blue) !important; }
+    .link-primary { color: var(--ctp-mauve) !important; }
     .link-primary:hover { color: var(--ctp-lavender) !important; }
     .page-link { background-color: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; color: var(--ctp-text) !important; }
     .page-link:hover { background-color: var(--ctp-surface1) !important; color: var(--ctp-mauve) !important; }
@@ -268,7 +268,7 @@ let
     .alert-danger, .alert-error { background-color: rgba(var(--bs-primary-rgb), 0.05) !important; border-color: var(--ctp-red) !important; color: var(--ctp-red) !important; }
     .alert-warning { background-color: rgba(var(--bs-primary-rgb), 0.05) !important; border-color: var(--ctp-yellow) !important; color: var(--ctp-yellow) !important; }
     .path-container, .breadcrumb { background-color: transparent !important; color: var(--ctp-subtext0) !important; }
-    .breadcrumb a { color: var(--ctp-blue) !important; }
+    .breadcrumb a { color: var(--ctp-mauve) !important; }
     .toolbar, .dir-tool-bar, .operation-toolbar { background-color: var(--ctp-base) !important; border-bottom: 1px solid var(--ctp-surface0) !important; }
     .search-input, .search-container input { background-color: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; color: var(--ctp-text) !important; }
     .tooltip-inner { background-color: var(--ctp-surface0) !important; color: var(--ctp-text) !important; }
@@ -319,10 +319,10 @@ let
     #wrapper { background-color: var(--ctp-base) !important; color: var(--ctp-text) !important; }
     #right-panel .hd { border-bottom-color: var(--ctp-surface1) !important; }
     #right-panel .hd .tab { color: var(--ctp-subtext0) !important; }
-    #right-panel .hd .tab:hover, #right-panel .hd .tab.current { color: var(--ctp-blue) !important; border-bottom-color: var(--ctp-blue) !important; }
+    #right-panel .hd .tab:hover, #right-panel .hd .tab.current { color: var(--ctp-mauve) !important; border-bottom-color: var(--ctp-mauve) !important; }
     .side-tabnav-tabs { background-color: var(--ctp-mantle) !important; }
     .side-tabnav-tabs .tab a { color: var(--ctp-subtext0) !important; }
-    .side-tabnav-tabs .tab a:hover, .side-tabnav-tabs .tab-cur a { color: var(--ctp-blue) !important; background-color: var(--ctp-surface0) !important; }
+    .side-tabnav-tabs .tab a:hover, .side-tabnav-tabs .tab-cur a { color: var(--ctp-mauve) !important; background-color: var(--ctp-surface0) !important; }
     .account-popup, .account-popup .sf-popover-con { background-color: var(--ctp-surface0) !important; }
     .account-popup a.item { color: var(--ctp-text) !important; }
     .account-popup a.item:hover { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
