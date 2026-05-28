@@ -73,14 +73,8 @@ let
   # === Logo Generator ===
   mkLogo =
     name:
-    let
-      textContent = "WAGOU ${name}";
-      textLen = builtins.stringLength textContent;
-      textWidth = textLen * 10 + 10;
-      totalWidth = 38 + textWidth;
-    in
     pkgs.writeText "logo-${lib.toLower name}.svg" ''
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${toString totalWidth} 40" width="${toString totalWidth}" height="40">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 40" preserveAspectRatio="xMinYMid meet">
         <defs>
           <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${gradient.start}"/>
