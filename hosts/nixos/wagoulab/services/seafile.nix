@@ -176,9 +176,9 @@ let
 
     .side-nav .nav-item, .side-nav a, .side-panel a { color: var(--ctp-subtext0) !important; }
     .side-nav .nav-item:hover, .side-nav a:hover, .side-panel a:hover { color: var(--ctp-text) !important; background-color: var(--ctp-surface0) !important; }
-    .side-nav .nav-item.active, .side-nav .nav-item.active a { color: var(--ctp-mauve) !important; background-color: var(--ctp-surface0) !important; }
+    .side-nav .nav-item.active, .side-nav .nav-item.active a { color: var(--ctp-lavender) !important; background-color: var(--ctp-surface0) !important; }
 
-    a { color: var(--ctp-mauve) !important; }
+    a { color: var(--ctp-blue) !important; }
     a:hover { color: var(--ctp-lavender) !important; }
 
     /* Buttons */
@@ -193,7 +193,7 @@ let
     .modal-header, .modal-footer { border-color: var(--ctp-surface1) !important; }
     .dropdown-menu { background-color: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important; }
     .dropdown-item { color: var(--ctp-text) !important; }
-    .dropdown-item:hover, .dropdown-item:focus { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
+    .dropdown-item:hover, .dropdown-item:focus { background-color: var(--ctp-lavender) !important; color: var(--ctp-crust) !important; }
     .dropdown-item:active, .dropdown-item.active { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
 
     /* Seafile popover */
@@ -208,12 +208,12 @@ let
     input:focus, textarea:focus, select:focus, .form-control:focus, .form-select:focus { border-color: var(--ctp-mauve) !important; box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25) !important; }
     input::placeholder, textarea::placeholder { color: var(--ctp-overlay0) !important; }
     select option { background-color: var(--ctp-surface0) !important; color: var(--ctp-text) !important; }
-    .form-check-input:checked { background-color: var(--ctp-mauve) !important; border-color: var(--ctp-mauve) !important; }
+    .form-check-input:checked { background-color: var(--ctp-green) !important; border-color: var(--ctp-green) !important; }
     .form-check-input[type=checkbox]:indeterminate { background-color: var(--ctp-mauve) !important; border-color: var(--ctp-mauve) !important; }
     .form-check-input:focus { box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25) !important; border-color: var(--ctp-mauve) !important; }
     .form-range::-webkit-slider-thumb { background-color: var(--ctp-mauve) !important; }
     .form-range::-moz-range-thumb { background-color: var(--ctp-mauve) !important; }
-    .custom-switch-input:checked ~ .custom-switch-indicator { background: var(--ctp-mauve) !important; }
+    .custom-switch-input:checked ~ .custom-switch-indicator { background: var(--ctp-green) !important; }
     .custom-control-input:checked ~ .custom-control-label:before { background-color: var(--ctp-mauve) !important; border-color: var(--ctp-mauve) !important; }
     .form-fieldset { background: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; }
     .form-help:hover, .form-help[aria-describedby] { background: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
@@ -230,13 +230,13 @@ let
     .nav.nav-pills { background-color: var(--ctp-mantle) !important; }
     .nav-pills .nav-link { color: var(--ctp-subtext0) !important; }
     .nav-pills .nav-link:hover { background-color: var(--ctp-surface0) !important; color: var(--ctp-text) !important; }
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: var(--ctp-lavender) !important; color: var(--ctp-crust) !important; }
 
     /* Nav tabs */
     .nav-tabs .nav-link { color: var(--ctp-subtext0) !important; }
-    .nav-tabs .nav-link.active { color: var(--ctp-mauve) !important; border-bottom-color: var(--ctp-mauve) !important; background-color: transparent !important; }
+    .nav-tabs .nav-link.active { color: var(--ctp-lavender) !important; border-bottom-color: var(--ctp-lavender) !important; background-color: transparent !important; }
     .nav-tabs { border-bottom-color: var(--ctp-surface0) !important; }
-    .nav-tabs .nav-submenu .nav-item.active { color: var(--ctp-mauve) !important; }
+    .nav-tabs .nav-submenu .nav-item.active { color: var(--ctp-lavender) !important; }
 
     /* Nav active indicators (::before) */
     .nav-item::before, .nav-item.active::before, .nav-link::before, .nav-link.active::before,
@@ -253,7 +253,7 @@ let
     .contextmenu li:hover, .context-menu li:hover, [class*="context-menu"] li:hover { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
 
     /* Misc */
-    .link-primary { color: var(--ctp-mauve) !important; }
+    .link-primary { color: var(--ctp-blue) !important; }
     .link-primary:hover { color: var(--ctp-lavender) !important; }
     .page-link { background-color: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; color: var(--ctp-text) !important; }
     .page-link:hover { background-color: var(--ctp-surface1) !important; color: var(--ctp-mauve) !important; }
@@ -268,7 +268,7 @@ let
     .alert-danger, .alert-error { background-color: rgba(var(--bs-primary-rgb), 0.05) !important; border-color: var(--ctp-red) !important; color: var(--ctp-red) !important; }
     .alert-warning { background-color: rgba(var(--bs-primary-rgb), 0.05) !important; border-color: var(--ctp-yellow) !important; color: var(--ctp-yellow) !important; }
     .path-container, .breadcrumb { background-color: transparent !important; color: var(--ctp-subtext0) !important; }
-    .breadcrumb a { color: var(--ctp-mauve) !important; }
+    .breadcrumb a { color: var(--ctp-blue) !important; }
     .toolbar, .dir-tool-bar, .operation-toolbar { background-color: var(--ctp-base) !important; border-bottom: 1px solid var(--ctp-surface0) !important; }
     .search-input, .search-container input { background-color: var(--ctp-surface0) !important; border-color: var(--ctp-surface1) !important; color: var(--ctp-text) !important; }
     .tooltip-inner { background-color: var(--ctp-surface0) !important; color: var(--ctp-text) !important; }
@@ -281,7 +281,7 @@ let
     .table-calendar-link:before { background: var(--ctp-mauve) !important; }
     .table-calendar-link:hover { background: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
     .sf-icon, .op-icon, svg.icon { color: var(--ctp-subtext0) !important; }
-    .sf-icon:hover, .op-icon:hover { color: var(--ctp-mauve) !important; }
+    .sf-icon:hover, .op-icon:hover { color: var(--ctp-peach) !important; }
 
     /* Color variety — use other Catppuccin palette colors for visual interest */
     /* Folder icons: Blue */
@@ -319,10 +319,10 @@ let
     #wrapper { background-color: var(--ctp-base) !important; color: var(--ctp-text) !important; }
     #right-panel .hd { border-bottom-color: var(--ctp-surface1) !important; }
     #right-panel .hd .tab { color: var(--ctp-subtext0) !important; }
-    #right-panel .hd .tab:hover, #right-panel .hd .tab.current { color: var(--ctp-mauve) !important; border-bottom-color: var(--ctp-mauve) !important; }
+    #right-panel .hd .tab:hover, #right-panel .hd .tab.current { color: var(--ctp-blue) !important; border-bottom-color: var(--ctp-blue) !important; }
     .side-tabnav-tabs { background-color: var(--ctp-mantle) !important; }
     .side-tabnav-tabs .tab a { color: var(--ctp-subtext0) !important; }
-    .side-tabnav-tabs .tab a:hover, .side-tabnav-tabs .tab-cur a { color: var(--ctp-mauve) !important; background-color: var(--ctp-surface0) !important; }
+    .side-tabnav-tabs .tab a:hover, .side-tabnav-tabs .tab-cur a { color: var(--ctp-blue) !important; background-color: var(--ctp-surface0) !important; }
     .account-popup, .account-popup .sf-popover-con { background-color: var(--ctp-surface0) !important; }
     .account-popup a.item { color: var(--ctp-text) !important; }
     .account-popup a.item:hover { background-color: var(--ctp-mauve) !important; color: var(--ctp-crust) !important; }
