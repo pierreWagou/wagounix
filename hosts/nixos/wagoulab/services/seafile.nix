@@ -846,9 +846,9 @@ let
     }
   '';
 
-  # SVG logo: "WAGOU DISK" with neon Mauve glow
+  # SVG logo: favicon icon + "WAGOU DISK" text
   logoSvg = pkgs.writeText "seafile-logo.svg" ''
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" width="220" height="40">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 40" width="250" height="40">
       <defs>
         <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur"/>
@@ -863,9 +863,19 @@ let
           </feMerge>
         </filter>
       </defs>
-      <text x="10" y="28"
+      <!-- Favicon icon -->
+      <rect x="2" y="4" width="32" height="32" rx="6" fill="#1e1e2e"/>
+      <rect x="3" y="5" width="30" height="30" rx="5" fill="none" stroke="#cba6f7" stroke-width="1.5" opacity="0.5"/>
+      <text x="18" y="26"
+            font-family="'JetBrains Mono', monospace"
+            font-size="13"
+            font-weight="700"
+            fill="#cba6f7"
+            text-anchor="middle">WD</text>
+      <!-- Text -->
+      <text x="44" y="27"
             font-family="'JetBrains Mono', 'Fira Code', 'SF Mono', monospace"
-            font-size="20"
+            font-size="18"
             font-weight="700"
             letter-spacing="2"
             fill="#cba6f7"
@@ -909,7 +919,7 @@ in
       "SITE_NAME = 'Wagou Disk'"
       "SITE_TITLE = 'Wagou Disk'"
       "LOGO_PATH = 'custom/logo.svg'"
-      "LOGO_WIDTH = 220"
+      "LOGO_WIDTH = 250"
       "LOGO_HEIGHT = 40"
       "FAVICON_PATH = 'custom/favicon.svg'"
       "LOGIN_BG_IMAGE_PATH = 'custom/login-bg.jpg'"
