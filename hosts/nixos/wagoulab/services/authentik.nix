@@ -36,10 +36,10 @@ let
           domain: authentik-default
         attrs:
           default: true
-          branding_title: Wagou
-          branding_logo: /media/branding/logo.svg
-          branding_favicon: /media/branding/favicon.svg
-          branding_default_flow_background: https://dash.${host.domain}/bg/city.jpg
+      branding_title: Wagou
+      branding_logo: https://dash.${host.domain}/bg/favicon.svg
+      branding_favicon: https://dash.${host.domain}/bg/favicon.svg
+      branding_default_flow_background: https://dash.${host.domain}/bg/city.jpg
           branding_custom_css: |
     ${indentedCss}
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
@@ -71,8 +71,6 @@ in
           "/var/lib/authentik/media:/media"
           "/var/lib/authentik/templates:/templates"
           "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
-          "${branding.mkLogo "AUTH"}:/media/branding/logo.svg:ro"
-          "${branding.favicon}:/media/branding/favicon.svg:ro"
         ];
         exec = [ "server" ];
         labels = {
@@ -102,8 +100,6 @@ in
           "/var/lib/authentik/media:/media"
           "/var/lib/authentik/templates:/templates"
           "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
-          "${branding.mkLogo "AUTH"}:/media/branding/logo.svg:ro"
-          "${branding.favicon}:/media/branding/favicon.svg:ro"
         ];
         exec = [ "worker" ];
       };
@@ -143,7 +139,6 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/authentik 0755 root root -"
     "d /var/lib/authentik/media 0755 root root -"
-    "d /var/lib/authentik/media/branding 0755 root root -"
     "d /var/lib/authentik/templates 0755 root root -"
     "d /var/lib/authentik-postgres 0755 root root -"
     "d /var/lib/authentik-redis 0755 root root -"
