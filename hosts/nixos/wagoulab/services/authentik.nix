@@ -37,7 +37,7 @@ let
         attrs:
           default: true
           branding_title: Wagou
-          branding_logo: https://dash.${host.domain}/bg/favicon.svg
+          branding_logo: https://dash.${host.domain}/bg/logo-auth.svg
           branding_favicon: https://dash.${host.domain}/bg/favicon.svg
           branding_default_flow_background: https://dash.${host.domain}/bg/city.jpg
           branding_custom_css: |

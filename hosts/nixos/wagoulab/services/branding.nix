@@ -106,17 +106,26 @@ let
 
   # === Authentik CSS ===
   authentikCss = ''
+    /* Catppuccin for Authentik — Light: Latte, Dark: Mocha */
+
+    /* === Light mode === */
     :root {
       --ak-accent: ${latte.mauve};
       --pf-global--primary-color--100: ${latte.mauve};
+      --pf-global--primary-color--dark-100: ${latte.mauve};
       --pf-global--link--Color: ${latte.mauve};
       --pf-global--link--Color--hover: ${latte.lavender};
+      --pf-global--link--Color--dark: ${latte.mauve};
+      --pf-global--link--Color--dark--hover: ${latte.lavender};
       --pf-global--BackgroundColor--100: ${latte.base};
       --pf-global--BackgroundColor--200: ${latte.mantle};
       --pf-global--Color--100: ${latte.text};
       --pf-global--Color--200: ${latte.subtext0};
       --pf-global--BorderColor--100: ${latte.surface0};
+      --pf-global--active-color--100: ${latte.mauve};
     }
+
+    /* === Dark mode === */
     html[data-theme=dark] {
       --ak-accent: ${mocha.mauve};
       --ak-dark-background: ${mocha.base};
@@ -124,17 +133,173 @@ let
       --ak-dark-background-lighter: ${mocha.surface0};
       --ak-dark-foreground: ${mocha.text};
       --pf-global--primary-color--100: ${mocha.mauve};
+      --pf-global--primary-color--light-100: ${mocha.mauve};
       --pf-global--link--Color: ${mocha.mauve};
       --pf-global--link--Color--hover: ${mocha.lavender};
+      --pf-global--link--Color--light: ${mocha.mauve};
       --pf-global--BackgroundColor--100: ${mocha.base};
       --pf-global--BackgroundColor--200: ${mocha.mantle};
       --pf-global--BackgroundColor--dark-100: ${mocha.base};
       --pf-global--BackgroundColor--dark-200: ${mocha.mantle};
       --pf-global--BackgroundColor--dark-300: ${mocha.surface0};
+      --pf-global--BackgroundColor--light-100: ${mocha.surface0};
+      --pf-global--BackgroundColor--light-300: ${mocha.surface1};
       --pf-global--Color--100: ${mocha.text};
       --pf-global--Color--200: ${mocha.subtext0};
+      --pf-global--Color--light-100: ${mocha.crust};
       --pf-global--BorderColor--100: ${mocha.surface1};
+      --pf-global--active-color--100: ${mocha.mauve};
     }
+
+    /* === Buttons (direct overrides for Shadow DOM penetration) === */
+    .pf-c-button.pf-m-primary {
+      background-color: var(--ak-accent) !important;
+      border-color: var(--ak-accent) !important;
+      color: ${mocha.crust} !important;
+    }
+    .pf-c-button.pf-m-primary:hover,
+    .pf-c-button.pf-m-primary:focus {
+      background-color: ${mocha.lavender} !important;
+      border-color: ${mocha.lavender} !important;
+    }
+    .pf-c-button.pf-m-secondary {
+      border-color: var(--ak-accent) !important;
+      color: var(--ak-accent) !important;
+    }
+    .pf-c-button.pf-m-secondary:hover {
+      background-color: var(--ak-accent) !important;
+      color: ${mocha.crust} !important;
+    }
+    .pf-c-button.pf-m-link {
+      color: var(--ak-accent) !important;
+    }
+    .pf-c-button.pf-m-link:hover {
+      color: ${mocha.lavender} !important;
+    }
+
+    /* === Links & clickable text === */
+    a, a:visited {
+      color: var(--pf-global--link--Color) !important;
+    }
+    a:hover {
+      color: var(--pf-global--link--Color--hover) !important;
+    }
+
+    /* === Switches / toggles === */
+    .pf-c-switch__input:checked ~ .pf-c-switch__toggle {
+      background-color: ${mocha.green} !important;
+    }
+    .pf-c-switch__input:checked ~ .pf-c-switch__toggle::before {
+      border-color: ${mocha.green} !important;
+    }
+
+    /* === Tabs (admin navigation) === */
+    .pf-c-tabs__link::after {
+      border-bottom-color: transparent !important;
+    }
+    .pf-c-tabs__item.pf-m-current .pf-c-tabs__link::after {
+      border-bottom-color: var(--ak-accent) !important;
+    }
+    .pf-c-tabs__item.pf-m-current .pf-c-tabs__link {
+      color: var(--ak-accent) !important;
+    }
+
+    /* === Badges / labels === */
+    .pf-c-badge.pf-m-read {
+      background-color: ${mocha.surface1} !important;
+      color: ${mocha.text} !important;
+    }
+    .pf-c-badge.pf-m-unread {
+      background-color: var(--ak-accent) !important;
+      color: ${mocha.crust} !important;
+    }
+
+    /* === Charts / diagrams — use Catppuccin palette === */
+    .ct-series-a .ct-bar,
+    .ct-series-a .ct-line,
+    .ct-series-a .ct-point,
+    .ct-series-a .ct-slice-donut,
+    .ct-series-a .ct-area {
+      stroke: ${mocha.mauve} !important;
+      fill: ${mocha.mauve} !important;
+    }
+    .ct-series-b .ct-bar,
+    .ct-series-b .ct-line,
+    .ct-series-b .ct-point,
+    .ct-series-b .ct-slice-donut,
+    .ct-series-b .ct-area {
+      stroke: ${mocha.blue} !important;
+      fill: ${mocha.blue} !important;
+    }
+    .ct-series-c .ct-bar,
+    .ct-series-c .ct-line,
+    .ct-series-c .ct-point,
+    .ct-series-c .ct-slice-donut,
+    .ct-series-c .ct-area {
+      stroke: ${mocha.green} !important;
+      fill: ${mocha.green} !important;
+    }
+    .ct-series-d .ct-bar,
+    .ct-series-d .ct-line,
+    .ct-series-d .ct-point,
+    .ct-series-d .ct-slice-donut,
+    .ct-series-d .ct-area {
+      stroke: ${mocha.peach} !important;
+      fill: ${mocha.peach} !important;
+    }
+    .ct-series-e .ct-bar,
+    .ct-series-e .ct-line,
+    .ct-series-e .ct-point,
+    .ct-series-e .ct-slice-donut,
+    .ct-series-e .ct-area {
+      stroke: ${mocha.lavender} !important;
+      fill: ${mocha.lavender} !important;
+    }
+    /* Chart.js canvas fallback */
+    canvas {
+      filter: hue-rotate(0deg) !important;
+    }
+    /* Chart grid lines */
+    .ct-grid {
+      stroke: ${mocha.surface1} !important;
+    }
+    .ct-label {
+      color: ${mocha.subtext0} !important;
+      fill: ${mocha.subtext0} !important;
+    }
+
+    /* === Cards (admin panels) === */
+    .pf-c-card {
+      --pf-c-card--BackgroundColor: ${mocha.surface0} !important;
+      background-color: ${mocha.surface0} !important;
+      border-color: ${mocha.surface1} !important;
+    }
+
+    /* === Navigation active indicator === */
+    .pf-c-nav__link.pf-m-current,
+    .pf-c-nav__link.pf-m-current::after {
+      color: var(--ak-accent) !important;
+      border-left-color: var(--ak-accent) !important;
+    }
+
+    /* === Form inputs === */
+    .pf-c-form-control:focus {
+      border-color: var(--ak-accent) !important;
+      box-shadow: 0 0 0 1px var(--ak-accent) !important;
+    }
+
+    /* === Progress / loading === */
+    .pf-c-spinner__path {
+      stroke: var(--ak-accent) !important;
+    }
+
+    /* === Chips / tags === */
+    .pf-c-chip {
+      background-color: ${mocha.surface0} !important;
+      border-color: ${mocha.surface1} !important;
+    }
+
+    /* === Login page === */
     .pf-c-login__main {
       background-color: rgba(49, 50, 68, 0.85) !important;
       border: 1px solid ${mocha.surface1} !important;
@@ -147,14 +312,18 @@ let
         border: 1px solid ${latte.surface0} !important;
       }
     }
-    .pf-c-button.pf-m-primary {
-      background-color: var(--ak-accent) !important;
-      border-color: var(--ak-accent) !important;
-    }
-    .pf-c-button.pf-m-primary:hover { opacity: 0.85 !important; }
+
+    /* === Scrollbar === */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: ${mocha.mantle}; }
     ::-webkit-scrollbar-thumb { background: ${mocha.surface1}; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: ${mocha.surface2}; }
+
+    /* === Selection === */
+    ::selection {
+      background-color: rgba(203, 166, 247, 0.3);
+      color: ${mocha.text};
+    }
   '';
 
   # === Seafile CSS (full theme) ===
