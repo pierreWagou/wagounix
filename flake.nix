@@ -38,6 +38,10 @@
       url = "github:Dashlane/homebrew-tap";
       flake = false;
     };
+    homebrew-alerter = {
+      url = "github:vjeantet/homebrew-tap";
+      flake = false;
+    };
     # SAP-specific — remove when SAP Mac is returned
     homebrew-hai = {
       url = "git+https://github.tools.sap/hAIperspace/hai-homebrew.git";
