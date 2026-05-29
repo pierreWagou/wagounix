@@ -14,7 +14,7 @@ in
       ];
       environments = {
         OPEN_REGISTRATION = "true";
-        OIDC_ISSUER = "https://cipher.${host.domain}/application/o/kitchen-owl/";
+        OIDC_ISSUER = "https://auth.${host.domain}/application/o/kitchen-owl/";
         OIDC_CLIENT_ID = "kitchenowl";
         FRONT_URL = "https://cabas.${host.domain}";
       };

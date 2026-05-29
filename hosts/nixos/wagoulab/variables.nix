@@ -25,7 +25,7 @@ rec {
     "creneau"
     "relay"
     "cabas"
-    "cipher"
+    "auth"
     "disk"
     "assets"
   ];

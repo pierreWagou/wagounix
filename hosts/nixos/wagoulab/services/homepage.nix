@@ -170,7 +170,7 @@ let
         {
           "Authentik" = {
             icon = "authentik.svg";
-            href = "https://cipher.${host.domain}";
+            href = "https://auth.${host.domain}";
             description = "Identity provider";
             siteMonitor = "http://authentik-server:9000";
           };
