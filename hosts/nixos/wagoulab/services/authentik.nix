@@ -80,7 +80,7 @@ in
         exec = [ "server" ];
         labels = {
           "traefik.enable" = "true";
-          "traefik.http.routers.authentik.rule" = "Host(`cipher.${host.domain}`)";
+          "traefik.http.routers.authentik.rule" = "Host(`auth.${host.domain}`)";
           "traefik.http.routers.authentik.entrypoints" = "websecure";
           "traefik.http.routers.authentik.tls" = "true";
           "traefik.http.routers.authentik.middlewares" = "secure-headers@file";
