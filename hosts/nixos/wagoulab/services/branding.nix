@@ -590,36 +590,6 @@ let
 
 in
 {
-  # === imgproxy container for serving branding assets ===
-  virtualisation.quadlet.containers.imgproxy = {
-    containerConfig = {
-      image = "docker.io/darthsim/imgproxy:v4.0.3";
-      noNewPrivileges = true;
-      networks = [ networks.proxy.ref ];
-      volumes = [ "${brandingDir}:/images:ro" ];
-      environments = {
-        IMGPROXY_LOCAL_FILESYSTEM_ROOT = "/images";
-        IMGPROXY_ALLOWED_SOURCES = "local://";
-        IMGPROXY_WORKERS = "2";
-        IMGPROXY_MALLOC = "jemalloc";
-        IMGPROXY_TTL = "86400";
-        IMGPROXY_USE_ETAG = "true";
-        IMGPROXY_SKIP_PROCESSING_FORMATS = "svg";
-        IMGPROXY_SANITIZE_SVG = "true";
-        IMGPROXY_MAX_SRC_RESOLUTION = "50";
-        IMGPROXY_QUALITY = "80";
-      };
-      labels = {
-        "traefik.enable" = "true";
-        "traefik.http.routers.imgproxy.rule" = "Host(`assets.${host.domain}`)";
-        "traefik.http.routers.imgproxy.entrypoints" = "websecure";
-        "traefik.http.routers.imgproxy.tls" = "true";
-        "traefik.http.routers.imgproxy.middlewares" = "secure-headers@file";
-        "traefik.http.services.imgproxy.loadbalancer.server.port" = "8080";
-      };
-    };
-  };
-
   options.wagou.branding = {
     palette.mocha = mkOption {
       type = types.attrs;
@@ -695,6 +665,38 @@ in
       default = urls;
       readOnly = true;
       description = "Pre-built URLs for common branding assets";
+    };
+  };
+
+  config = {
+    # === imgproxy container for serving branding assets ===
+    virtualisation.quadlet.containers.imgproxy = {
+      containerConfig = {
+        image = "docker.io/darthsim/imgproxy:v4.0.3";
+        noNewPrivileges = true;
+        networks = [ networks.proxy.ref ];
+        volumes = [ "${brandingDir}:/images:ro" ];
+        environments = {
+          IMGPROXY_LOCAL_FILESYSTEM_ROOT = "/images";
+          IMGPROXY_ALLOWED_SOURCES = "local://";
+          IMGPROXY_WORKERS = "2";
+          IMGPROXY_MALLOC = "jemalloc";
+          IMGPROXY_TTL = "86400";
+          IMGPROXY_USE_ETAG = "true";
+          IMGPROXY_SKIP_PROCESSING_FORMATS = "svg";
+          IMGPROXY_SANITIZE_SVG = "true";
+          IMGPROXY_MAX_SRC_RESOLUTION = "50";
+          IMGPROXY_QUALITY = "80";
+        };
+        labels = {
+          "traefik.enable" = "true";
+          "traefik.http.routers.imgproxy.rule" = "Host(`assets.${host.domain}`)";
+          "traefik.http.routers.imgproxy.entrypoints" = "websecure";
+          "traefik.http.routers.imgproxy.tls" = "true";
+          "traefik.http.routers.imgproxy.middlewares" = "secure-headers@file";
+          "traefik.http.services.imgproxy.loadbalancer.server.port" = "8080";
+        };
+      };
     };
   };
 }
