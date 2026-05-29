@@ -19,6 +19,7 @@
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-tap" = inputs.homebrew-dashlane;
+      "vjeantet/homebrew-tap" = inputs.homebrew-alerter;
     };
   };
 
@@ -31,6 +32,7 @@
     };
     taps = builtins.attrNames config.nix-homebrew.taps;
     brews = [
+      "alerter"
       "dashlane-cli"
       "yarn"
     ];

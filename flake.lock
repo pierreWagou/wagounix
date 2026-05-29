@@ -91,6 +91,22 @@
         "type": "github"
       }
     },
+    "homebrew-alerter": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779832383,
+        "narHash": "sha256-+Xxy1QnCeMKSv2bL/bzZm0Ak57fj8Ec5CDjK7FcdM34=",
+        "owner": "vjeantet",
+        "repo": "homebrew-tap",
+        "rev": "8d780925ad7bd9661c65f3f33cef9e9cbdde8b0a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vjeantet",
+        "repo": "homebrew-tap",
+        "type": "github"
+      }
+    },
     "homebrew-cask": {
       "flake": false,
       "locked": {
@@ -229,6 +245,7 @@
       "inputs": {
         "darwin-custom-icons": "darwin-custom-icons",
         "git-hooks": "git-hooks",
+        "homebrew-alerter": "homebrew-alerter",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "homebrew-dashlane": "homebrew-dashlane",
