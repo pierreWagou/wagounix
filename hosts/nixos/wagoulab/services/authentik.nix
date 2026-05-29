@@ -1,6 +1,5 @@
 {
   config,
-  lib,
   pkgs,
   host,
   ...
@@ -11,10 +10,10 @@ let
   inherit (config.wagou) branding;
   authentikVersion = "2026.5.0";
 
-  # Indent each line of the CSS by 8 spaces for YAML literal block
-  indentedCss = lib.concatMapStringsSep "\n" (line: if line == "" then "" else "        ${line}") (
-    lib.splitString "\n" branding.css.authentik
-  );
+  # Escape CSS for YAML double-quoted string
+  escapedCss =
+    builtins.replaceStrings [ "\\" "\"" "\n" ] [ "\\\\" "\\\"" "\\n" ]
+      branding.css.authentik;
 
   # Declarative branding blueprint — auto-applied by Authentik on startup
   brandBlueprint = pkgs.writeText "wagou-brand.yaml" ''
@@ -36,12 +35,11 @@ let
           domain: authentik-default
         attrs:
           default: true
-      branding_title: Wagou
-      branding_logo: ${branding.urls.logoAuth}
-      branding_favicon: ${branding.urls.favicon}
-      branding_default_flow_background: ${branding.urls.bgCity}
-          branding_custom_css: |
-    ${indentedCss}
+          branding_title: Wagou
+          branding_logo: "${branding.urls.logoAuth}"
+          branding_favicon: "${branding.urls.favicon}"
+          branding_default_flow_background: "${branding.urls.bgCity}"
+          branding_custom_css: "${escapedCss}"
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           flow_invalidation: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           flow_user_settings: !Find [authentik_flows.flow, [slug, default-user-settings-flow]]
