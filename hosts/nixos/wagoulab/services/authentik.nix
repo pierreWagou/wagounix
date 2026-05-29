@@ -43,6 +43,13 @@ let
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           flow_invalidation: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           flow_user_settings: !Find [authentik_flows.flow, [slug, default-user-settings-flow]]
+
+      - model: authentik_flows.flow
+        state: present
+        identifiers:
+          slug: default-authentication-flow
+        attrs:
+          title: Sign in to Wagoulab
   '';
 in
 {
