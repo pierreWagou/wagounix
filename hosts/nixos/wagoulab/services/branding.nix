@@ -6,8 +6,6 @@
   ...
 }:
 
-with lib;
-
 let
   inherit (config.virtualisation.quadlet) networks;
   # === Catppuccin Palettes ===
@@ -591,20 +589,20 @@ let
 in
 {
   options.wagou.branding = {
-    palette.mocha = mkOption {
-      type = types.attrs;
+    palette.mocha = lib.mkOption {
+      type = lib.types.attrs;
       default = mocha;
       readOnly = true;
       description = "Catppuccin Mocha palette (dark mode)";
     };
-    palette.latte = mkOption {
-      type = types.attrs;
+    palette.latte = lib.mkOption {
+      type = lib.types.attrs;
       default = latte;
       readOnly = true;
       description = "Catppuccin Latte palette (light mode)";
     };
-    accent = mkOption {
-      type = types.attrs;
+    accent = lib.mkOption {
+      type = lib.types.attrs;
       default = {
         light = latte.mauve;
         dark = mocha.mauve;
@@ -612,56 +610,56 @@ in
       readOnly = true;
       description = "Primary accent colors for light/dark mode";
     };
-    gradient = mkOption {
-      type = types.attrs;
+    gradient = lib.mkOption {
+      type = lib.types.attrs;
       default = gradient;
       readOnly = true;
       description = "Sunset gradient colors (start, mid, end)";
     };
-    favicon = mkOption {
-      type = types.path;
+    favicon = lib.mkOption {
+      type = lib.types.path;
       default = favicon;
       readOnly = true;
       description = "Synthwave sunset favicon SVG";
     };
-    backgrounds = mkOption {
-      type = types.attrs;
+    backgrounds = lib.mkOption {
+      type = lib.types.attrs;
       default = backgrounds;
       readOnly = true;
       description = "Available background images";
     };
-    loginBackground = mkOption {
-      type = types.path;
+    loginBackground = lib.mkOption {
+      type = lib.types.path;
       default = backgrounds.city;
       readOnly = true;
       description = "Default login page background image";
     };
-    mkLogo = mkOption {
-      type = types.functionTo types.package;
+    mkLogo = lib.mkOption {
+      type = lib.types.functionTo lib.types.package;
       default = mkLogo;
       readOnly = true;
       description = "Function: service name -> SVG logo derivation";
     };
-    css.seafile = mkOption {
-      type = types.package;
+    css.seafile = lib.mkOption {
+      type = lib.types.package;
       default = seafileCss;
       readOnly = true;
       description = "Complete Seafile Catppuccin CSS file";
     };
-    css.authentik = mkOption {
-      type = types.str;
+    css.authentik = lib.mkOption {
+      type = lib.types.str;
       default = authentikCss;
       readOnly = true;
       description = "Authentik custom CSS string (for blueprint injection)";
     };
-    baseUrl = mkOption {
-      type = types.str;
+    baseUrl = lib.mkOption {
+      type = lib.types.str;
       default = assetsBaseUrl;
       readOnly = true;
       description = "Base URL for imgproxy branding assets";
     };
-    urls = mkOption {
-      type = types.attrs;
+    urls = lib.mkOption {
+      type = lib.types.attrs;
       default = urls;
       readOnly = true;
       description = "Pre-built URLs for common branding assets";

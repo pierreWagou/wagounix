@@ -128,6 +128,14 @@ let
             siteMonitor = "http://kitchenowl:8080";
           };
         }
+        {
+          "Creneau" = {
+            icon = "calendar.svg";
+            href = "https://creneau.${host.domain}";
+            description = "Appointment scheduling";
+            siteMonitor = "http://creneau:3000";
+          };
+        }
       ];
     }
     {
@@ -201,6 +209,14 @@ let
               tunnelid = host.cloudflareTunnelId;
               key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
             };
+          };
+        }
+        {
+          "ttyd" = {
+            icon = "terminal.svg";
+            href = "https://dev.${host.domain}";
+            description = "Web terminal";
+            siteMonitor = "http://127.0.0.1:7681";
           };
         }
       ];

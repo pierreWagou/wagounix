@@ -57,7 +57,6 @@
       "microsoft-word"
       "obsidian"
       "onedrive"
-      "opencloud"
       "opencode-desktop"
       "openvpn-connect"
       "philips-hue-sync"

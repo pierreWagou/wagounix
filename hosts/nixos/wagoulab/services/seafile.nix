@@ -67,7 +67,7 @@ in
   virtualisation.quadlet.containers = {
     seafile = {
       containerConfig = {
-        image = "docker.io/seafileltd/seafile-mc:13.0-latest";
+        image = "docker.io/seafileltd/seafile-mc:13.0.21";
         noNewPrivileges = true;
         networks = [
           networks.proxy.ref
@@ -91,6 +91,7 @@ in
           REDIS_PORT = "6379";
           ENABLE_SEADOC = "true";
           INIT_SEAFILE_ADMIN_EMAIL = "pierre.romon@gmail.com";
+          # One-time init only — change password immediately after first login
           INIT_SEAFILE_ADMIN_PASSWORD = "changeme";
         };
         environmentFiles = [ config.sops.templates."seafile.env".path ];
@@ -147,7 +148,7 @@ in
 
     seadoc = {
       containerConfig = {
-        image = "docker.io/seafileltd/sdoc-server:2.0-latest";
+        image = "docker.io/seafileltd/sdoc-server:2.0.8";
         noNewPrivileges = true;
         networks = [ networks.seafile-internal.ref ];
         volumes = [ "/var/lib/seadoc:/shared" ];
