@@ -136,8 +136,21 @@ let
     /* Catppuccin for Authentik — Light: Latte, Dark: Mocha */
 
     /* === Light mode === */
+    :host,
     :root {
       --ak-accent: ${latte.mauve};
+      --ak-accent-hover: ${latte.lavender};
+      --ak-on-accent: ${latte.crust};
+      --ak-surface-raised: ${latte.surface0};
+      --ak-surface-border: ${latte.surface1};
+      --ak-sidebar-bg: ${latte.mantle};
+      --ak-sidebar-border: ${latte.surface0};
+      --ak-sidebar-text: ${latte.subtext1};
+      --ak-sidebar-text-hover: ${latte.text};
+      --ak-sidebar-text-active: ${latte.mauve};
+      --ak-sidebar-section-text: ${latte.subtext0};
+      --ak-sidebar-bg-hover: ${latte.crust};
+      --ak-sidebar-bg-active: ${latte.surface0};
       --pf-global--primary-color--100: ${latte.mauve};
       --pf-global--primary-color--dark-100: ${latte.mauve};
       --pf-global--link--Color: ${latte.mauve};
@@ -153,8 +166,21 @@ let
     }
 
     /* === Dark mode === */
+    :host([theme="dark"]),
     html[data-theme=dark] {
       --ak-accent: ${mocha.mauve};
+      --ak-accent-hover: ${mocha.lavender};
+      --ak-on-accent: ${mocha.crust};
+      --ak-surface-raised: ${mocha.surface0};
+      --ak-surface-border: ${mocha.surface1};
+      --ak-sidebar-bg: ${mocha.mantle};
+      --ak-sidebar-border: ${mocha.surface0};
+      --ak-sidebar-text: ${mocha.subtext0};
+      --ak-sidebar-text-hover: ${mocha.text};
+      --ak-sidebar-text-active: ${mocha.lavender};
+      --ak-sidebar-section-text: ${mocha.subtext1};
+      --ak-sidebar-bg-hover: ${mocha.surface0};
+      --ak-sidebar-bg-active: ${mocha.surface1};
       --ak-dark-background: ${mocha.base};
       --ak-dark-background-light: ${mocha.mantle};
       --ak-dark-background-lighter: ${mocha.surface0};
@@ -182,12 +208,12 @@ let
     .pf-c-button.pf-m-primary {
       background-color: var(--ak-accent) !important;
       border-color: var(--ak-accent) !important;
-      color: ${mocha.crust} !important;
+      color: var(--ak-on-accent) !important;
     }
     .pf-c-button.pf-m-primary:hover,
     .pf-c-button.pf-m-primary:focus {
-      background-color: ${mocha.lavender} !important;
-      border-color: ${mocha.lavender} !important;
+      background-color: var(--ak-accent-hover) !important;
+      border-color: var(--ak-accent-hover) !important;
     }
     .pf-c-button.pf-m-secondary {
       border-color: var(--ak-accent) !important;
@@ -195,13 +221,13 @@ let
     }
     .pf-c-button.pf-m-secondary:hover {
       background-color: var(--ak-accent) !important;
-      color: ${mocha.crust} !important;
+      color: var(--ak-on-accent) !important;
     }
     .pf-c-button.pf-m-link {
       color: var(--ak-accent) !important;
     }
     .pf-c-button.pf-m-link:hover {
-      color: ${mocha.lavender} !important;
+      color: var(--ak-accent-hover) !important;
     }
 
     /* === Links & clickable text === */
@@ -233,12 +259,12 @@ let
 
     /* === Badges / labels === */
     .pf-c-badge.pf-m-read {
-      background-color: ${mocha.surface1} !important;
-      color: ${mocha.text} !important;
+      background-color: var(--ak-surface-border) !important;
+      color: var(--pf-global--Color--100) !important;
     }
     .pf-c-badge.pf-m-unread {
       background-color: var(--ak-accent) !important;
-      color: ${mocha.crust} !important;
+      color: var(--ak-on-accent) !important;
     }
 
     /* === Charts / diagrams — use Catppuccin palette === */
@@ -297,15 +323,60 @@ let
 
     /* === Cards (admin panels) === */
     .pf-c-card {
-      --pf-c-card--BackgroundColor: ${mocha.surface0} !important;
-      background-color: ${mocha.surface0} !important;
-      border-color: ${mocha.surface1} !important;
+      --pf-c-card--BackgroundColor: var(--ak-surface-raised) !important;
+      background-color: var(--ak-surface-raised) !important;
+      border-color: var(--ak-surface-border) !important;
     }
 
-    /* === Navigation active indicator === */
+    /* === Sidebar === */
+    .pf-c-page__sidebar {
+      --pf-c-page__sidebar--BackgroundColor: var(--ak-sidebar-bg);
+      --pf-c-page__sidebar--m-dark--BackgroundColor: var(--ak-sidebar-bg);
+      background-color: var(--ak-sidebar-bg) !important;
+      border-inline-end: 1px solid var(--ak-sidebar-border) !important;
+    }
+    .pf-c-nav {
+      --pf-c-nav__link--Color: var(--ak-sidebar-text);
+      --pf-c-nav__link--hover--Color: var(--ak-sidebar-text-hover);
+      --pf-c-nav__link--focus--Color: var(--ak-sidebar-text-hover);
+      --pf-c-nav__link--active--Color: var(--ak-sidebar-text-hover);
+      --pf-c-nav__link--hover--BackgroundColor: var(--ak-sidebar-bg-hover);
+      --pf-c-nav__link--focus--BackgroundColor: var(--ak-sidebar-bg-hover);
+      --pf-c-nav__link--active--BackgroundColor: var(--ak-sidebar-bg-hover);
+      --pf-c-nav__link--m-current--Color: var(--ak-sidebar-text-active);
+      --pf-c-nav__link--m-current--BackgroundColor: var(--ak-sidebar-bg-active);
+      --pf-c-nav__item--m-current--not--m-expanded__link--BackgroundColor: var(--ak-sidebar-bg-active);
+      --pf-c-nav__item--before--BorderColor: transparent;
+      --pf-c-nav__link--after--BorderColor: var(--ak-sidebar-border);
+      --pf-c-nav__section-title--Color: var(--ak-sidebar-section-text);
+      --pf-c-nav__section-title--BorderBottomColor: var(--ak-sidebar-border);
+      --pf-c-nav__scroll-button--Color: var(--ak-sidebar-text);
+      --pf-c-nav__scroll-button--before--BorderColor: var(--ak-sidebar-border);
+    }
+    .pf-c-nav__link {
+      color: var(--ak-sidebar-text) !important;
+      border-radius: 0.5rem;
+    }
+    .pf-c-nav__link:hover,
+    .pf-c-nav__link:focus,
+    .pf-c-nav__link:active {
+      color: var(--ak-sidebar-text-hover) !important;
+      background-color: var(--ak-sidebar-bg-hover) !important;
+    }
     .pf-c-nav__link.pf-m-current,
-    .pf-c-nav__link.pf-m-current::after {
-      color: var(--ak-accent) !important;
+    .pf-c-nav__item.pf-m-current > .pf-c-nav__link,
+    .pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link {
+      color: var(--ak-sidebar-text-active) !important;
+      background-color: var(--ak-sidebar-bg-active) !important;
+    }
+    .pf-c-nav__section-title {
+      color: var(--ak-sidebar-section-text) !important;
+      border-bottom-color: var(--ak-sidebar-border) !important;
+    }
+    .pf-c-nav__link.pf-m-current::after,
+    .pf-c-nav__link.pf-m-current:hover::after,
+    .pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link::after {
+      --pf-c-nav__link--m-current--after--BorderColor: var(--ak-accent);
       border-left-color: var(--ak-accent) !important;
     }
 
@@ -322,8 +393,8 @@ let
 
     /* === Chips / tags === */
     .pf-c-chip {
-      background-color: ${mocha.surface0} !important;
-      border-color: ${mocha.surface1} !important;
+      background-color: var(--ak-surface-raised) !important;
+      border-color: var(--ak-surface-border) !important;
     }
 
     /* === Login page === */
