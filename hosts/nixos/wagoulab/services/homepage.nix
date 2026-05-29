@@ -12,6 +12,18 @@ let
 
   # Branding assets — served by an nginx sidecar container at /bg/*
   brandingAssetsDir = ./branding-assets;
+  # Combined directory: static assets + generated logos
+  brandingDir = pkgs.symlinkJoin {
+    name = "branding-dir";
+    paths = [
+      brandingAssetsDir
+      (pkgs.runCommand "generated-logos" { } ''
+        mkdir -p $out
+        cp ${branding.mkLogo "AUTH"} $out/logo-auth.svg
+        cp ${branding.mkLogo "DISK"} $out/logo-disk.svg
+      '')
+    ];
+  };
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir brandingAssetsDir)
   );
@@ -326,10 +338,8 @@ in
         noNewPrivileges = true;
         networks = [ networks.proxy.ref ];
         volumes = [
-          "${brandingAssetsDir}:/usr/share/nginx/html/bg:ro"
+          "${brandingDir}:/usr/share/nginx/html/bg:ro"
           "${nginxConf}:/etc/nginx/conf.d/default.conf:ro"
-          "${branding.mkLogo "AUTH"}:/usr/share/nginx/html/bg/logo-auth.svg:ro"
-          "${branding.mkLogo "DISK"}:/usr/share/nginx/html/bg/logo-disk.svg:ro"
         ];
         labels = {
           "traefik.enable" = "true";
