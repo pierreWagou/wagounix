@@ -10,32 +10,21 @@ let
   inherit (config.wagou) branding;
   m = branding.palette.mocha;
 
-  # Branding assets — served by an nginx sidecar container at /bg/*
+  # Branding assets — image list for random background picker
   brandingAssetsDir = ./branding-assets;
-  # Combined directory: static assets + generated logos
-  brandingDir = pkgs.symlinkJoin {
-    name = "branding-dir";
-    paths = [
-      brandingAssetsDir
-      (pkgs.runCommand "generated-logos" { } ''
-        mkdir -p $out
-        cp ${branding.mkLogo "AUTH"} $out/logo-auth.svg
-        cp ${branding.mkLogo "DISK"} $out/logo-disk.svg
-      '')
-    ];
-  };
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir brandingAssetsDir)
   );
-  defaultImage = if imageFiles != [ ] then builtins.head imageFiles else "placeholder.jpg";
-  imageListJS = builtins.concatStringsSep ", " (map (f: ''"${f}"'') imageFiles);
+  imageListJS = builtins.concatStringsSep ", " (
+    map (f: ''"${branding.baseUrl}/plain/local:///${f}"'') imageFiles
+  );
 
   yamlFormat = pkgs.formats.yaml { };
 
   settingsFile = yamlFormat.generate "settings.yaml" {
     title = "wagoulab://dash";
-    favicon = "https://dash.${host.domain}/bg/favicon.svg";
-    logo = "https://dash.${host.domain}/bg/favicon.svg";
+    inherit (branding.urls) favicon;
+    logo = branding.urls.favicon;
     theme = "dark";
     color = "slate";
     headerStyle = "clean";
@@ -44,7 +33,7 @@ let
     hideVersion = true;
     cardBlur = "sm";
     background = {
-      image = "https://dash.${host.domain}/bg/${defaultImage}";
+      image = branding.urls.bgCity;
       blur = "xl";
       brightness = 75;
       opacity = 75;
@@ -285,17 +274,7 @@ let
     const pick = images[Math.floor(Math.random() * images.length)];
     const bgEl = document.getElementById("background");
     if (bgEl) {
-      bgEl.style.backgroundImage = "url('/bg/" + pick + "')";
-    }
-  '';
-
-  # Nginx config to serve branding assets at /bg/*
-  nginxConf = pkgs.writeText "nginx-branding-assets.conf" ''
-    server {
-      listen 8090;
-      location /bg/ {
-        alias /usr/share/nginx/html/bg/;
-      }
+      bgEl.style.backgroundImage = "url('" + pick + "')";
     }
   '';
 in
@@ -327,27 +306,6 @@ in
           "traefik.http.routers.homepage.tls" = "true";
           "traefik.http.routers.homepage.middlewares" = "secure-headers@file";
           "traefik.http.services.homepage.loadbalancer.server.port" = "3000";
-        };
-      };
-    };
-
-    # Lightweight nginx sidecar to serve branding assets at /bg/*
-    branding-assets = {
-      containerConfig = {
-        image = "docker.io/library/nginx:1.31.1-alpine";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [
-          "${brandingDir}:/usr/share/nginx/html/bg:ro"
-          "${nginxConf}:/etc/nginx/conf.d/default.conf:ro"
-        ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.branding-assets.rule" = "Host(`dash.${host.domain}`) && PathPrefix(`/bg/`)";
-          "traefik.http.routers.branding-assets.entrypoints" = "websecure";
-          "traefik.http.routers.branding-assets.tls" = "true";
-          "traefik.http.routers.branding-assets.priority" = "100";
-          "traefik.http.services.branding-assets.loadbalancer.server.port" = "8090";
         };
       };
     };

@@ -36,10 +36,10 @@ let
           domain: authentik-default
         attrs:
           default: true
-          branding_title: Wagou
-          branding_logo: https://dash.${host.domain}/bg/logo-auth.svg
-          branding_favicon: https://dash.${host.domain}/bg/favicon.svg
-          branding_default_flow_background: https://dash.${host.domain}/bg/city.jpg
+      branding_title: Wagou
+      branding_logo: ${branding.urls.logoAuth}
+      branding_favicon: ${branding.urls.favicon}
+      branding_default_flow_background: ${branding.urls.bgCity}
           branding_custom_css: |
     ${indentedCss}
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
