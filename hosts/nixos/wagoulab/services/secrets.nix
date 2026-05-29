@@ -14,7 +14,7 @@
       # Compose service secrets (referenced in env templates below)
       cloudflare-dns-token.mode = "0400";
       cloudflare-tunnel-token.mode = "0400";
-      opencloud-admin-password.mode = "0400";
+
       vaultwarden-admin-token.mode = "0400";
       immich-api-key.mode = "0400";
       immich-db-username.mode = "0400";
@@ -26,6 +26,14 @@
       renovate-github-app-key.mode = "0400";
       renovate-installation-id.mode = "0400";
       kitchenowl-jwt-secret.mode = "0400";
+      authentik-secret-key.mode = "0400";
+      authentik-postgres-password.mode = "0400";
+      kitchenowl-oidc-client-secret.mode = "0400";
+      seafile-mysql-root-password.mode = "0400";
+      seafile-mysql-password.mode = "0400";
+      seafile-jwt-key.mode = "0400";
+      seafile-oauth-client-secret.mode = "0400";
+      seafile-secret-key.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -42,10 +50,6 @@
     templates = {
       "traefik.env" = {
         content = "CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
-      };
-
-      "opencloud.env" = {
-        content = "IDM_ADMIN_PASSWORD=${config.sops.placeholder.opencloud-admin-password}\n";
       };
 
       "vaultwarden.env" = {
@@ -81,7 +85,33 @@
       };
 
       "kitchenowl.env" = {
-        content = "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}\n";
+        content = builtins.concatStringsSep "\n" [
+          "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}"
+          "OIDC_CLIENT_SECRET=${config.sops.placeholder.kitchenowl-oidc-client-secret}"
+        ];
+      };
+
+      "authentik.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "AUTHENTIK_SECRET_KEY=${config.sops.placeholder.authentik-secret-key}"
+          "AUTHENTIK_POSTGRESQL__PASSWORD=${config.sops.placeholder.authentik-postgres-password}"
+        ];
+      };
+
+      "authentik-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
+      };
+
+      "seafile.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
+          "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
+          "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
+        ];
+      };
+
+      "seafile-db.env" = {
+        content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
       };
     };
   };

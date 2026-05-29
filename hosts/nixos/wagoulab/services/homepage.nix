@@ -7,21 +7,24 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
+  inherit (config.wagou) branding;
+  m = branding.palette.mocha;
 
-  # Background images — served by an nginx sidecar container at /bg/*
-  homepageImages = ./homepage-images;
+  # Branding assets — image list for random background picker
+  brandingAssetsDir = ./branding-assets;
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
-    builtins.attrNames (builtins.readDir homepageImages)
+    builtins.attrNames (builtins.readDir brandingAssetsDir)
   );
-  defaultImage = if imageFiles != [ ] then builtins.head imageFiles else "placeholder.jpg";
-  imageListJS = builtins.concatStringsSep ", " (map (f: ''"${f}"'') imageFiles);
+  imageListJS = builtins.concatStringsSep ", " (
+    map (f: ''"${branding.baseUrl}/plain/local:///${f}"'') imageFiles
+  );
 
   yamlFormat = pkgs.formats.yaml { };
 
   settingsFile = yamlFormat.generate "settings.yaml" {
     title = "wagoulab://dash";
-    favicon = "https://dash.${host.domain}/bg/favicon.svg";
-    logo = "https://dash.${host.domain}/bg/favicon.svg";
+    inherit (branding.urls) favicon;
+    logo = branding.urls.favicon;
     theme = "dark";
     color = "slate";
     headerStyle = "clean";
@@ -30,7 +33,7 @@ let
     hideVersion = true;
     cardBlur = "sm";
     background = {
-      image = "https://dash.${host.domain}/bg/${defaultImage}";
+      image = branding.urls.bgCity;
       blur = "xl";
       brightness = 75;
       opacity = 75;
@@ -96,11 +99,11 @@ let
           };
         }
         {
-          "OpenCloud" = {
-            icon = "owncloud.svg";
-            href = "https://cloud.${host.domain}";
+          "Seafile" = {
+            icon = "seafile.svg";
+            href = "https://disk.${host.domain}";
             description = "File sync & sharing";
-            siteMonitor = "http://opencloud:9200";
+            siteMonitor = "http://seafile:80";
           };
         }
         {
@@ -123,6 +126,14 @@ let
             href = "https://cabas.${host.domain}";
             description = "Recipes & grocery lists";
             siteMonitor = "http://kitchenowl:8080";
+          };
+        }
+        {
+          "Creneau" = {
+            icon = "calendar.svg";
+            href = "https://creneau.${host.domain}";
+            description = "Appointment scheduling";
+            siteMonitor = "http://creneau:3000";
           };
         }
       ];
@@ -156,6 +167,14 @@ let
     }
     {
       "Infrastructure" = [
+        {
+          "Authentik" = {
+            icon = "authentik.svg";
+            href = "https://auth.${host.domain}";
+            description = "Identity provider";
+            siteMonitor = "http://authentik-server:9000";
+          };
+        }
         {
           "Traefik" = {
             icon = "traefik.svg";
@@ -192,6 +211,14 @@ let
             };
           };
         }
+        {
+          "ttyd" = {
+            icon = "terminal.svg";
+            href = "https://dev.${host.domain}";
+            description = "Web terminal";
+            siteMonitor = "http://127.0.0.1:7681";
+          };
+        }
       ];
     }
   ];
@@ -211,24 +238,22 @@ let
       --color-theme-800: 24 24 37;
       --color-theme-900: 17 17 27;
       --bg-color: 17 17 27;
-      --ctp-base:      #1e1e2e;
-      --ctp-mantle:    #181825;
-      --ctp-crust:     #11111b;
-      --ctp-surface0:  #313244;
-      --ctp-surface1:  #45475a;
-      --ctp-surface2:  #585b70;
-      --ctp-overlay0:  #6c7086;
-      --ctp-text:      #cdd6f4;
-      --ctp-subtext0:  #a6adc8;
-      --ctp-subtext1:  #bac2de;
-      --ctp-lavender:  #b4befe;
-      --ctp-mauve:     #cba6f7;
-      --ctp-pink:      #f5c2e7;
-      --ctp-green:     #a6e3a1;
-      --ctp-red:       #f38ba8;
-      --ctp-peach:     #fab387;
-      --ctp-blue:      #89b4fa;
-      --ctp-teal:      #94e2d5;
+      --ctp-base:      ${m.base};
+      --ctp-mantle:    ${m.mantle};
+      --ctp-crust:     ${m.crust};
+      --ctp-surface0:  ${m.surface0};
+      --ctp-surface1:  ${m.surface1};
+      --ctp-surface2:  ${m.surface2};
+      --ctp-overlay0:  ${m.overlay0};
+      --ctp-text:      ${m.text};
+      --ctp-subtext0:  ${m.subtext0};
+      --ctp-subtext1:  ${m.subtext1};
+      --ctp-lavender:  ${m.lavender};
+      --ctp-mauve:     ${m.mauve};
+      --ctp-green:     ${m.green};
+      --ctp-red:       ${m.red};
+      --ctp-peach:     ${m.peach};
+      --ctp-blue:      ${m.blue};
     }
     body { background: var(--ctp-crust) !important; }
     .service-card { background: rgba(30, 30, 46, 0.7) !important; border: 1px solid rgba(69, 71, 90, 0.5) !important; border-radius: 12px !important; backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%); transition: all 0.2s ease !important; }
@@ -265,17 +290,7 @@ let
     const pick = images[Math.floor(Math.random() * images.length)];
     const bgEl = document.getElementById("background");
     if (bgEl) {
-      bgEl.style.backgroundImage = "url('/bg/" + pick + "')";
-    }
-  '';
-
-  # Nginx config to serve background images at /bg/*
-  nginxConf = pkgs.writeText "nginx-homepage-images.conf" ''
-    server {
-      listen 8090;
-      location /bg/ {
-        alias /usr/share/nginx/html/bg/;
-      }
+      bgEl.style.backgroundImage = "url('" + pick + "')";
     }
   '';
 in
@@ -307,27 +322,6 @@ in
           "traefik.http.routers.homepage.tls" = "true";
           "traefik.http.routers.homepage.middlewares" = "secure-headers@file";
           "traefik.http.services.homepage.loadbalancer.server.port" = "3000";
-        };
-      };
-    };
-
-    # Lightweight nginx sidecar to serve background images at /bg/*
-    homepage-images = {
-      containerConfig = {
-        image = "docker.io/library/nginx:1.31.1-alpine";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [
-          "${homepageImages}:/usr/share/nginx/html/bg:ro"
-          "${nginxConf}:/etc/nginx/conf.d/default.conf:ro"
-        ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.homepage-images.rule" = "Host(`dash.${host.domain}`) && PathPrefix(`/bg/`)";
-          "traefik.http.routers.homepage-images.entrypoints" = "websecure";
-          "traefik.http.routers.homepage-images.tls" = "true";
-          "traefik.http.routers.homepage-images.priority" = "100";
-          "traefik.http.services.homepage-images.loadbalancer.server.port" = "8090";
         };
       };
     };

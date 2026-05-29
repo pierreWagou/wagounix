@@ -54,6 +54,7 @@ in
     immich-ml = {
       containerConfig = {
         image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}-openvino";
+        noNewPrivileges = true;
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
