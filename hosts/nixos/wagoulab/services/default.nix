@@ -10,7 +10,6 @@ _: {
     ./traefik.nix
     ./cloudflared.nix
     ./vaultwarden.nix
-    ./opencloud.nix
     ./jellyfin.nix
     ./home-assistant.nix
     ./homepage.nix
@@ -25,5 +24,8 @@ _: {
     ./webhook.nix
     ./renovate.nix
     ./kitchenowl.nix
+    ./authentik.nix
+    ./seafile.nix
+    ./branding.nix
   ];
 }
