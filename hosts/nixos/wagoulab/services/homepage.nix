@@ -328,6 +328,8 @@ in
         volumes = [
           "${brandingAssetsDir}:/usr/share/nginx/html/bg:ro"
           "${nginxConf}:/etc/nginx/conf.d/default.conf:ro"
+          "${branding.mkLogo "AUTH"}:/usr/share/nginx/html/bg/logo-auth.svg:ro"
+          "${branding.mkLogo "DISK"}:/usr/share/nginx/html/bg/logo-disk.svg:ro"
         ];
         labels = {
           "traefik.enable" = "true";
