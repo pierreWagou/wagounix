@@ -27,5 +27,6 @@ rec {
     "cabas"
     "cipher"
     "disk"
+    "assets"
   ];
 }

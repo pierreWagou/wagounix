@@ -1,12 +1,15 @@
 {
+  config,
   lib,
   pkgs,
+  host,
   ...
 }:
 
 with lib;
 
 let
+  inherit (config.virtualisation.quadlet) networks;
   # === Catppuccin Palettes ===
   mocha = {
     base = "#1e1e2e";
@@ -103,6 +106,32 @@ let
               fill="url(#sun)">WAGOU ${name}</text>
       </svg>
     '';
+
+  # === Combined branding directory (real file copies for imgproxy) ===
+  brandingDir = pkgs.runCommand "branding-dir" { } ''
+    mkdir -p $out
+    cp ${./branding-assets}/* $out/
+    cp ${mkLogo "AUTH"} $out/logo-auth.svg
+    cp ${mkLogo "DISK"} $out/logo-disk.svg
+  '';
+
+  # === imgproxy URL base ===
+  assetsBaseUrl = "https://assets.${host.domain}/insecure";
+
+  # === Pre-built URLs for common assets ===
+  urls = {
+    favicon = "${assetsBaseUrl}/plain/local:///favicon.svg";
+    faviconPng32 = "${assetsBaseUrl}/rs:fit:32:32/plain/local:///favicon.svg@png";
+    logoAuth = "${assetsBaseUrl}/plain/local:///logo-auth.svg";
+    logoDisk = "${assetsBaseUrl}/plain/local:///logo-disk.svg";
+    bgCity = "${assetsBaseUrl}/plain/local:///city.jpg";
+    bgOcean = "${assetsBaseUrl}/plain/local:///ocean.jpg";
+    bgBridge = "${assetsBaseUrl}/plain/local:///bridge.jpg";
+    bgDock = "${assetsBaseUrl}/plain/local:///dock.jpg";
+    bgHood = "${assetsBaseUrl}/plain/local:///hood.jpg";
+    bgRiver = "${assetsBaseUrl}/plain/local:///river.jpg";
+    bgStreet = "${assetsBaseUrl}/plain/local:///street.jpg";
+  };
 
   # === Authentik CSS ===
   authentikCss = ''
@@ -561,6 +590,36 @@ let
 
 in
 {
+  # === imgproxy container for serving branding assets ===
+  virtualisation.quadlet.containers.imgproxy = {
+    containerConfig = {
+      image = "docker.io/darthsim/imgproxy:v4.0.3";
+      noNewPrivileges = true;
+      networks = [ networks.proxy.ref ];
+      volumes = [ "${brandingDir}:/images:ro" ];
+      environments = {
+        IMGPROXY_LOCAL_FILESYSTEM_ROOT = "/images";
+        IMGPROXY_ALLOWED_SOURCES = "local://";
+        IMGPROXY_WORKERS = "2";
+        IMGPROXY_MALLOC = "jemalloc";
+        IMGPROXY_TTL = "86400";
+        IMGPROXY_USE_ETAG = "true";
+        IMGPROXY_SKIP_PROCESSING_FORMATS = "svg";
+        IMGPROXY_SANITIZE_SVG = "true";
+        IMGPROXY_MAX_SRC_RESOLUTION = "50";
+        IMGPROXY_QUALITY = "80";
+      };
+      labels = {
+        "traefik.enable" = "true";
+        "traefik.http.routers.imgproxy.rule" = "Host(`assets.${host.domain}`)";
+        "traefik.http.routers.imgproxy.entrypoints" = "websecure";
+        "traefik.http.routers.imgproxy.tls" = "true";
+        "traefik.http.routers.imgproxy.middlewares" = "secure-headers@file";
+        "traefik.http.services.imgproxy.loadbalancer.server.port" = "8080";
+      };
+    };
+  };
+
   options.wagou.branding = {
     palette.mocha = mkOption {
       type = types.attrs;
@@ -624,6 +683,18 @@ in
       default = authentikCss;
       readOnly = true;
       description = "Authentik custom CSS string (for blueprint injection)";
+    };
+    baseUrl = mkOption {
+      type = types.str;
+      default = assetsBaseUrl;
+      readOnly = true;
+      description = "Base URL for imgproxy branding assets";
+    };
+    urls = mkOption {
+      type = types.attrs;
+      default = urls;
+      readOnly = true;
+      description = "Pre-built URLs for common branding assets";
     };
   };
 }

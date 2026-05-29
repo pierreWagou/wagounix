@@ -9,11 +9,8 @@ let
   inherit (config.virtualisation.quadlet) networks containers;
   inherit (config.wagou) branding;
 
-  # Branding assets from the shared module
+  # Branding CSS from the shared module (deployed locally by seafile-deploy)
   customCss = branding.css.seafile;
-  logoSvg = branding.mkLogo "DISK";
-  faviconSvg = branding.favicon;
-  loginBg = branding.loginBackground;
 in
 {
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
@@ -33,11 +30,11 @@ in
       "# Branding"
       "SITE_NAME = 'Wagou Disk'"
       "SITE_TITLE = 'Wagou Disk'"
-      "LOGO_PATH = 'custom/logo.svg'"
+      "LOGO_PATH = '${branding.urls.logoDisk}'"
       "LOGO_WIDTH = 250"
       "LOGO_HEIGHT = 40"
-      "FAVICON_PATH = 'custom/favicon.svg'"
-      "LOGIN_BG_IMAGE_PATH = 'custom/login-bg.jpg'"
+      "FAVICON_PATH = '${branding.urls.favicon}'"
+      "LOGIN_BG_IMAGE_PATH = '${branding.urls.bgCity}'"
       "BRANDING_CSS = 'custom/custom.css'"
       "ENABLE_SETTINGS_VIA_WEB = False"
       ""
@@ -177,7 +174,7 @@ in
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
   ];
 
-  # Idempotent script to deploy seahub config + branding
+  # Idempotent script to deploy seahub config + branding CSS
   # Run: sudo seafile-deploy
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "seafile-deploy" ''
@@ -190,12 +187,9 @@ in
       # Deploy seahub config
       cp ${config.sops.templates."seahub_settings.py".path} "$SETTINGS"
       chmod 644 "$SETTINGS"
-      # Deploy branding assets
+      # Deploy custom CSS (logo/favicon/bg served by imgproxy at assets.wagou.fr)
       mkdir -p "$CUSTOM"
       cp ${customCss} "$CUSTOM/custom.css"
-      cp ${logoSvg} "$CUSTOM/logo.svg"
-      cp ${faviconSvg} "$CUSTOM/favicon.svg"
-      cp ${loginBg} "$CUSTOM/login-bg.jpg"
       chmod 644 "$CUSTOM"/*
       # Restart seahub
       podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
