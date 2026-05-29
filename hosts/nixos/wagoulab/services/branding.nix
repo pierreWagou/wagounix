@@ -143,6 +143,8 @@ let
       --ak-on-accent: ${latte.crust};
       --ak-surface-raised: ${latte.surface0};
       --ak-surface-border: ${latte.surface1};
+      --ak-tooltip-bg: ${latte.surface0};
+      --ak-tooltip-text: ${latte.text};
       --ak-sidebar-bg: ${latte.mantle};
       --ak-sidebar-border: ${latte.surface0};
       --ak-sidebar-text: ${latte.subtext1};
@@ -151,6 +153,11 @@ let
       --ak-sidebar-section-text: ${latte.subtext0};
       --ak-sidebar-bg-hover: ${latte.crust};
       --ak-sidebar-bg-active: ${latte.surface0};
+      --ak-input-bg: ${latte.mantle};
+      --ak-input-text: ${latte.text};
+      --ak-input-placeholder: ${latte.overlay0};
+      --ak-input-border: ${latte.surface1};
+      --ak-input-readonly-bg: ${latte.crust};
       --pf-global--primary-color--100: ${latte.mauve};
       --pf-global--primary-color--dark-100: ${latte.mauve};
       --pf-global--link--Color: ${latte.mauve};
@@ -173,6 +180,8 @@ let
       --ak-on-accent: ${mocha.crust};
       --ak-surface-raised: ${mocha.surface0};
       --ak-surface-border: ${mocha.surface1};
+      --ak-tooltip-bg: ${mocha.surface0};
+      --ak-tooltip-text: ${mocha.text};
       --ak-sidebar-bg: ${mocha.mantle};
       --ak-sidebar-border: ${mocha.surface0};
       --ak-sidebar-text: ${mocha.subtext0};
@@ -181,6 +190,11 @@ let
       --ak-sidebar-section-text: ${mocha.subtext1};
       --ak-sidebar-bg-hover: ${mocha.surface0};
       --ak-sidebar-bg-active: ${mocha.surface1};
+      --ak-input-bg: ${mocha.mantle};
+      --ak-input-text: ${mocha.text};
+      --ak-input-placeholder: ${mocha.overlay0};
+      --ak-input-border: ${mocha.surface1};
+      --ak-input-readonly-bg: ${mocha.crust};
       --ak-dark-background: ${mocha.base};
       --ak-dark-background-light: ${mocha.mantle};
       --ak-dark-background-lighter: ${mocha.surface0};
@@ -380,10 +394,40 @@ let
       border-left-color: var(--ak-accent) !important;
     }
 
+    /* === Tooltips === */
+    pf-tooltip {
+      --pf-c-tooltip__content--BackgroundColor: var(--ak-tooltip-bg);
+      --pf-c-tooltip__content--Color: var(--ak-tooltip-text);
+      --pf-c-tooltip--BoxShadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
     /* === Form inputs === */
+    .pf-c-form-control {
+      --pf-c-form-control--BackgroundColor: var(--ak-input-bg) !important;
+      --pf-c-form-control--Color: var(--ak-input-text) !important;
+      --pf-c-form-control--placeholder--Color: var(--ak-input-placeholder) !important;
+      --pf-c-form-control--readonly--BackgroundColor: var(--ak-input-readonly-bg) !important;
+      --pf-c-form-control--disabled--BackgroundColor: var(--ak-input-readonly-bg) !important;
+      --pf-c-form-control--BorderBottomColor: var(--ak-input-border) !important;
+      background-color: var(--ak-input-bg) !important;
+      color: var(--ak-input-text) !important;
+    }
+    .pf-c-form-control::placeholder {
+      color: var(--ak-input-placeholder) !important;
+    }
+    .pf-c-form-control[readonly],
+    .pf-c-form-control:disabled {
+      background-color: var(--ak-input-readonly-bg) !important;
+      color: var(--ak-input-text) !important;
+    }
     .pf-c-form-control:focus {
       border-color: var(--ak-accent) !important;
       box-shadow: 0 0 0 1px var(--ak-accent) !important;
+    }
+    .pf-c-form__helper-text,
+    .pf-c-form__label-text,
+    .pf-c-check__label {
+      color: var(--pf-global--Color--100) !important;
     }
 
     /* === Progress / loading === */
