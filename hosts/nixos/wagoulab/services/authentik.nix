@@ -112,7 +112,7 @@ in
 
     authentik-postgres = {
       containerConfig = {
-        image = "docker.io/library/postgres:16-alpine";
+        image = "docker.io/library/postgres:18-alpine";
         noNewPrivileges = true;
         networks = [ networks.authentik-internal.ref ];
         volumes = [ "/var/lib/authentik-postgres:/var/lib/postgresql/data" ];
