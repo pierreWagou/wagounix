@@ -118,7 +118,7 @@ in
 
     seafile-db = {
       containerConfig = {
-        image = "docker.io/library/mariadb:10.11";
+        image = "docker.io/library/mariadb:12.3";
         noNewPrivileges = true;
         networks = [ networks.seafile-internal.ref ];
         volumes = [ "/var/lib/seafile-mysql:/var/lib/mysql" ];
