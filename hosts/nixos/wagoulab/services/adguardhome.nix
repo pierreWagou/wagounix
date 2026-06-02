@@ -69,44 +69,20 @@ let
       {
         enabled = true;
         id = 2;
-        name = "Steven Black's Unified Hosts";
-        url = "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts";
-      }
-      {
-        enabled = true;
-        id = 3;
         name = "Malicious URL Blocklist";
         url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt";
       }
       {
         enabled = true;
-        id = 4;
+        id = 3;
         name = "OISD Big";
         url = "https://big.oisd.nl";
       }
       {
         enabled = true;
-        id = 5;
-        name = "HaGeZi Multi Ultimate";
-        url = "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt";
-      }
-      {
-        enabled = true;
-        id = 6;
-        name = "AdGuard Tracking Protection";
-        url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_4.txt";
-      }
-      {
-        enabled = true;
-        id = 7;
+        id = 4;
         name = "Liste FR - French ads";
         url = "https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt";
-      }
-      {
-        enabled = true;
-        id = 8;
-        name = "Peter Lowe's Ad and tracking server list";
-        url = "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=1&mimetype=plaintext";
       }
     ];
   };
