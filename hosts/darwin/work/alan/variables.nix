@@ -1,5 +1,5 @@
 rec {
-  username = "wagou";
+  username = "pierre.romon";
   homeDir = "/Users/${username}";
   restrictedAppDir = "/Applications";
   enableRosetta = false;
