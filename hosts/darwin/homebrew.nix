@@ -53,7 +53,6 @@
       "hiddenbar"
       "logitune"
       "microsoft-excel"
-      "microsoft-outlook"
       "microsoft-powerpoint"
       "microsoft-teams"
       "microsoft-word"

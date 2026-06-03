@@ -16,6 +16,7 @@
       "btp"
       "drawio"
       "figma"
+      "microsoft-outlook"
       "microsoft-azure-storage-explorer"
     ];
     masApps = {
