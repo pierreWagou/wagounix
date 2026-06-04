@@ -1,4 +1,4 @@
-{ inputs, host, ... }:
+{ inputs, ... }:
 {
 
   imports = [
@@ -53,7 +53,7 @@
         icon = ./icons/raycast.icns;
       }
       {
-        path = "${host.restrictedAppDir}/Spotify.app";
+        path = "/Applications/Spotify.app";
         icon = ./icons/spotify.icns;
       }
       {

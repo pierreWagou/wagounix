@@ -40,12 +40,7 @@
       "alt-tab"
       "bruno"
       "claude"
-      {
-        name = "discord";
-        args = {
-          appdir = host.restrictedAppDir;
-        };
-      }
+      "discord"
       "flutter"
       "ghostty"
       "google-chrome"
@@ -62,12 +57,7 @@
       "openvpn-connect"
       "philips-hue-sync"
       "raycast"
-      {
-        name = "spotify";
-        args = {
-          appdir = host.restrictedAppDir;
-        };
-      }
+      "spotify"
       "seafile-client"
       "synology-drive"
       "tailscale-app"
