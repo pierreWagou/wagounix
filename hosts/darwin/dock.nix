@@ -1,7 +1,6 @@
 {
   lib,
   config,
-  host,
   ...
 }:
 
@@ -11,31 +10,34 @@ in
 {
 
   options.wagounix.dock = {
-    leadingApps = lib.mkOption {
+    communication = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [
-        "/Applications/Thunderbird.app/"
-        "/Applications/Zen.app/"
-      ];
-      description = "Dock apps placed before host-specific entries.";
+      default = [ "/Applications/Thunderbird.app/" ];
+      description = "Communication apps in the dock.";
     };
 
-    middleApps = lib.mkOption {
+    browser = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "Host-specific dock apps inserted between the shared app groups.";
+      default = [ "/Applications/Zen.app/" ];
+      description = "Browser apps in the dock.";
     };
 
-    trailingApps = lib.mkOption {
+    development = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [
         "/Applications/Visual Studio Code.app/"
         "/Applications/Ghostty.app/"
-        "${host.restrictedAppDir}/Spotify.app/"
       ];
-      description = "Dock apps placed after host-specific entries.";
+      description = "Development apps in the dock.";
+    };
+
+    others = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ "/Applications/Spotify.app/" ];
+      description = "Other apps in the dock.";
     };
   };
 
-  config.system.defaults.dock.persistent-apps = cfg.leadingApps ++ cfg.middleApps ++ cfg.trailingApps;
+  config.system.defaults.dock.persistent-apps =
+    cfg.communication ++ cfg.browser ++ cfg.development ++ cfg.others;
 }
