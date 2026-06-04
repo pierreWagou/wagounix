@@ -15,9 +15,6 @@ jobs:
         with:
           name: wagounix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Configure SAP GitHub access
-        run: |
-          git config --global url."https://${{ secrets.SAP_GITHUB_TOKEN }}@github.tools.sap/".insteadOf "https://github.tools.sap/"
       - name: nixfmt
         run: nix develop --command bash -c 'nixfmt --check $(find . -name "*.nix")'
       - name: statix
@@ -29,7 +26,7 @@ jobs:
     runs-on: macos-15
     strategy:
       matrix:
-        profile: [sap, wagoumac, alan]
+        profile: [wagoumac, alan]
     steps:
       - uses: actions/checkout@v6
       - uses: cachix/install-nix-action@v30
@@ -37,9 +34,6 @@ jobs:
         with:
           name: wagounix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Configure SAP GitHub access
-        run: |
-          git config --global url."https://${{ secrets.SAP_GITHUB_TOKEN }}@github.tools.sap/".insteadOf "https://github.tools.sap/"
       - name: Build ${{ matrix.profile }}
         run: nix build .#darwinConfigurations.${{ matrix.profile }}.system --no-link
 
@@ -52,8 +46,5 @@ jobs:
         with:
           name: wagounix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Configure SAP GitHub access
-        run: |
-          git config --global url."https://${{ secrets.SAP_GITHUB_TOKEN }}@github.tools.sap/".insteadOf "https://github.tools.sap/"
       - name: Build wagoulab
         run: nix build .#nixosConfigurations.wagoulab.config.system.build.toplevel --no-link
