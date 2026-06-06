@@ -1,6 +1,7 @@
 _: {
 
   imports = [
+    ./appearance.nix
     ./control-center.nix
     ./dock.nix
     ./global-domain.nix

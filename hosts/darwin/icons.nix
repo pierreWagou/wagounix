@@ -57,6 +57,10 @@
         icon = ./icons/spotify.icns;
       }
       {
+        path = "/Applications/Slack.app";
+        icon = ./icons/slack.icns;
+      }
+      {
         path = "/Applications/Thunderbird.app";
         icon = ./icons/thunderbird.icns;
       }
