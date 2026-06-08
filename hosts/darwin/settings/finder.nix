@@ -21,4 +21,13 @@ _: {
     ShowStatusBar = true;
   };
 
+  system.defaults.CustomUserPreferences."com.apple.finder" = {
+    ShowSidebar = true;
+    FXICloudDriveEnabled = true;
+    FXICloudDriveDesktop = false;
+    FXICloudDriveDocuments = false;
+    SidebarDevicesSectionDisclosedState = true;
+    SidebarPlacesSectionDisclosedState = true;
+  };
+
 }

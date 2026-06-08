@@ -38,6 +38,7 @@
     ];
     casks = [
       "alt-tab"
+      "betterDisplay"
       "bruno"
       "claude"
       "discord"

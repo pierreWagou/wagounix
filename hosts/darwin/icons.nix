@@ -45,6 +45,10 @@
         icon = ./icons/microsoft_word.icns;
       }
       {
+        path = "/Applications/Notion.app";
+        icon = ./icons/notion.icns;
+      }
+      {
         path = "/Applications/OneDrive.app";
         icon = ./icons/microsoft_onedrive.icns;
       }
