@@ -10,26 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
           name: wagounix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: nixfmt
-        run: nix develop --command bash -c 'nixfmt --check $(find . -name "*.nix")'
+        run: nix develop --command bash -c 'find . -name "*.nix" -not -path "./.git/*" -not -path "./result/*" | xargs nixfmt --check'
       - name: statix
         run: nix develop --command statix check .
       - name: deadnix
         run: nix develop --command deadnix --fail .
 
   build-darwin:
+    needs: lint
     runs-on: macos-15
     strategy:
       matrix:
         profile: [wagoumac, alan]
     steps:
       - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
           name: wagounix
@@ -38,10 +39,11 @@ jobs:
         run: nix build .#darwinConfigurations.${{ matrix.profile }}.system --no-link
 
   build-nixos:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: cachix/install-nix-action@v30
+      - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
           name: wagounix

@@ -47,7 +47,7 @@ in
       ExecStart = builtins.concatStringsSep " " [
         "${pkgs.ttyd}/bin/ttyd"
         "--writable"
-        "--port 7681"
+        "--port ${toString host.ports.ttyd}"
         "--interface ${host.serverIP}"
         "--client-option fontFamily='JetBrainsMono Nerd Font Mono,monospace'"
         "--client-option fontSize=14"

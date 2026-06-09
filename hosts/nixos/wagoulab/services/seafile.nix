@@ -90,9 +90,7 @@ in
           REDIS_HOST = "seafile-redis";
           REDIS_PORT = "6379";
           ENABLE_SEADOC = "true";
-          INIT_SEAFILE_ADMIN_EMAIL = "pierre.romon@gmail.com";
-          # One-time init only — change password immediately after first login
-          INIT_SEAFILE_ADMIN_PASSWORD = "changeme";
+          INIT_SEAFILE_ADMIN_EMAIL = host.adminEmail;
         };
         environmentFiles = [ config.sops.templates."seafile.env".path ];
         labels = {
@@ -132,7 +130,7 @@ in
 
     seafile-redis = {
       containerConfig = {
-        image = "docker.io/valkey/valkey:9.1.0";
+        image = host.valkeyImage;
         noNewPrivileges = true;
         networks = [ networks.seafile-internal.ref ];
         exec = [
@@ -179,6 +177,7 @@ in
   # Run: sudo seafile-deploy
   environment.systemPackages = [
     (pkgs.writeShellScriptBin "seafile-deploy" ''
+      set -euo pipefail
       SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
       CUSTOM="/var/lib/seafile/seafile/seahub-data/custom"
       if [ ! -d "/var/lib/seafile/seafile/conf" ]; then
@@ -193,8 +192,8 @@ in
       cp ${customCss} "$CUSTOM/custom.css"
       chmod 644 "$CUSTOM"/*
       # Restart seahub
-      podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
-        podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
+      ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
+        ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
       echo "Done. Seahub config + branding deployed."
     '')
   ];

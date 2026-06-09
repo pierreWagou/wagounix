@@ -30,7 +30,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Service | NixOS config | Container port | Remote URL |
 |---|---|---|---|
 | Vaultwarden | `services/vaultwarden.nix` | 80 (Podman network) | `https://vault.wagou.fr` |
-| OpenCloud | `services/opencloud.nix` | 9200 (Podman network) | `https://cloud.wagou.fr` |
+| Seafile | `services/seafile.nix` | 80 (Podman network) | `https://disk.wagou.fr` |
 | Immich | `services/immich.nix` | 2283 (Podman network) | `https://pixel.wagou.fr` |
 | Homepage | `services/homepage.nix` | 3000 (Podman network) | `https://dash.wagou.fr` |
 | Home Assistant | `services/home-assistant.nix` | 8123 (Podman network) | `https://home.wagou.fr` |
@@ -46,6 +46,8 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Webhook | `services/webhook.nix` | 9000 (host service, native) | `https://relay.wagou.fr` |
 | Renovate | `services/renovate.nix` | - (systemd oneshot + timer) | - |
 | KitchenOwl | `services/kitchenowl.nix` | 8080 (Podman network) | `https://cabas.wagou.fr` |
+| Authentik | `services/authentik.nix` | 9000 (Podman network) | `https://auth.wagou.fr` |
+| Branding (imgproxy) | `services/branding.nix` | 8080 (Podman network) | `https://assets.wagou.fr` |
 
 ## Files
 
@@ -54,7 +56,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | File | Purpose |
 |---|---|
 | `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `networkInterface`, `lanSubnet`, `renderGroupGID`, `timezone`, `acmeEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains` |
+| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `networkInterface`, `lanSubnet`, `renderGroupGid`, `timezone`, `acmeEmail`, `adminEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains`, `valkeyImage`, `podmanCIDRs`, `ports`, `latitude`, `longitude` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/wagoulab/services/`
@@ -66,13 +68,15 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | `secrets.nix` | sops-nix secret declarations and templates |
 | `traefik.nix` | Traefik reverse proxy container (Let's Encrypt, HSTS headers, Cloudflare trusted IPs) |
 | `vaultwarden.nix` | Password manager container |
-| `opencloud.nix` | File sync & sharing container |
+| `seafile.nix` | File sync & sharing (Seafile MC + SeaDoc + MariaDB + Redis, OIDC SSO via Authentik) |
 | `immich.nix` | Photo management (server, ML, PostgreSQL, Redis — 4 containers + internal network) |
 | `adguardhome.nix` | DNS server container, ad blocking, blocklists, local DNS rewrites |
 | `cloudflared.nix` | Cloudflare Tunnel container |
 | `tailscale.nix` | Tailscale VPN (native NixOS service, subnet router for `192.168.68.0/24`) |
-| `homepage.nix` | Homepage dashboard container (Catppuccin Mocha theme, service widgets, nginx image sidecar) |
-| `homepage-images/` | Background images and favicon for Homepage dashboard |
+| `homepage.nix` | Homepage dashboard container (Catppuccin theme via branding module, service widgets, imgproxy backgrounds) |
+| `authentik.nix` | Identity provider / SSO — OIDC (server, worker, PostgreSQL, Redis) |
+| `branding.nix` | Shared Catppuccin theme + imgproxy assets server (logos, backgrounds, favicon, CSS) |
+| `branding-assets/` | Source images and favicon served via imgproxy (`assets.wagou.fr`) |
 | `home-assistant.nix` | Home automation container |
 | `jellyfin.nix` | Media server container with Intel hardware transcoding |
 | `fail2ban.nix` | Brute force protection |
@@ -88,7 +92,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 
 | File | Purpose |
 |---|---|
-| `default.nix` | Imports configuration.nix |
+| `default.nix` | Imports `configuration.nix` and `packages.nix` |
 | `configuration.nix` | SSH (hardened, key-only), user account, timezone, locale, auto-updates |
 
 ### Secrets: `hosts/nixos/wagoulab/`
@@ -128,7 +132,6 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | Secret key | Used by | Mechanism |
 |---|---|---|
 | `cloudflare-credentials` | `cloudflared.nix` | Credentials file for tunnel auth |
-| `opencloud-admin-password` | `opencloud.nix` | Via sops template `opencloud.env` |
 | `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` |
 | `immich-db-username` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
 | `immich-db-password` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
@@ -145,6 +148,15 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `renovate-github-app-key` | `renovate.nix` | Raw secret file (base64-encoded PEM) |
 | `renovate-installation-id` | `renovate.nix` | Raw secret file (token generation script) |
 | `kitchenowl-jwt-secret` | `kitchenowl.nix` | Via sops template `kitchenowl.env` |
+| `kitchenowl-oidc-client-secret` | `kitchenowl.nix` | OIDC client secret (Authentik SSO), via `kitchenowl.env` |
+| `authentik-secret-key` | `authentik.nix` | Via sops template `authentik.env` |
+| `authentik-postgres-password` | `authentik.nix` | Via `authentik.env` + `authentik-postgres.env` |
+| `seafile-mysql-root-password` | `seafile.nix` | Via `seafile.env` + `seafile-db.env` |
+| `seafile-mysql-password` | `seafile.nix` | Via sops template `seafile.env` |
+| `seafile-jwt-key` | `seafile.nix` | Via sops template `seafile.env` |
+| `seafile-admin-password` | `seafile.nix` | Via sops template `seafile.env` |
+| `seafile-secret-key` | `seafile.nix` | Via `seahub_settings.py` template |
+| `seafile-oauth-client-secret` | `seafile.nix` | OIDC client secret (Authentik SSO), via `seahub_settings.py` |
 
 ### Encryption keys
 
@@ -211,7 +223,7 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 Tailscale is configured with **split DNS** in the admin console (admin.tailscale.com -> DNS):
 - Domain `wagou.fr` uses custom nameserver `100.68.157.70` (Beelink's Tailscale IP)
-- "Override local DNS" is **disabled** (so work/SAP network DNS still resolves corporate domains)
+- "Override local DNS" is **disabled** (so work network DNS still resolves corporate domains)
 
 This means when Tailscale is connected:
 - `*.wagou.fr` queries go to AdGuard Home via Tailscale -> resolves to `192.168.68.65` -> routed via subnet tunnel -> Traefik
@@ -247,13 +259,9 @@ Runs as a Podman container with a seed config. The declarative config from Nix i
 | Name | URL |
 |---|---|
 | AdGuard DNS filter | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt` |
-| Steven Black's Unified Hosts | `https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts` |
 | Malicious URL Blocklist | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_11.txt` |
 | OISD Big | `https://big.oisd.nl` |
-| HaGeZi Multi Ultimate | `https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/ultimate.txt` |
-| AdGuard Tracking Protection | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_4.txt` |
 | Liste FR - French ads | `https://adguardteam.github.io/HostlistsRegistry/assets/filter_16.txt` |
-| Peter Lowe's Ad and tracking server list | `https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus&showintro=1&mimetype=plaintext` |
 
 ## Traefik routing
 
@@ -265,10 +273,11 @@ Routing is determined by `Host()` rules matching the subdomain:
 |---|---|---|---|
 | `vault.wagou.fr` | vaultwarden | 80 | `IP_HEADER = "X-Real-IP"` for audit logs |
 | `pixel.wagou.fr` | immich-server | 2283 | - |
-| `cloud.wagou.fr` | opencloud | 9200 | `OC_INSECURE = "true"` (behind Traefik) |
+| `disk.wagou.fr` | seafile | 80 | SeaDoc + OIDC SSO via Authentik |
 | `guard.wagou.fr` | adguard | 3000 | Web UI |
-| `dash.wagou.fr` | homepage-images (nginx) | 8090 | Static images at `/bg/*` |
-| `dash.wagou.fr` | homepage | 3000 | Dashboard (default route) |
+| `dash.wagou.fr` | homepage | 3000 | Dashboard (backgrounds via imgproxy) |
+| `auth.wagou.fr` | authentik-server | 9000 | Identity provider / SSO (OIDC) |
+| `assets.wagou.fr` | imgproxy | 8080 | Branding assets (logos, backgrounds, favicon) |
 | `home.wagou.fr` | home-assistant | 8123 | - |
 | `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
 | `dev.wagou.fr` | ttyd (host service) | 7681 | Routed via file provider dynamic config (not container labels) |
@@ -297,7 +306,7 @@ Connect with: `ssh wagoulab`
 
 ### Authorized key
 
-The homeserver SSH public key is declared in `hosts/nixos/configuration.nix` under `users.users.wagou.openssh.authorizedKeys.keys`. This is the `id_ed25519_homeserver` key (separate from the SAP work SSH key for identity separation).
+The homeserver SSH public key is declared in `hosts/nixos/configuration.nix` under `users.users.wagou.openssh.authorizedKeys.keys`. This is the `id_ed25519_homeserver` key (separate from the work SSH key for identity separation).
 
 ## Adding a new service
 
@@ -343,7 +352,11 @@ Add `./newservice.nix` to the imports in `services/default.nix`.
 Add the subdomain to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
 
 ```nix
-tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "newservice" ];
+tunnelSubdomains = [
+  "vault" "pixel" "dash" "guard" "home" "tape"
+  "dev" "creneau" "relay" "cabas" "auth" "disk" "assets"
+  "newservice" # <-- add your new subdomain here
+];
 ```
 
 This automatically wires up:
@@ -380,15 +393,15 @@ sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 
 > Full troubleshooting guide: see `hosts/nixos/wagoulab/README.md` -> "Troubleshooting" section.
 
-### OpenCloud "Permanent Redirect" loop
+### Seafile branding/config not applied
 
-OpenCloud redirects HTTP to HTTPS because its URL is configured as `https://cloud.wagou.fr`. The fix is `OC_INSECURE = "true"` and `PROXY_TLS = "false"` in the container environment, which tells OpenCloud to accept plain HTTP behind Traefik.
+`seahub_settings.py` and the Catppuccin `custom.css` are deployed by the manual idempotent `seafile-deploy` script (Seafile generates its config on first run, so it can't be fully declarative). After the first start, run `sudo seafile-deploy` to copy the rendered config + CSS into the container and restart seahub.
 
-### OpenCloud fails to start ("Failed to load environment files")
+### Seafile fails to start ("Failed to load environment files")
 
-sops-nix decrypts secrets during the NixOS activation script (before services start). If OpenCloud still can't find its environment file, check:
-1. `sudo ls -la /run/secrets/rendered/opencloud.env` — should exist
-2. `journalctl -u opencloud --no-pager | tail -20` — check for specific error
+sops-nix decrypts secrets during the NixOS activation script (before services start). If Seafile can't find its environment file, check:
+1. `sudo ls -la /run/secrets/rendered/seafile.env` — should exist
+2. `journalctl -u seafile --no-pager | tail -20` — check for specific error
 3. sops-nix does NOT use a systemd service — do NOT add `after = [ "sops-nix.service" ]`
 
 ### Ghostty terminal error when SSHing

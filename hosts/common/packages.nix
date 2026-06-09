@@ -9,7 +9,6 @@
     bat
     bottom
     chezmoi
-    cloudflared
     eza
     fd
     fzf
@@ -29,7 +28,6 @@
     sheldon
     sops
     starship
-    tailscale
     television
     tmux
     tmuxinator

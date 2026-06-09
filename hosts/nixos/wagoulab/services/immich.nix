@@ -58,7 +58,7 @@ in
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
-        addGroups = [ host.renderGroupGID ]; # render group GID on NixOS (also in jellyfin.nix)
+        addGroups = [ host.renderGroupGid ]; # render group GID on NixOS (also in jellyfin.nix)
       };
     };
 
@@ -79,19 +79,28 @@ in
 
     immich-redis = {
       containerConfig = {
-        image = "docker.io/valkey/valkey:9.1.0";
+        image = host.valkeyImage;
         noNewPrivileges = true;
         networks = [ networks.immich-internal.ref ];
+        exec = [
+          "--save"
+          "60"
+          "1"
+          "--loglevel"
+          "warning"
+        ];
+        volumes = [ "/var/lib/immich-redis:/data" ];
       };
     };
   };
 
-  # GPU drivers shared with Jellyfin
+  # GPU drivers shared with Jellyfin — primary declaration is in jellyfin.nix
   hardware.graphics.enable = true;
 
   systemd.tmpfiles.rules = [
     "d /var/lib/immich 0755 root root -"
     "d /var/lib/immich-ml-cache 0755 root root -"
     "d /var/lib/immich-postgres 0755 root root -"
+    "d /var/lib/immich-redis 0755 root root -"
   ];
 }

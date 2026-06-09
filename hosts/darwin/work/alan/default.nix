@@ -5,7 +5,7 @@
     ./packages.nix
   ];
 
-  wagounix.dock.communication = [
+  wagou.dock.communication = [
     "/Applications/Thunderbird.app/"
     "/Applications/Slack.app/"
   ];

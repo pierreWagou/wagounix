@@ -9,6 +9,7 @@ let
   # Speaks the Assuan pinentry protocol: responds to GETPIN with the password.
   # This enables zero-touch rbw unlock on the headless server.
   pinentry-rbw-sops = pkgs.writeShellScript "pinentry-rbw-sops" ''
+    set -euo pipefail
     SECRET_FILE="${config.sops.secrets.rbw-master-password.path}"
 
     while IFS= read -r cmd; do
@@ -19,7 +20,7 @@ let
             echo "D $password"
             echo "OK"
           else
-            echo "ERR 83886179 No secret file found"
+            echo "ERR 83886179 No secret file found" # Assuan error: no secret file found
           fi
           ;;
         BYE)

@@ -45,11 +45,11 @@ let
         ttyd:
           loadBalancer:
             servers:
-              - url: "http://${host.serverIP}:7681"
+              - url: "http://${host.serverIP}:${toString host.ports.ttyd}"
         webhook:
           loadBalancer:
             servers:
-              - url: "http://${host.serverIP}:9000"
+              - url: "http://${host.serverIP}:${toString host.ports.webhook}"
   '';
 in
 {

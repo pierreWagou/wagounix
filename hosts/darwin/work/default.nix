@@ -1,6 +1,1 @@
-_: {
-
-  imports = [
-    ./homebrew.nix
-  ];
-}
+_: { }

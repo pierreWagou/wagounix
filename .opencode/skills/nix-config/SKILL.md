@@ -22,8 +22,9 @@ wagounix/
 │   │   ├── fonts.nix              # Cross-platform fonts (all machines)
 │   │   └── users.nix              # Cross-platform user config (all machines)
 │   ├── darwin/                    # macOS platform base
-│   │   ├── default.nix            # Imports configuration, homebrew, icons, packages, settings
+│   │   ├── default.nix            # Imports configuration, dock, homebrew, icons, packages, settings
 │   │   ├── configuration.nix      # nix-darwin system config (stateVersion, PAM Touch ID)
+│   │   ├── dock.nix               # wagou.dock options module (dock app categories)
 │   │   ├── homebrew.nix           # Common Homebrew brews, casks, taps
 │   │   ├── icons.nix              # Custom macOS app icons
 │   │   ├── packages.nix           # Darwin-only nix packages (cocoapods, spicetify, etc.)
@@ -35,30 +36,21 @@ wagounix/
 │   │   │   ├── keyboard.nix
 │   │   │   └── ...
 │   │   ├── personal/              # Personal Mac layer
-│   │   │   ├── default.nix        # Imports dock, homebrew
-│   │   │   ├── dock.nix           # Personal dock apps
+│   │   │   ├── default.nix        # Imports packages, homebrew
 │   │   │   ├── packages.nix       # Personal nix packages (android-tools, mas)
 │   │   │   ├── homebrew.nix       # Personal casks (Steam, Ankama, etc.) + masApps
-│   │   │   ├── wagoumac/             # New personal Mac (aarch64-darwin)
-│   │   │   │   ├── default.nix
-│   │   │   │   ├── variables.nix
-│   │   │   │   └── homebrew.nix   # docker-desktop
-│   │   │   └── wagouintel/           # Intel personal Mac (x86_64-darwin)
+│   │   │   └── wagoumac/          # Personal Mac (aarch64-darwin)
 │   │   │       ├── default.nix
 │   │   │       └── variables.nix
 │   │   └── work/                  # Work Mac layer
-│   │       ├── default.nix        # Imports dock, homebrew
-│   │       ├── dock.nix           # Work dock apps (Outlook, Teams, etc.)
-│   │       ├── homebrew.nix       # Work casks (docker-desktop)
-│   │       ├── sap/               # SAP Mac (legacy — remove when returned)
-│   │       │   ├── default.nix
-│   │       │   ├── variables.nix
-│   │       │   └── homebrew.nix   # hai tap, btp, figma, etc.
-│   │       └── alan/              # New work Mac (aarch64-darwin)
-│   │           ├── default.nix
-│   │           └── variables.nix
+│   │       ├── default.nix        # No-op layer entry point (all config at host level)
+│   │       └── alan/              # Work Mac (aarch64-darwin)
+│   │           ├── default.nix    # Imports homebrew, packages; sets wagou.dock
+│   │           ├── variables.nix
+│   │           ├── homebrew.nix   # 1password, figma, notion, slack
+│   │           └── packages.nix   # awscli2, 1password-cli
 │   └── nixos/                     # NixOS platform base
-│       ├── default.nix            # Imports configuration
+│       ├── default.nix            # Imports configuration, packages
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
 │       ├── packages.nix           # NixOS-only packages (ghostty.terminfo, ventoy)
 │       └── wagoulab/              # Home server (x86_64-linux)
@@ -72,19 +64,21 @@ wagounix/
 │               ├── secrets.nix
 │               ├── traefik.nix
 │               ├── vaultwarden.nix
-│               ├── opencloud.nix
+│               ├── seafile.nix
 │               ├── immich.nix
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
 │               ├── tailscale.nix
 │               ├── homepage.nix
+│               ├── branding.nix
+│               ├── branding-assets/
+│               ├── authentik.nix
 │               ├── home-assistant.nix
 │               ├── jellyfin.nix
 │               ├── creneau.nix
 │               ├── kitchenowl.nix
 │               ├── renovate.nix
 │               ├── webhook.nix
-│               ├── homepage-images/
 │               ├── fail2ban.nix
 │               ├── firewall.nix
 │               ├── ttyd.nix
@@ -107,17 +101,16 @@ Each configuration loads modules in order:
 In `flake.nix`, this is expressed as:
 
 ```nix
-commonModules = [ ./hosts/common ];
-
-# Darwin host
-sap = nix-darwin.lib.darwinSystem {
+# Darwin host (modules are inlined per host — there is no shared `commonModules` var)
+alan = nix-darwin.lib.darwinSystem {
+  system = "aarch64-darwin";
   modules = [
     ./hosts/common              # common
     ./hosts/darwin              # platform
     ./hosts/darwin/work         # layer
-    ./hosts/darwin/work/sap     # host
+    ./hosts/darwin/work/alan    # host
   ];
-  specialArgs = { inherit inputs; host = import ./hosts/darwin/work/sap/variables.nix; };
+  specialArgs = { inherit inputs; host = import ./hosts/darwin/work/alan/variables.nix; };
 };
 
 # NixOS host
@@ -143,16 +136,25 @@ Each host has a `variables.nix` that exports a plain attribute set (not a module
 rec {
   username = "wagou";
   homeDir = "/Users/${username}";     # /home/${username} for NixOS
-  restrictedAppDir = "/Applications";   # darwin only
   enableRosetta = false;                # darwin only
   hostname = "wagoulab";              # NixOS only
   domain = "wagou.fr";                  # NixOS only
   serverIP = "192.168.68.65";           # NixOS only
+  tailscaleIP = "100.68.157.70";        # NixOS only
+  networkInterface = "enp170s0";        # NixOS only
+  lanSubnet = "192.168.68.0/24";        # NixOS only
+  renderGroupGid = "303";               # NixOS only (Jellyfin/Immich HW transcode)
   timezone = "Europe/Paris";            # NixOS only
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
+  adminEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
-  tunnelSubdomains = [ "vault" "pixel" "cloud" "dash" "guard" "home" "tape" "dev" "creneau" "relay" "cabas" ]; # NixOS only
+  tunnelSubdomains = [ "vault" "pixel" "dash" "guard" "home" "tape" "dev" "creneau" "relay" "cabas" "auth" "disk" "assets" ]; # NixOS only
+  valkeyImage = "docker.io/valkey/valkey:9.1.0"; # NixOS only (shared by immich, authentik, seafile Redis)
+  podmanCIDRs = [ "10.89.0.0/16" "172.16.0.0/12" ]; # NixOS only
+  ports = { ttyd = 7681; webhook = 9000; }; # NixOS only
+  latitude = 48.8566;                   # NixOS only (for weather widgets)
+  longitude = 2.3522;                   # NixOS only
 }
 ```
 
@@ -178,7 +180,6 @@ Edit the appropriate `packages.nix` under `hosts/darwin/<layer>/` or `hosts/darw
 ### Homebrew cask (GUI app)
 
 Edit the appropriate `homebrew.nix` and add to the `casks` list.
-For custom install path: `{ name = "app"; args = { appdir = host.restrictedAppDir; }; }`
 
 ### Homebrew brew (CLI formula)
 
@@ -199,7 +200,6 @@ masApps = { "App Name" = 123456789; };
    rec {
      username = "myuser";
      homeDir = "/Users/${username}";
-     restrictedAppDir = "/Applications";
      enableRosetta = false;
    }
    ```
@@ -211,7 +211,8 @@ masApps = { "App Name" = 123456789; };
    ```nix
    <hostname> = nix-darwin.lib.darwinSystem {
      system = "aarch64-darwin";
-     modules = commonModules ++ [
+     modules = [
+       ./hosts/common
        ./hosts/darwin
        ./hosts/darwin/<layer>
        ./hosts/darwin/<layer>/<hostname>
@@ -251,6 +252,21 @@ masApps = { "App Name" = 123456789; };
 2. Add it to the imports in `hosts/darwin/settings/default.nix`
 
 Common `system.defaults` namespaces: `dock`, `finder`, `NSGlobalDomain`, `trackpad`, `CustomUserPreferences`, `menuExtraClock`, `screencapture`, `screensaver`, `spaces`, `controlcenter`, `magicmouse`, `SoftwareUpdate`.
+
+## Configuring the dock
+
+`hosts/darwin/dock.nix` defines a custom `wagou.dock` options module that assembles the dock's persistent apps from named categories. Set the categories in a layer (`personal`/`work`) or host `default.nix`:
+
+```nix
+wagou.dock = {
+  communication = [ "/Applications/Thunderbird.app" "/Applications/Slack.app" ];
+  browser = [ "/Applications/Zen.app" ];
+  development = [ "/Applications/Visual Studio Code.app" "/Applications/Ghostty.app" ];
+  others = [ "/Applications/Spotify.app" ];
+};
+```
+
+Categories: `communication`, `browser`, `development`, `others`. Each darwin host inherits defaults and can override per category.
 
 ## Adding custom icons
 
@@ -336,8 +352,8 @@ nix flake check      # runs all checks + builds
 
 ### CI (GitHub Actions)
 
-- **lint** — nixfmt, statix, deadnix (macos-15)
-- **build-darwin** — sap, wagoumac (macos-15, parallel)
+- **lint** — nixfmt, statix, deadnix (ubuntu-latest)
+- **build-darwin** — wagoumac, alan (macos-15, parallel)
 - **build-nixos** — wagoulab (ubuntu-latest)
 
 ## Key commands
@@ -355,7 +371,7 @@ nix flake check      # runs all checks + builds
 
 ## Important rules
 
-- ALWAYS work in `~/.config/wagounix/` — this is the source of truth
+- ALWAYS work in `~/Projects/wagou/wagounix/` — this is the source of truth
 - Use `build` first to test, then `switch` to activate
 - When adding a package, check if it exists: `nix search nixpkgs <name>`
 - GUI apps -> Homebrew casks; CLI tools -> nix packages (prefer nix when available)

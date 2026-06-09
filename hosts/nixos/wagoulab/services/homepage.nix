@@ -73,8 +73,7 @@ let
     {
       openmeteo = {
         label = "Paris";
-        latitude = 48.8566;
-        longitude = 2.3522;
+        inherit (host) latitude longitude;
         units = "metric";
       };
     }
@@ -216,7 +215,7 @@ let
             icon = "terminal.svg";
             href = "https://dev.${host.domain}";
             description = "Web terminal";
-            siteMonitor = "http://127.0.0.1:7681";
+            siteMonitor = "http://127.0.0.1:${toString host.ports.ttyd}";
           };
         }
       ];
@@ -309,7 +308,7 @@ in
           "${bookmarksFile}:/app/config/bookmarks.yaml:ro"
           "${customCSS}:/app/config/custom.css:ro"
           "${customJS}:/app/config/custom.js:ro"
-          "/var/lib/wagoulab/homepage-logs:/app/config/logs"
+          "/var/lib/${host.hostname}/homepage-logs:/app/config/logs"
         ];
         environments = {
           HOMEPAGE_ALLOWED_HOSTS = "${host.domain},dash.${host.domain}";
@@ -328,6 +327,6 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/wagoulab/homepage-logs 0755 root root -"
+    "d /var/lib/${host.hostname}/homepage-logs 0755 root root -"
   ];
 }

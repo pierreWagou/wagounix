@@ -75,6 +75,7 @@ in
       RuntimeDirectoryMode = "0700";
       ExecStartPre = "${generate-renovate-token}/bin/generate-renovate-token";
       ExecStart = pkgs.writeShellScript "renovate-run" ''
+        set -euo pipefail
         TOKEN=$(cat /run/renovate/token)
         exec ${pkgs.podman}/bin/podman run --rm \
           --env RENOVATE_PLATFORM=github \

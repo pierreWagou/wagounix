@@ -9,27 +9,26 @@ let
   inherit (config.virtualisation.quadlet) networks;
 
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
-    default_config:
+        default_config:
 
-    homeassistant:
-      name: Home
-      unit_system: metric
-      time_zone: ${host.timezone}
-      external_url: https://home.${host.domain}
-      internal_url: https://home.${host.domain}
+        homeassistant:
+          name: Home
+          unit_system: metric
+          time_zone: ${host.timezone}
+          external_url: https://home.${host.domain}
+          internal_url: https://home.${host.domain}
 
-    http:
-      use_x_forwarded_for: true
-      trusted_proxies:
-        - 172.16.0.0/12
-        - 10.89.0.0/16
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+    ${builtins.concatStringsSep "\n" (map (cidr: "        - ${cidr}") host.podmanCIDRs)}
 
-    frontend:
-      themes: !include_dir_merge_named themes
+        frontend:
+          themes: !include_dir_merge_named themes
 
-    automation: !include automations.yaml
-    script: !include scripts.yaml
-    scene: !include scenes.yaml
+        automation: !include automations.yaml
+        script: !include scripts.yaml
+        scene: !include scenes.yaml
   '';
 in
 {
@@ -76,9 +75,12 @@ in
     };
     path = with pkgs; [ podman ];
     script = ''
+      set -euo pipefail
       HACS_DIR="/var/lib/home-assistant/custom_components/hacs"
       if [ ! -d "$HACS_DIR" ]; then
         echo "Installing HACS via official script inside container..."
+        # TODO: Pin HACS to a specific release and verify checksum.
+        # Current approach fetches and executes an unpinned remote script (supply chain risk).
         podman exec home-assistant bash -c "wget -O - https://get.hacs.xyz | bash -"
         echo "HACS installed. Restarting Home Assistant..."
         systemctl restart home-assistant.service

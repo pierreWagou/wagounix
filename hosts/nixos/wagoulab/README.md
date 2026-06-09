@@ -18,27 +18,27 @@ Remote via Tailscale (split DNS)                        Traefik (HTTPS :443)
                                                              │
                                               ┌──────────────┼──────────────┐
                                               ▼              ▼              ▼
-                                        Vaultwarden    OpenCloud        Immich
-                                          (:80)         (:9200)        (:2283)
+                                         Vaultwarden     Seafile         Immich
+                                           (:80)          (:80)         (:2283)
 
 Remote SSH/LAN access via Tailscale
   ── Tailscale (WireGuard) ──▶ Beelink (subnet router) ──▶ 192.168.68.0/24
 ```
 
-All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network — no ports are published to the host except Traefik (80/443) and AdGuard Home (53). Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 challenge via Cloudflare). The Cloudflare Tunnel connects to Traefik over HTTPS (container-to-container). On the local network, AdGuard Home rewrites `*.wagou.fr` to the Beelink's IP, bypassing Cloudflare.
+All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network — no ports are published to the host except Traefik (80/443), AdGuard Home (53 on LAN/Tailscale/loopback, 3000 on loopback). Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 challenge via Cloudflare). The Cloudflare Tunnel connects to Traefik over HTTPS (container-to-container). On the local network, AdGuard Home rewrites `*.wagou.fr` to the Beelink's IP, bypassing Cloudflare.
 
 ## Services
 
 | Service | Purpose | Remote URL | Container port |
 |---|---|---|---|
 | **Vaultwarden** | Password manager (Bitwarden-compatible) | `https://vault.wagou.fr` | 80 |
-| **OpenCloud** | File sync & sharing (ownCloud-compatible) | `https://cloud.wagou.fr` | 9200 |
+| **Seafile** | File sync & sharing (SeaDoc + OIDC SSO) | `https://disk.wagou.fr` | 80 |
 | **Immich** | Photo management (Google Photos replacement) | `https://pixel.wagou.fr` | 2283 |
 | **Homepage** | Dashboard (Catppuccin Mocha theme) | `https://dash.wagou.fr` | 3000 |
 | **Home Assistant** | Home automation | `https://home.wagou.fr` | 8123 |
 | **Jellyfin** | Media server (hardware transcoding) | `https://tape.wagou.fr` | 8096 |
 | **Traefik** | Reverse proxy + HTTPS termination | - | 80, 443 |
-| **AdGuard Home** | DNS server + ad blocker | `https://guard.wagou.fr` | 53, 3000 |
+| **AdGuard Home** | DNS server + ad blocker | `https://guard.wagou.fr` | 5353 (→ host:53), 3000 |
 | **Cloudflare Tunnel** | Secure remote access (web services) | - | Outbound only |
 | **Tailscale** | VPN + subnet router (SSH, LAN access) | - | Native NixOS service |
 | **Fail2ban** | Brute force protection | - | - |
@@ -48,6 +48,8 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Webhook** | GitHub webhook receiver | `https://relay.wagou.fr` | 9000 (native systemd service) |
 | **Renovate** | Dependency update bot | - | Podman oneshot (timer + webhook trigger) |
 | **KitchenOwl** | Recipes & grocery lists | `https://cabas.wagou.fr` | 8080 |
+| **Authentik** | Identity provider / SSO (OIDC) | `https://auth.wagou.fr` | 9000 |
+| **imgproxy** | Branding assets (logos, backgrounds, favicon) | `https://assets.wagou.fr` | 8080 |
 
 ## Hardware
 
@@ -82,7 +84,7 @@ hosts/nixos/wagoulab/
     ├── secrets.nix          # sops-nix secret declarations and templates
     ├── traefik.nix          # Reverse proxy (Traefik container with Let's Encrypt)
     ├── vaultwarden.nix      # Password manager
-    ├── opencloud.nix        # File sync & sharing
+    ├── seafile.nix          # File sync & sharing (SeaDoc + OIDC SSO)
     ├── immich.nix           # Photo management
     ├── home-assistant.nix   # Home automation
     ├── jellyfin.nix         # Media server
@@ -90,7 +92,9 @@ hosts/nixos/wagoulab/
     ├── cloudflared.nix      # Cloudflare Tunnel
     ├── tailscale.nix        # Tailscale VPN (subnet router for LAN access)
     ├── homepage.nix         # Homepage dashboard
-    ├── homepage-images/     # Background images and favicon for Homepage dashboard
+    ├── authentik.nix        # Identity provider / SSO (OIDC)
+    ├── branding.nix         # Shared Catppuccin theme + imgproxy assets server
+    ├── branding-assets/     # Logos, background images, favicon (served via imgproxy)
     ├── fail2ban.nix         # Brute force protection
     ├── firewall.nix         # Firewall rules (ports 22, 53, 80, 443)
     ├── ttyd.nix             # Web terminal (remote dev access via dev.wagou.fr)
@@ -106,6 +110,7 @@ Platform-level config at `hosts/nixos/`:
 | File | Purpose |
 |---|---|
 | `configuration.nix` | SSH (hardened), user account, timezone, auto-updates, firewall enable |
+| `packages.nix` | NixOS-only packages (ghostty.terminfo, ventoy) |
 
 ## Security
 
@@ -130,7 +135,6 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | Secret | Used by | Runtime path |
 |---|---|---|
 | `cloudflare-credentials` | Cloudflare Tunnel (credentials file) | `/run/secrets/cloudflare-credentials` |
-| `opencloud-admin-password` | OpenCloud (via sops template) | `/run/secrets/rendered/opencloud.env` |
 | `vaultwarden-admin-token` | Vaultwarden (via sops template) | `/run/secrets/rendered/vaultwarden.env` |
 | `immich-db-username` | Immich + PostgreSQL (via sops template) | `/run/secrets/rendered/immich.env` |
 | `immich-db-password` | Immich + PostgreSQL (via sops template) | `/run/secrets/rendered/immich-postgres.env` |
@@ -147,6 +151,15 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `renovate-github-app-key` | GitHub App private key (base64 PEM) | Raw secret file |
 | `renovate-installation-id` | GitHub App installation ID | Raw secret file |
 | `kitchenowl-jwt-secret` | JWT signing key for KitchenOwl | `kitchenowl.env` template |
+| `kitchenowl-oidc-client-secret` | KitchenOwl OIDC client secret (Authentik SSO) | `kitchenowl.env` template |
+| `authentik-secret-key` | Authentik server secret key | `authentik.env` template |
+| `authentik-postgres-password` | Authentik PostgreSQL password | `authentik.env` + `authentik-postgres.env` |
+| `seafile-secret-key` | Seafile SECRET_KEY (seahub) | `seahub_settings.py` template |
+| `seafile-oauth-client-secret` | Seafile OIDC client secret (Authentik SSO) | `seahub_settings.py` template |
+| `seafile-mysql-root-password` | Seafile MariaDB root password | `seafile.env` + `seafile-db.env` |
+| `seafile-mysql-password` | Seafile MariaDB user password | `seafile.env` template |
+| `seafile-jwt-key` | Seafile internal JWT key | `seafile.env` template |
+| `seafile-admin-password` | Seafile initial admin account password | `seafile.env` template |
 
 ### Editing secrets
 
@@ -298,22 +311,23 @@ The homeserver uses a dedicated SSH key (`id_ed25519_homeserver`), separate from
 | AdGuard Home dashboard | `https://guard.wagou.fr` |
 | Homepage dashboard | `https://dash.wagou.fr` |
 | Vaultwarden | `https://vault.wagou.fr` |
-| OpenCloud | `https://cloud.wagou.fr` |
+| Seafile | `https://disk.wagou.fr` |
 | Immich | `https://pixel.wagou.fr` |
 | Home Assistant | `https://home.wagou.fr` |
 | Jellyfin | `https://tape.wagou.fr` |
+| Authentik | `https://auth.wagou.fr` |
 
 ## Troubleshooting
 
-### OpenCloud "Permanent Redirect" loop
+### Seafile branding/config not applied
 
-OpenCloud redirects HTTP to HTTPS because its URL is `https://cloud.wagou.fr`. The fix is `OC_INSECURE = "true"` and `PROXY_TLS = "false"` in the container environment — tells OpenCloud to accept plain HTTP behind Traefik.
+`seahub_settings.py` and the Catppuccin `custom.css` are deployed by a manual idempotent script (not auto-applied, since Seafile generates its config on first run). After the first start, run `sudo seafile-deploy` to copy the rendered config + CSS into the container and restart seahub.
 
-### OpenCloud fails to start ("Failed to load environment files")
+### Seafile fails to start ("Failed to load environment files")
 
 sops-nix decrypts secrets during activation (before services start). Check:
-1. `sudo ls -la /run/secrets/rendered/opencloud.env` — should exist
-2. `journalctl -u opencloud --no-pager | tail -20`
+1. `sudo ls -la /run/secrets/rendered/seafile.env` — should exist
+2. `journalctl -u seafile --no-pager | tail -20`
 3. sops-nix does NOT use a systemd service — do NOT add `after = [ "sops-nix.service" ]`
 
 ### Ghostty terminal error when SSHing

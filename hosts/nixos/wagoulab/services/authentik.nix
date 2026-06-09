@@ -126,7 +126,7 @@ in
 
     authentik-redis = {
       containerConfig = {
-        image = "docker.io/valkey/valkey:9.1.0";
+        image = host.valkeyImage;
         noNewPrivileges = true;
         networks = [ networks.authentik-internal.ref ];
         exec = [

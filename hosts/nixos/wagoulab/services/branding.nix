@@ -57,20 +57,6 @@ let
     end = "#7b2eff";
   };
 
-  # === Backgrounds ===
-  backgrounds = {
-    ocean = ./branding-assets/ocean.jpg;
-    city = ./branding-assets/city.jpg;
-    bridge = ./branding-assets/bridge.jpg;
-    dock = ./branding-assets/dock.jpg;
-    hood = ./branding-assets/hood.jpg;
-    river = ./branding-assets/river.jpg;
-    street = ./branding-assets/street.jpg;
-  };
-
-  # === Favicon (synthwave sunset) ===
-  favicon = ./branding-assets/favicon.svg;
-
   # === Logo Generator ===
   mkLogo =
     name:
@@ -119,16 +105,9 @@ let
   # === Pre-built URLs for common assets ===
   urls = {
     favicon = "${assetsBaseUrl}/plain/local:///favicon.svg";
-    faviconPng32 = "${assetsBaseUrl}/rs:fit:32:32/plain/local:///favicon.svg@png";
     logoAuth = "${assetsBaseUrl}/plain/local:///logo-auth.svg";
     logoDisk = "${assetsBaseUrl}/plain/local:///logo-disk.svg";
     bgCity = "${assetsBaseUrl}/plain/local:///city.jpg";
-    bgOcean = "${assetsBaseUrl}/plain/local:///ocean.jpg";
-    bgBridge = "${assetsBaseUrl}/plain/local:///bridge.jpg";
-    bgDock = "${assetsBaseUrl}/plain/local:///dock.jpg";
-    bgHood = "${assetsBaseUrl}/plain/local:///hood.jpg";
-    bgRiver = "${assetsBaseUrl}/plain/local:///river.jpg";
-    bgStreet = "${assetsBaseUrl}/plain/local:///street.jpg";
   };
 
   # === Authentik CSS ===
@@ -469,7 +448,8 @@ let
   '';
 
   # === Seafile CSS (full theme) ===
-  # Uses palette variables for generation, outputs CSS custom properties for runtime
+  # Uses palette variables for generation, outputs CSS custom properties for runtime.
+  # l/m abbreviate latte/mocha to keep the ~220-line CSS block readable.
   l = latte;
   m = mocha;
 
@@ -705,55 +685,10 @@ in
 {
   options.wagou.branding = {
     palette.mocha = lib.mkOption {
-      type = lib.types.attrs;
+      type = lib.types.attrsOf lib.types.str;
       default = mocha;
       readOnly = true;
       description = "Catppuccin Mocha palette (dark mode)";
-    };
-    palette.latte = lib.mkOption {
-      type = lib.types.attrs;
-      default = latte;
-      readOnly = true;
-      description = "Catppuccin Latte palette (light mode)";
-    };
-    accent = lib.mkOption {
-      type = lib.types.attrs;
-      default = {
-        light = latte.mauve;
-        dark = mocha.mauve;
-      };
-      readOnly = true;
-      description = "Primary accent colors for light/dark mode";
-    };
-    gradient = lib.mkOption {
-      type = lib.types.attrs;
-      default = gradient;
-      readOnly = true;
-      description = "Sunset gradient colors (start, mid, end)";
-    };
-    favicon = lib.mkOption {
-      type = lib.types.path;
-      default = favicon;
-      readOnly = true;
-      description = "Synthwave sunset favicon SVG";
-    };
-    backgrounds = lib.mkOption {
-      type = lib.types.attrs;
-      default = backgrounds;
-      readOnly = true;
-      description = "Available background images";
-    };
-    loginBackground = lib.mkOption {
-      type = lib.types.path;
-      default = backgrounds.city;
-      readOnly = true;
-      description = "Default login page background image";
-    };
-    mkLogo = lib.mkOption {
-      type = lib.types.functionTo lib.types.package;
-      default = mkLogo;
-      readOnly = true;
-      description = "Function: service name -> SVG logo derivation";
     };
     css.seafile = lib.mkOption {
       type = lib.types.package;
@@ -774,7 +709,7 @@ in
       description = "Base URL for imgproxy branding assets";
     };
     urls = lib.mkOption {
-      type = lib.types.attrs;
+      type = lib.types.attrsOf lib.types.str;
       default = urls;
       readOnly = true;
       description = "Pre-built URLs for common branding assets";

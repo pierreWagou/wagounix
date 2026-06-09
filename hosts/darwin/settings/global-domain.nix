@@ -20,8 +20,6 @@ _: {
     AppleMetricUnits = 1;
     ApplePressAndHoldEnabled = false;
     AppleScrollerPagingBehavior = true;
-    AppleShowAllExtensions = true;
-    AppleShowAllFiles = false;
     AppleShowScrollBars = "WhenScrolling";
     AppleSpacesSwitchOnActivate = true;
     AppleTemperatureUnit = "Celsius";
