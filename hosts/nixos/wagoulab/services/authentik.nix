@@ -29,6 +29,12 @@ let
             name: Default - Authentication flow
           required: false
 
+      - model: authentik_blueprints.metaapplyblueprint
+        attrs:
+          identifiers:
+            name: Default - Recovery flow
+          required: false
+
       - model: authentik_brands.brand
         state: present
         identifiers:
