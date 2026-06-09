@@ -43,6 +43,7 @@ let
           flow_authentication: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           flow_invalidation: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           flow_user_settings: !Find [authentik_flows.flow, [slug, default-user-settings-flow]]
+          flow_recovery: !Find [authentik_flows.flow, [slug, default-recovery-flow]]
 
       - model: authentik_flows.flow
         state: present
