@@ -159,7 +159,6 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 | `seafile-mysql-root-password` | Seafile MariaDB root password | `seafile.env` + `seafile-db.env` |
 | `seafile-mysql-password` | Seafile MariaDB user password | `seafile.env` template |
 | `seafile-jwt-key` | Seafile internal JWT key | `seafile.env` template |
-| `seafile-admin-password` | Seafile initial admin account password | `seafile.env` template |
 
 ### Editing secrets
 
