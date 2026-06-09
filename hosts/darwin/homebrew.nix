@@ -42,6 +42,7 @@
       "bruno"
       "claude"
       "discord"
+      "docker-desktop"
       "flutter"
       "ghostty"
       "google-chrome"

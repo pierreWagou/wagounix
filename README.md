@@ -34,10 +34,8 @@ Each configuration is assembled from layered modules — common packages are sha
   │         hosts/darwin/            │        hosts/nixos/        │  platform
   ├────────────────┬─────────────────┼────────────────────────────┤
   │   personal/    │     work/       │        wagoulab/           │  layer / host
-  ├────────┬───────┼──────┬──────────┤                            │
-  │wagoumac│wagou- │ sap  │  alan    │                            │
-  │        │ intel │      │          │                            │
-  └────────┴───────┴──────┴──────────┴────────────────────────────┘
+  │   wagoumac     │      alan       │                            │
+  └────────────────┴─────────────────┴────────────────────────────┘
 ```
 
 ## Structure
@@ -48,8 +46,8 @@ wagounix/
 └── hosts/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
-    │   ├── personal/  # Personal Macs (wagoumac, wagouintel)
-    │   └── work/      # Work Macs (sap, alan)
+    │   ├── personal/  # Personal Mac (wagoumac)
+    │   └── work/      # Work Mac (alan)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
 ```
@@ -78,6 +76,7 @@ wagounix/
     ├── darwin/
     │   ├── default.nix
     │   ├── configuration.nix
+    │   ├── dock.nix
     │   ├── homebrew.nix
     │   ├── packages.nix
     │   ├── icons.nix
@@ -91,30 +90,22 @@ wagounix/
     │   │   └── ...
     │   ├── personal/
     │   │   ├── default.nix
-    │   │   ├── dock.nix
     │   │   ├── packages.nix
     │   │   ├── homebrew.nix
-    │   │   ├── wagoumac/
-    │   │   │   ├── default.nix
-    │   │   │   ├── variables.nix
-    │   │   │   └── homebrew.nix
-    │   │   └── wagouintel/
+    │   │   └── wagoumac/
     │   │       ├── default.nix
     │   │       └── variables.nix
     │   └── work/
     │       ├── default.nix
-    │       ├── dock.nix
-    │       ├── homebrew.nix
-    │       ├── sap/
-    │       │   ├── default.nix
-    │       │   ├── variables.nix
-    │       │   └── homebrew.nix
     │       └── alan/
     │           ├── default.nix
-    │           └── variables.nix
+    │           ├── variables.nix
+    │           ├── homebrew.nix
+    │           └── packages.nix
     └── nixos/
         ├── default.nix
         ├── configuration.nix
+        ├── packages.nix
         └── wagoulab/
             ├── default.nix
             ├── variables.nix
@@ -126,13 +117,15 @@ wagounix/
                 ├── secrets.nix
                 ├── traefik.nix
                 ├── vaultwarden.nix
-                ├── opencloud.nix
+                ├── seafile.nix
                 ├── immich.nix
                 ├── adguardhome.nix
                 ├── cloudflared.nix
                 ├── tailscale.nix
                 ├── homepage.nix
-                ├── homepage-images/
+                ├── branding.nix
+                ├── branding-assets/
+                ├── authentik.nix
                 ├── home-assistant.nix
                 ├── jellyfin.nix
                 ├── fail2ban.nix
@@ -153,10 +146,8 @@ wagounix/
 
 | Profile | System | Layer | Description |
 |---|---|---|---|
-| `sap` | aarch64-darwin | work | SAP work Mac (legacy) |
 | `wagoumac` | aarch64-darwin | personal | Personal Mac (Apple Silicon) |
-| `wagouintel` | x86_64-darwin | personal | Personal Mac (Intel) |
-| `alan` | aarch64-darwin | work | New work Mac |
+| `alan` | aarch64-darwin | work | Work Mac |
 
 ### NixOS
 
@@ -168,7 +159,7 @@ wagounix/
 
 ### macOS
 
-Profiles: `wagoumac`, `wagouintel`, `sap`, `alan`
+Profiles: `wagoumac`, `alan`
 
 ```bash
 # 1. Install Lix (Nix)
@@ -197,10 +188,10 @@ sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 
 ```bash
 # macOS
-darwin-rebuild switch --flake ~/.config/wagounix#<profile>
+darwin-rebuild switch --flake ~/Projects/wagou/wagounix#<profile>
 
 # NixOS (local)
-sudo nixos-rebuild switch --flake ~/.config/wagounix#wagoulab
+sudo nixos-rebuild switch --flake ~/Projects/wagou/wagounix#wagoulab
 
 # NixOS (from GitHub, on server)
 sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
@@ -227,10 +218,8 @@ GitHub Actions runs on push to `main` and on PRs:
 | Job | Runner | Profiles |
 |---|---|---|
 | Lint | ubuntu-latest | nixfmt, statix, deadnix |
-| Build darwin | macos-15 | sap, wagoumac, alan (parallel) |
+| Build darwin | macos-15 | wagoumac, alan (parallel) |
 | Build NixOS | ubuntu-latest | wagoulab |
-
-> Note: `wagouintel` (x86_64-darwin) is not built in CI — GitHub Actions no longer offers Intel macOS runners for free.
 
 ## Quick Reference
 

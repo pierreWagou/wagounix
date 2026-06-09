@@ -34,6 +34,7 @@
       seafile-jwt-key.mode = "0400";
       seafile-oauth-client-secret.mode = "0400";
       seafile-secret-key.mode = "0400";
+      seafile-admin-password.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -106,6 +107,7 @@
         content = builtins.concatStringsSep "\n" [
           "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
           "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
+          "INIT_SEAFILE_ADMIN_PASSWORD=${config.sops.placeholder.seafile-admin-password}"
           "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
         ];
       };

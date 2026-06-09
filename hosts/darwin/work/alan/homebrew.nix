@@ -4,6 +4,7 @@ _: {
       "1password"
       "figma"
       "notion"
+      "slack"
     ];
   };
 }

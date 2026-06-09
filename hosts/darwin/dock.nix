@@ -5,11 +5,11 @@
 }:
 
 let
-  cfg = config.wagounix.dock;
+  cfg = config.wagou.dock;
 in
 {
 
-  options.wagounix.dock = {
+  options.wagou.dock = {
     communication = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ "/Applications/Thunderbird.app/" ];

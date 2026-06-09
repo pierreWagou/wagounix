@@ -18,8 +18,10 @@ let
     users = [
       {
         name = "admin";
-        # bcrypt hash — not a secret (irreversible). Stored here because the AdGuard
-        # config is generated as a Nix derivation; sops-nix can't inject at build time.
+        # WARNING: This bcrypt hash is in version control. While bcrypt is irreversible,
+        # anyone with repo access can attempt to crack it. Regenerate after deployment
+        # with: htpasswd -nbBC 10 "" 'newpassword' | cut -d: -f2
+        # Stored here because sops-nix can't inject at build time for YAML generation.
         password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
       }
     ];
@@ -46,10 +48,9 @@ let
       local_ptr_upstreams = [ ];
     };
     trusted_proxies = [
-      "10.89.0.0/16"
       "127.0.0.0/8"
-      "172.16.0.0/12"
-    ];
+    ]
+    ++ host.podmanCIDRs;
     filtering = {
       protection_enabled = true;
       filtering_enabled = true;

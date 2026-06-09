@@ -7,7 +7,7 @@
 {
   services.webhook = {
     enable = true;
-    port = 9000;
+    port = host.ports.webhook;
     ip = host.serverIP;
     user = "webhook";
     group = "webhook";

@@ -3,6 +3,7 @@
 {
   environment.systemPackages = with pkgs; [
     # Darwin-specific
+    cloudflared
     cocoapods
     darwin.trash
     git-credential-manager
