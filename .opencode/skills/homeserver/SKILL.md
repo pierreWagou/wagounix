@@ -154,7 +154,6 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 | `seafile-mysql-root-password` | `seafile.nix` | Via `seafile.env` + `seafile-db.env` |
 | `seafile-mysql-password` | `seafile.nix` | Via sops template `seafile.env` |
 | `seafile-jwt-key` | `seafile.nix` | Via sops template `seafile.env` |
-| `seafile-admin-password` | `seafile.nix` | Via sops template `seafile.env` |
 | `seafile-secret-key` | `seafile.nix` | Via `seahub_settings.py` template |
 | `seafile-oauth-client-secret` | `seafile.nix` | OIDC client secret (Authentik SSO), via `seahub_settings.py` |
 
