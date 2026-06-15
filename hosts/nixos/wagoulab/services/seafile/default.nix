@@ -8,9 +8,42 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   inherit (config.wagou) branding;
+  l = branding.palette.latte;
+  m = branding.palette.mocha;
 
-  # Branding CSS from the shared module (deployed locally by seafile-deploy)
-  customCss = branding.css.seafile;
+  # CSS variable blocks for light (Latte) and dark (Mocha) modes, prepended to the static CSS file
+  seafileCssVars = ''
+    /* === LIGHT MODE: Catppuccin Latte === */
+    :root,
+    [data-bs-theme=light] {
+      --ctp-base: ${l.base}; --ctp-mantle: ${l.mantle}; --ctp-crust: ${l.crust};
+      --ctp-surface0: ${l.surface0}; --ctp-surface1: ${l.surface1}; --ctp-surface2: ${l.surface2};
+      --ctp-overlay0: ${l.overlay0}; --ctp-overlay1: ${l.overlay1};
+      --ctp-text: ${l.text}; --ctp-subtext0: ${l.subtext0}; --ctp-subtext1: ${l.subtext1};
+      --ctp-mauve: ${l.mauve}; --ctp-lavender: ${l.lavender};
+      --ctp-red: ${l.red}; --ctp-green: ${l.green}; --ctp-yellow: ${l.yellow};
+      --ctp-peach: ${l.peach}; --ctp-blue: ${l.blue};
+      --bs-primary: ${l.mauve}; --bs-primary-rgb: 136, 57, 239;
+    }
+
+    /* === DARK MODE: Catppuccin Mocha === */
+    [data-bs-theme=dark] {
+      --ctp-base: ${m.base}; --ctp-mantle: ${m.mantle}; --ctp-crust: ${m.crust};
+      --ctp-surface0: ${m.surface0}; --ctp-surface1: ${m.surface1}; --ctp-surface2: ${m.surface2};
+      --ctp-overlay0: ${m.overlay0}; --ctp-overlay1: ${m.overlay1};
+      --ctp-text: ${m.text}; --ctp-subtext0: ${m.subtext0}; --ctp-subtext1: ${m.subtext1};
+      --ctp-mauve: ${m.mauve}; --ctp-lavender: ${m.lavender};
+      --ctp-red: ${m.red}; --ctp-green: ${m.green}; --ctp-yellow: ${m.yellow};
+      --ctp-peach: ${m.peach}; --ctp-blue: ${m.blue};
+      --bs-primary: ${m.mauve}; --bs-primary-rgb: 203, 166, 247;
+      color-scheme: dark;
+    }
+  '';
+
+  customCss = pkgs.concatText "seafile-custom.css" [
+    (pkgs.writeText "seafile-vars.css" seafileCssVars)
+    ./seafile.css
+  ];
 in
 {
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)

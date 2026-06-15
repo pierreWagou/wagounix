@@ -13,6 +13,14 @@
         icon = ./icons/bruno.icns;
       }
       {
+        path = "/Applications/Claude.app";
+        icon = ./icons/claude.icns;
+      }
+      {
+        path = "/Applications/Cloudflare WARP.app";
+        icon = ./icons/cloudflare.icns;
+      }
+      {
         path = "/Applications/Docker.app";
         icon = ./icons/docker.icns;
       }

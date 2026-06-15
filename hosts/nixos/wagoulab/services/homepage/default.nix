@@ -8,10 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks;
   inherit (config.wagou) branding;
-  m = branding.palette.mocha;
-
-  # Branding assets — image list for random background picker
-  brandingAssetsDir = ./branding-assets;
+  brandingAssetsDir = ../branding-assets;
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir brandingAssetsDir)
   );
@@ -224,65 +221,10 @@ let
 
   bookmarksFile = yamlFormat.generate "bookmarks.yaml" [ ];
 
-  customCSS = pkgs.writeText "custom.css" ''
-    :root {
-      --color-theme-50:  205 214 244;
-      --color-theme-100: 186 194 222;
-      --color-theme-200: 166 173 200;
-      --color-theme-300: 108 112 134;
-      --color-theme-400: 88 91 112;
-      --color-theme-500: 69 71 90;
-      --color-theme-600: 49 50 68;
-      --color-theme-700: 30 30 46;
-      --color-theme-800: 24 24 37;
-      --color-theme-900: 17 17 27;
-      --bg-color: 17 17 27;
-      --ctp-base:      ${m.base};
-      --ctp-mantle:    ${m.mantle};
-      --ctp-crust:     ${m.crust};
-      --ctp-surface0:  ${m.surface0};
-      --ctp-surface1:  ${m.surface1};
-      --ctp-surface2:  ${m.surface2};
-      --ctp-overlay0:  ${m.overlay0};
-      --ctp-text:      ${m.text};
-      --ctp-subtext0:  ${m.subtext0};
-      --ctp-subtext1:  ${m.subtext1};
-      --ctp-lavender:  ${m.lavender};
-      --ctp-mauve:     ${m.mauve};
-      --ctp-green:     ${m.green};
-      --ctp-red:       ${m.red};
-      --ctp-peach:     ${m.peach};
-      --ctp-blue:      ${m.blue};
-    }
-    body { background: var(--ctp-crust) !important; }
-    .service-card { background: rgba(30, 30, 46, 0.7) !important; border: 1px solid rgba(69, 71, 90, 0.5) !important; border-radius: 12px !important; backdrop-filter: blur(16px) saturate(120%); -webkit-backdrop-filter: blur(16px) saturate(120%); transition: all 0.2s ease !important; }
-    .service-card:hover { background: rgba(49, 50, 68, 0.8) !important; border-color: var(--ctp-lavender) !important; transform: translateY(-1px); }
-    .service-name, .service-title { color: var(--ctp-text) !important; font-weight: 500 !important; }
-    .service-description { color: var(--ctp-subtext0) !important; }
-    .service-block, .bg-theme-200\/50 { background: rgba(203, 166, 247, 0.1) !important; border: 1px solid rgba(69, 71, 90, 0.4) !important; border-radius: 8px !important; }
-    .service-block .uppercase { color: var(--ctp-mauve) !important; }
-    .service-block .font-thin { color: var(--ctp-text) !important; }
-    .service-group-name { color: var(--ctp-mauve) !important; font-weight: 600 !important; text-transform: uppercase; letter-spacing: 1.5px; font-size: 12px !important; }
-    #information-widgets { border-color: var(--ctp-surface0) !important; }
-    .information-widget-resource:nth-child(1) .resource-icon { color: var(--ctp-blue) !important; }
-    .information-widget-resource:nth-child(2) .resource-icon { color: var(--ctp-mauve) !important; }
-    .information-widget-resource:nth-child(3) .resource-icon { color: var(--ctp-peach) !important; }
-    .information-widget-resource .text-xs { color: var(--ctp-lavender) !important; }
-    .resource-usage { background: var(--ctp-surface0) !important; border-radius: 4px; }
-    .information-widget-resource:nth-child(1) .resource-usage > div { background: var(--ctp-blue) !important; }
-    .information-widget-resource:nth-child(2) .resource-usage > div { background: var(--ctp-mauve) !important; }
-    .information-widget-resource:nth-child(3) .resource-usage > div { background: var(--ctp-peach) !important; }
-    .information-widget-datetime span { color: var(--ctp-lavender) !important; }
-    .ping-up, [class*="bg-emerald"] { background-color: var(--ctp-green) !important; }
-    .ping-down, [class*="bg-rose"] { background-color: var(--ctp-red) !important; }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--ctp-surface1); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--ctp-surface2); }
-    .information-widget-greeting { order: 99; width: 100%; text-align: center; padding-top: 1rem; padding-bottom: 0.5rem; }
-    .information-widget-greeting span { font-size: 1.4rem !important; font-weight: 600; color: var(--ctp-lavender) !important; letter-spacing: 0.5px; }
-    #footer svg { color: var(--ctp-overlay0) !important; }
-  '';
+  customCSS = pkgs.concatText "custom.css" [
+    (pkgs.writeText "ctp-vars.css" branding.css.ctpVars)
+    ./custom.css
+  ];
 
   customJS = pkgs.writeText "custom.js" ''
     const images = [${imageListJS}];
