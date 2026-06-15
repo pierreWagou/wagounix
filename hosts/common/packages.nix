@@ -16,6 +16,7 @@
     git
     gh
     gnupg
+    go
     mise
     mprocs
     neovim

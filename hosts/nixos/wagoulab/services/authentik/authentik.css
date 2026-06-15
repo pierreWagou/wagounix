@@ -1,0 +1,254 @@
+/* Catppuccin for Authentik — Light: Latte, Dark: Mocha
+   Color variables are injected by Nix from the branding palette.
+   --ak-*  : Authentik component tokens (set per theme in the generated :root / [theme=dark] blocks)
+   --pf-*  : PatternFly tokens (same)
+   --ctp-* : Catppuccin Mocha fixed colors (for elements that are always dark: charts, scrollbar, etc.) */
+
+/* === Buttons (direct overrides for Shadow DOM penetration) === */
+.pf-c-button.pf-m-primary {
+  background-color: var(--ak-accent) !important;
+  border-color: var(--ak-accent) !important;
+  color: var(--ak-on-accent) !important;
+}
+.pf-c-button.pf-m-primary:hover,
+.pf-c-button.pf-m-primary:focus {
+  background-color: var(--ak-accent-hover) !important;
+  border-color: var(--ak-accent-hover) !important;
+}
+.pf-c-button.pf-m-secondary {
+  border-color: var(--ak-accent) !important;
+  color: var(--ak-accent) !important;
+}
+.pf-c-button.pf-m-secondary:hover {
+  background-color: var(--ak-accent) !important;
+  color: var(--ak-on-accent) !important;
+}
+.pf-c-button.pf-m-link {
+  color: var(--ak-accent) !important;
+}
+.pf-c-button.pf-m-link:hover {
+  color: var(--ak-accent-hover) !important;
+}
+
+/* === Links & clickable text === */
+a, a:visited {
+  color: var(--pf-global--link--Color) !important;
+}
+a:hover {
+  color: var(--pf-global--link--Color--hover) !important;
+}
+
+/* === Switches / toggles === */
+.pf-c-switch__input:checked ~ .pf-c-switch__toggle {
+  background-color: var(--ctp-green) !important;
+}
+.pf-c-switch__input:checked ~ .pf-c-switch__toggle::before {
+  border-color: var(--ctp-green) !important;
+}
+
+/* === Tabs (admin navigation) === */
+.pf-c-tabs__link::after {
+  border-bottom-color: transparent !important;
+}
+.pf-c-tabs__item.pf-m-current .pf-c-tabs__link::after {
+  border-bottom-color: var(--ak-accent) !important;
+}
+.pf-c-tabs__item.pf-m-current .pf-c-tabs__link {
+  color: var(--ak-accent) !important;
+}
+
+/* === Badges / labels === */
+.pf-c-badge.pf-m-read {
+  background-color: var(--ak-surface-border) !important;
+  color: var(--pf-global--Color--100) !important;
+}
+.pf-c-badge.pf-m-unread {
+  background-color: var(--ak-accent) !important;
+  color: var(--ak-on-accent) !important;
+}
+
+/* === Charts / diagrams — always Mocha for visibility === */
+.ct-series-a .ct-bar,
+.ct-series-a .ct-line,
+.ct-series-a .ct-point,
+.ct-series-a .ct-slice-donut,
+.ct-series-a .ct-area {
+  stroke: var(--ctp-mauve) !important;
+  fill: var(--ctp-mauve) !important;
+}
+.ct-series-b .ct-bar,
+.ct-series-b .ct-line,
+.ct-series-b .ct-point,
+.ct-series-b .ct-slice-donut,
+.ct-series-b .ct-area {
+  stroke: var(--ctp-blue) !important;
+  fill: var(--ctp-blue) !important;
+}
+.ct-series-c .ct-bar,
+.ct-series-c .ct-line,
+.ct-series-c .ct-point,
+.ct-series-c .ct-slice-donut,
+.ct-series-c .ct-area {
+  stroke: var(--ctp-green) !important;
+  fill: var(--ctp-green) !important;
+}
+.ct-series-d .ct-bar,
+.ct-series-d .ct-line,
+.ct-series-d .ct-point,
+.ct-series-d .ct-slice-donut,
+.ct-series-d .ct-area {
+  stroke: var(--ctp-peach) !important;
+  fill: var(--ctp-peach) !important;
+}
+.ct-series-e .ct-bar,
+.ct-series-e .ct-line,
+.ct-series-e .ct-point,
+.ct-series-e .ct-slice-donut,
+.ct-series-e .ct-area {
+  stroke: var(--ctp-lavender) !important;
+  fill: var(--ctp-lavender) !important;
+}
+/* Chart.js canvas fallback */
+canvas {
+  filter: hue-rotate(0deg) !important;
+}
+/* Chart grid lines */
+.ct-grid {
+  stroke: var(--ctp-surface1) !important;
+}
+.ct-label {
+  color: var(--ctp-subtext0) !important;
+  fill: var(--ctp-subtext0) !important;
+}
+
+/* === Cards (admin panels) === */
+.pf-c-card {
+  --pf-c-card--BackgroundColor: var(--ak-surface-raised) !important;
+  background-color: var(--ak-surface-raised) !important;
+  border-color: var(--ak-surface-border) !important;
+}
+
+/* === Sidebar === */
+.pf-c-page__sidebar {
+  --pf-c-page__sidebar--BackgroundColor: var(--ak-sidebar-bg);
+  --pf-c-page__sidebar--m-dark--BackgroundColor: var(--ak-sidebar-bg);
+  background-color: var(--ak-sidebar-bg) !important;
+  border-inline-end: 1px solid var(--ak-sidebar-border) !important;
+}
+.pf-c-nav {
+  --pf-c-nav__link--Color: var(--ak-sidebar-text);
+  --pf-c-nav__link--hover--Color: var(--ak-sidebar-text-hover);
+  --pf-c-nav__link--focus--Color: var(--ak-sidebar-text-hover);
+  --pf-c-nav__link--active--Color: var(--ak-sidebar-text-hover);
+  --pf-c-nav__link--hover--BackgroundColor: var(--ak-sidebar-bg-hover);
+  --pf-c-nav__link--focus--BackgroundColor: var(--ak-sidebar-bg-hover);
+  --pf-c-nav__link--active--BackgroundColor: var(--ak-sidebar-bg-hover);
+  --pf-c-nav__link--m-current--Color: var(--ak-sidebar-text-active);
+  --pf-c-nav__link--m-current--BackgroundColor: var(--ak-sidebar-bg-active);
+  --pf-c-nav__item--m-current--not--m-expanded__link--BackgroundColor: var(--ak-sidebar-bg-active);
+  --pf-c-nav__item--before--BorderColor: transparent;
+  --pf-c-nav__link--after--BorderColor: var(--ak-sidebar-border);
+  --pf-c-nav__section-title--Color: var(--ak-sidebar-section-text);
+  --pf-c-nav__section-title--BorderBottomColor: var(--ak-sidebar-border);
+  --pf-c-nav__scroll-button--Color: var(--ak-sidebar-text);
+  --pf-c-nav__scroll-button--before--BorderColor: var(--ak-sidebar-border);
+}
+.pf-c-nav__link {
+  color: var(--ak-sidebar-text) !important;
+  border-radius: 0.5rem;
+}
+.pf-c-nav__link:hover,
+.pf-c-nav__link:focus,
+.pf-c-nav__link:active {
+  color: var(--ak-sidebar-text-hover) !important;
+  background-color: var(--ak-sidebar-bg-hover) !important;
+}
+.pf-c-nav__link.pf-m-current,
+.pf-c-nav__item.pf-m-current > .pf-c-nav__link,
+.pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link {
+  color: var(--ak-sidebar-text-active) !important;
+  background-color: var(--ak-sidebar-bg-active) !important;
+}
+.pf-c-nav__section-title {
+  color: var(--ak-sidebar-section-text) !important;
+  border-bottom-color: var(--ak-sidebar-border) !important;
+}
+.pf-c-nav__link.pf-m-current::after,
+.pf-c-nav__link.pf-m-current:hover::after,
+.pf-c-nav__item.pf-m-current:not(.pf-m-expanded) .pf-c-nav__link::after {
+  --pf-c-nav__link--m-current--after--BorderColor: var(--ak-accent);
+  border-left-color: var(--ak-accent) !important;
+}
+
+/* === Tooltips === */
+pf-tooltip {
+  --pf-c-tooltip__content--BackgroundColor: var(--ak-tooltip-bg);
+  --pf-c-tooltip__content--Color: var(--ak-tooltip-text);
+  --pf-c-tooltip--BoxShadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* === Form inputs === */
+.pf-c-form-control {
+  --pf-c-form-control--BackgroundColor: var(--ak-input-bg) !important;
+  --pf-c-form-control--Color: var(--ak-input-text) !important;
+  --pf-c-form-control--placeholder--Color: var(--ak-input-placeholder) !important;
+  --pf-c-form-control--readonly--BackgroundColor: var(--ak-input-readonly-bg) !important;
+  --pf-c-form-control--disabled--BackgroundColor: var(--ak-input-readonly-bg) !important;
+  --pf-c-form-control--BorderBottomColor: var(--ak-input-border) !important;
+  background-color: var(--ak-input-bg) !important;
+  color: var(--ak-input-text) !important;
+}
+.pf-c-form-control::placeholder {
+  color: var(--ak-input-placeholder) !important;
+}
+.pf-c-form-control[readonly],
+.pf-c-form-control:disabled {
+  background-color: var(--ak-input-readonly-bg) !important;
+  color: var(--ak-input-text) !important;
+}
+.pf-c-form-control:focus {
+  border-color: var(--ak-accent) !important;
+  box-shadow: 0 0 0 1px var(--ak-accent) !important;
+}
+.pf-c-form__helper-text,
+.pf-c-form__label-text,
+.pf-c-check__label {
+  color: var(--pf-global--Color--100) !important;
+}
+
+/* === Progress / loading === */
+.pf-c-spinner__path {
+  stroke: var(--ak-accent) !important;
+}
+
+/* === Chips / tags === */
+.pf-c-chip {
+  background-color: var(--ak-surface-raised) !important;
+  border-color: var(--ak-surface-border) !important;
+}
+
+/* === Login page === */
+.pf-c-login__main {
+  background-color: rgba(49, 50, 68, 0.85) !important;
+  border: 1px solid var(--ctp-surface1) !important;
+  border-radius: 8px !important;
+  backdrop-filter: blur(10px) !important;
+}
+@media (prefers-color-scheme: light) {
+  .pf-c-login__main {
+    background-color: rgba(239, 241, 245, 0.85) !important;
+    border: 1px solid var(--ak-surface-raised) !important;
+  }
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--ctp-mantle); }
+::-webkit-scrollbar-thumb { background: var(--ctp-surface1); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ctp-surface2); }
+
+/* === Selection === */
+::selection {
+  background-color: rgba(203, 166, 247, 0.3);
+  color: var(--ctp-text);
+}

@@ -12,7 +12,7 @@ _: {
     ./vaultwarden.nix
     ./jellyfin.nix
     ./home-assistant.nix
-    ./homepage.nix
+    ./homepage
     ./adguardhome.nix
     ./immich.nix
     ./fail2ban.nix
@@ -24,8 +24,8 @@ _: {
     ./webhook.nix
     ./renovate.nix
     ./kitchenowl.nix
-    ./authentik.nix
-    ./seafile.nix
+    ./authentik
+    ./seafile
     ./branding.nix
   ];
 }
