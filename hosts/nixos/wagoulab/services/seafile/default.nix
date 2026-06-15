@@ -179,7 +179,7 @@ in
 
     seadoc = {
       containerConfig = {
-        image = "docker.io/seafileltd/sdoc-server:2.0.8";
+        image = "docker.io/seafileltd/sdoc-server:2.0.9";
         noNewPrivileges = true;
         networks = [ networks.seafile-internal.ref ];
         volumes = [ "/var/lib/seadoc:/shared" ];
