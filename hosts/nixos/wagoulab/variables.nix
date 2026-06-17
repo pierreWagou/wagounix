@@ -42,7 +42,7 @@ rec {
     "home"
     "tape"
     "dev"
-    "creneau"
+    "coolify"
     "relay"
     "cabas"
     "auth"
