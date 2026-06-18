@@ -89,11 +89,13 @@ in
               "1"
               "--loglevel"
               "warning"
-              "--requirepass"
-              "$(REDIS_PASSWORD)"
+              "--include"
+              "/etc/valkey/valkey.conf"
             ];
-            volumes = [ "/data/coolify/redis:/data" ];
-            environmentFiles = [ config.sops.templates."coolify.env".path ];
+            volumes = [
+              "/data/coolify/redis:/data"
+              "${config.sops.templates."coolify-valkey.conf".path}:/etc/valkey/valkey.conf:ro"
+            ];
           };
         };
       };
