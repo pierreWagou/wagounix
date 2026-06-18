@@ -14,7 +14,8 @@ in
         coolify = {
           containerConfig = {
             image = "ghcr.io/coollabsio/coolify:${coolifyVersion}";
-            noNewPrivileges = true;
+            # noNewPrivileges omitted: the s6-overlay init inside the Coolify image
+            # needs to chown /run to UID 9999 at startup — no-new-privileges blocks it.
             networks = [
               networks.proxy.ref
               networks.coolify-internal.ref
