@@ -135,6 +135,10 @@
       "coolify-db.env" = {
         content = "POSTGRES_PASSWORD=${config.sops.placeholder.coolify-db-password}\n";
       };
+
+      "coolify-valkey.conf" = {
+        content = "requirepass ${config.sops.placeholder.coolify-redis-password}\n";
+      };
     };
   };
 }
