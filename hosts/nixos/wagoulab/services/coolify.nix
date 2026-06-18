@@ -6,9 +6,6 @@ let
 in
 {
   virtualisation = {
-    # Expose the Podman socket at /var/run/docker.sock so Coolify can manage containers.
-    podman.dockerSocket.enable = true;
-
     quadlet = {
       # Coolify-internal network — isolates DB and Redis from the proxy network.
       networks.coolify-internal = { };
@@ -42,7 +39,7 @@ in
             environmentFiles = [ config.sops.templates."coolify.env".path ];
             volumes = [
               "/data/coolify:/data/coolify"
-              "/var/run/docker.sock:/var/run/docker.sock"
+              "/run/podman/podman.sock:/var/run/docker.sock"
             ];
             labels = {
               "traefik.enable" = "true";
