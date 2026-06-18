@@ -137,6 +137,8 @@
       };
 
       "coolify-valkey.conf" = {
+        # mode 0444: Valkey runs as non-root inside the container and reads this via bind mount
+        mode = "0444";
         content = "requirepass ${config.sops.placeholder.coolify-redis-password}\n";
       };
     };
