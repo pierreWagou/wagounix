@@ -81,7 +81,7 @@ in
         "--providers.docker=true"
         "--providers.docker.endpoint=unix:///run/podman/podman.sock"
         "--providers.docker.exposedbydefault=false"
-        "--providers.docker.network=systemd-proxy"
+        "--providers.docker.network=proxy"
         "--providers.file.filename=/etc/traefik/dynamic.yml"
         # Entrypoints
         "--entrypoints.web.address=:80"
