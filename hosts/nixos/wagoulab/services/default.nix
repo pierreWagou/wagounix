@@ -26,5 +26,6 @@ _: {
     ./authentik
     ./seafile
     ./branding.nix
+    ./coolify.nix
   ];
 }
