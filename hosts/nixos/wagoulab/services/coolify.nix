@@ -48,7 +48,7 @@ in
               "traefik.http.routers.coolify.entrypoints" = "websecure";
               "traefik.http.routers.coolify.tls" = "true";
               "traefik.http.routers.coolify.middlewares" = "secure-headers@file";
-              "traefik.http.services.coolify.loadbalancer.server.port" = "8000";
+              "traefik.http.services.coolify.loadbalancer.server.port" = "3000";
             };
           };
         };
