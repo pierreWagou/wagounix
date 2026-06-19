@@ -1,9 +1,11 @@
 keys:
   - &admin age1ygezr8p29dslzduyvleekzl9zf4swqjntyy4t3yp4fr590jhrfyqsjcy9s
   - &wagoulab age1fqkxw5ly485yz6lpqw9v84hka764sy45xyrd53vx7grs4yvjud9sa4chjc
+  - &wagoumac age1ya5p9n5p90p8jsml4lnw6jlfyu8t872khjf5vaff9gxzlkav2u4qcrsxcr
 creation_rules:
   - path_regex: hosts/nixos/wagoulab/secrets\.yaml$
     key_groups:
       - age:
           - *admin
           - *wagoulab
+          - *wagoumac

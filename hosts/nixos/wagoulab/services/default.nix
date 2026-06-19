@@ -20,12 +20,12 @@ _: {
     ./tailscale.nix
     ./ttyd.nix
     ./rbw.nix
-    ./creneau.nix
     ./webhook.nix
     ./renovate.nix
     ./kitchenowl.nix
     ./authentik
     ./seafile
     ./branding.nix
+    ./dokploy.nix
   ];
 }
