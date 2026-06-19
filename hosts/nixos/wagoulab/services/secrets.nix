@@ -35,13 +35,6 @@
       seafile-oauth-client-secret.mode = "0400";
       seafile-secret-key.mode = "0400";
 
-      coolify-app-key.mode = "0400";
-      coolify-pusher-app-id.mode = "0400";
-      coolify-pusher-app-key.mode = "0400";
-      coolify-pusher-app-secret.mode = "0400";
-      coolify-db-password.mode = "0400";
-      coolify-redis-password.mode = "0400";
-
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
       root-password-hash.neededForUsers = true;
@@ -119,27 +112,6 @@
 
       "seafile-db.env" = {
         content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
-      };
-
-      "coolify.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "APP_KEY=${config.sops.placeholder.coolify-app-key}"
-          "DB_PASSWORD=${config.sops.placeholder.coolify-db-password}"
-          "REDIS_PASSWORD=${config.sops.placeholder.coolify-redis-password}"
-          "PUSHER_APP_ID=${config.sops.placeholder.coolify-pusher-app-id}"
-          "PUSHER_APP_KEY=${config.sops.placeholder.coolify-pusher-app-key}"
-          "PUSHER_APP_SECRET=${config.sops.placeholder.coolify-pusher-app-secret}"
-        ];
-      };
-
-      "coolify-db.env" = {
-        content = "POSTGRES_PASSWORD=${config.sops.placeholder.coolify-db-password}\n";
-      };
-
-      "coolify-valkey.conf" = {
-        # mode 0444: Valkey runs as non-root inside the container and reads this via bind mount
-        mode = "0444";
-        content = "requirepass ${config.sops.placeholder.coolify-redis-password}\n";
       };
     };
   };

@@ -42,7 +42,7 @@ rec {
     "home"
     "tape"
     "dev"
-    "coolify"
+    "apps"
     "relay"
     "cabas"
     "auth"
