@@ -53,6 +53,7 @@
     hashedPasswordFile = config.sops.secrets.wagou-password-hash.path;
     extraGroups = [
       "wheel"
+      "docker" # Allows wagou to use Docker CLI (required for Dokploy management)
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7V9q0WZKoODnbbHsHDFXwTE4JDEqmhvmKxWG05JhBp wagou@wagoumac"

@@ -52,6 +52,7 @@
       set -euo pipefail
 
       ADVERTISE_ADDR="${host.serverIP}"
+      DOKPLOY_HOST_PORT="3001"     # Port 3000 is taken by AdGuard web UI (127.0.0.1:3000)
       DOKPLOY_TRAEFIK_HTTP_PORT="8080"
       DOKPLOY_TRAEFIK_HTTPS_PORT="8443"
 
@@ -99,6 +100,12 @@
       fi
 
       # Deploy or update the main dokploy service
+      CURRENT_PORT=$(docker service inspect dokploy --format '{{range .Endpoint.Ports}}{{.PublishedPort}}{{end}}' 2>/dev/null || echo "")
+      if [ -n "$CURRENT_PORT" ] && [ "$CURRENT_PORT" != "$DOKPLOY_HOST_PORT" ]; then
+        echo "Dokploy service exists but uses port $CURRENT_PORT, recreating on port $DOKPLOY_HOST_PORT..."
+        docker service rm dokploy
+        CURRENT_PORT=""
+      fi
       if docker service ls --filter name=dokploy --format '{{.Name}}' | grep -q '^dokploy$'; then
         echo "Updating dokploy service to latest..."
         docker service update \
@@ -115,7 +122,7 @@
           --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
           --mount type=bind,source=/etc/dokploy,target=/etc/dokploy \
           --mount type=volume,source=dokploy,target=/root/.docker \
-          --publish published=3000,target=3000,mode=host \
+          --publish published="$DOKPLOY_HOST_PORT",target=3000,mode=host \
           --update-parallelism 1 \
           --update-order stop-first \
           --constraint 'node.role == manager' \
