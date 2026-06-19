@@ -96,8 +96,9 @@
         echo "Deploying dokploy-redis..."
         docker service create \
           --detach \
-          --name dokploy-redis \
-          --constraint 'node.role==manager' \
+          --name dokploy \
+          --replicas 1 \
+          --restart-max-attempts 5 \
           --network dokploy-network \
           --mount type=volume,source=dokploy-redis,target=/data \
           redis:7
