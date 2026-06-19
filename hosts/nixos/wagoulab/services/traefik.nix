@@ -41,6 +41,14 @@ let
           middlewares:
             - secure-headers
           service: webhook
+        dokploy:
+          rule: "Host(`apps.${host.domain}`)"
+          entrypoints:
+            - websecure
+          tls: {}
+          middlewares:
+            - secure-headers
+          service: dokploy
       services:
         ttyd:
           loadBalancer:
@@ -50,6 +58,10 @@ let
           loadBalancer:
             servers:
               - url: "http://${host.serverIP}:${toString host.ports.webhook}"
+        dokploy:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:3000"
   '';
 in
 {
