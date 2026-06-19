@@ -35,6 +35,8 @@
       seafile-oauth-client-secret.mode = "0400";
       seafile-secret-key.mode = "0400";
 
+      dokploy-db-password.mode = "0400";
+
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
       root-password-hash.neededForUsers = true;
@@ -112,6 +114,10 @@
 
       "seafile-db.env" = {
         content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
+      };
+
+      "dokploy-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.dokploy-db-password}\n";
       };
     };
   };

@@ -1,4 +1,9 @@
-{ host, pkgs, ... }:
+{
+  config,
+  host,
+  pkgs,
+  ...
+}:
 
 # Dokploy: self-hosted PaaS for deploying apps via a web UI.
 # It requires Docker Swarm (not Podman) — this file enables Docker alongside Podman
@@ -73,6 +78,7 @@
       fi
 
       # Deploy or update dokploy-postgres service
+      DB_PASSWORD=$(cat ${config.sops.secrets.dokploy-db-password.path})
       if docker service ls --filter name=dokploy-postgres --format '{{.Name}}' | grep -q '^dokploy-postgres$'; then
         echo "dokploy-postgres already deployed, skipping."
       else
@@ -84,7 +90,7 @@
           --network dokploy-network \
           --env POSTGRES_USER=dokploy \
           --env POSTGRES_DB=dokploy \
-          --env POSTGRES_PASSWORD=dokploy \
+          --env POSTGRES_PASSWORD="$DB_PASSWORD" \
           --mount type=volume,source=dokploy-postgres,target=/var/lib/postgresql/data \
           postgres:16
       fi
@@ -96,9 +102,8 @@
         echo "Deploying dokploy-redis..."
         docker service create \
           --detach \
-          --name dokploy \
-          --replicas 1 \
-          --restart-max-attempts 5 \
+          --name dokploy-redis \
+          --constraint 'node.role==manager' \
           --network dokploy-network \
           --mount type=volume,source=dokploy-redis,target=/data \
           redis:7
@@ -116,6 +121,7 @@
         docker service update \
           --detach \
           --image dokploy/dokploy:latest \
+          --env-add DATABASE_URL="postgresql://dokploy:$DB_PASSWORD@dokploy-postgres:5432/dokploy" \
           --update-parallelism 1 \
           --update-order stop-first \
           dokploy
@@ -134,6 +140,7 @@
           --update-order stop-first \
           --constraint 'node.role == manager' \
           --env ADVERTISE_ADDR="$ADVERTISE_ADDR" \
+          --env DATABASE_URL="postgresql://dokploy:$DB_PASSWORD@dokploy-postgres:5432/dokploy" \
           --env TRAEFIK_PORT="$DOKPLOY_TRAEFIK_HTTP_PORT" \
           --env TRAEFIK_SSL_PORT="$DOKPLOY_TRAEFIK_HTTPS_PORT" \
           --env TZ="${host.timezone}" \
