@@ -61,7 +61,7 @@ let
         dokploy:
           loadBalancer:
             servers:
-              - url: "http://127.0.0.1:3001"
+              - url: "http://${host.serverIP}:3001"
   '';
 in
 {
