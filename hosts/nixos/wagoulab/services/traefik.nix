@@ -77,6 +77,7 @@ in
       environmentFiles = [ config.sops.templates."traefik.env".path ];
       volumes = [
         "/run/podman/podman.sock:/run/podman/podman.sock:ro"
+        "/var/run/docker.sock:/var/run/docker.sock:ro"
         "/var/lib/traefik/letsencrypt:/letsencrypt"
         "${dynamicConfig}:/etc/traefik/dynamic.yml:ro"
       ];
@@ -94,6 +95,11 @@ in
         "--providers.docker.endpoint=unix:///run/podman/podman.sock"
         "--providers.docker.exposedbydefault=false"
         "--providers.docker.network=proxy"
+        # Swarm provider — discovers Dokploy-deployed Docker Swarm services
+        "--providers.swarm=true"
+        "--providers.swarm.endpoint=unix:///var/run/docker.sock"
+        "--providers.swarm.exposedbydefault=false"
+        "--providers.swarm.network=dokploy-network"
         "--providers.file.filename=/etc/traefik/dynamic.yml"
         # Entrypoints
         "--entrypoints.web.address=:80"

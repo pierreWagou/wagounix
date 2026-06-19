@@ -33,7 +33,8 @@ rec {
     webhook = 9000;
   };
 
-  # Subdomains routed through the tunnel, served by Traefik, and rewritten by AdGuard
+  # Subdomains routed through the tunnel, served by Traefik, and rewritten by AdGuard.
+  # "*.apps" covers all Dokploy-deployed apps under apps.wagou.fr without NixOS rebuilds.
   tunnelSubdomains = [
     "vault"
     "pixel"
@@ -44,6 +45,7 @@ rec {
     "dev"
     "creneau"
     "apps"
+    "*.apps"
     "relay"
     "cabas"
     "auth"
