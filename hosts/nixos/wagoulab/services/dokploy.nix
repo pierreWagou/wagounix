@@ -39,6 +39,8 @@
       # Retry a few times in case docker is still initializing
       Restart = "on-failure";
       RestartSec = "5s";
+      # Prevent blocking nixos-rebuild switch indefinitely (image pulls can take time)
+      TimeoutStartSec = "300";
     };
 
     # Make docker and standard tools available in the script PATH
@@ -76,6 +78,7 @@
       else
         echo "Deploying dokploy-postgres..."
         docker service create \
+          --detach \
           --name dokploy-postgres \
           --constraint 'node.role==manager' \
           --network dokploy-network \
@@ -92,6 +95,7 @@
       else
         echo "Deploying dokploy-redis..."
         docker service create \
+          --detach \
           --name dokploy-redis \
           --constraint 'node.role==manager' \
           --network dokploy-network \
@@ -109,6 +113,7 @@
       if docker service ls --filter name=dokploy --format '{{.Name}}' | grep -q '^dokploy$'; then
         echo "Updating dokploy service to latest..."
         docker service update \
+          --detach \
           --image dokploy/dokploy:latest \
           --update-parallelism 1 \
           --update-order stop-first \
@@ -118,6 +123,7 @@
         docker service create \
           --name dokploy \
           --replicas 1 \
+          --detach \
           --network dokploy-network \
           --mount type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock \
           --mount type=bind,source=/etc/dokploy,target=/etc/dokploy \
