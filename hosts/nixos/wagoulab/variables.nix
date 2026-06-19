@@ -42,6 +42,7 @@ rec {
     "home"
     "tape"
     "dev"
+    "creneau"
     "apps"
     "relay"
     "cabas"
