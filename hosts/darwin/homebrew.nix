@@ -37,6 +37,7 @@
       "yarn"
     ];
     casks = [
+      "aerial"
       "alt-tab"
       "betterDisplay"
       "bruno"
