@@ -10,15 +10,18 @@
 # and deploys Dokploy as a Docker Swarm service managed by a NixOS systemd unit.
 #
 # Architecture:
-#   - NixOS Traefik (Podman/quadlet): single TLS termination point for all traffic.
-#     Routes NixOS services on *.wagou.fr and Dokploy-deployed apps on *.apps.wagou.fr.
-#     Discovers Dokploy Swarm services via --providers.swarm (Docker socket).
-#   - Dokploy's bundled Traefik: NOT used — bypassed entirely.
+#   - NixOS Traefik (Podman/quadlet): single external entry point, handles *.wagou.fr.
+#     Forwards Dokploy app traffic to Dokploy Traefik via 127.0.0.1:8080.
+#   - Dokploy Traefik (Docker Swarm): internal router for Dokploy-deployed apps.
+#     Published to 127.0.0.1:8080 only (not externally accessible).
+#     Reads routing config from /etc/dokploy/traefik/dynamic/ (file provider).
+#   - Two Docker networks:
+#     - dokploy-network: Dokploy infra (UI, postgres, redis, traefik) — internal only.
+#     - apps: Deployed app containers — isolated from Dokploy infra.
 #   - Cloudflare tunnel: forwards all traffic to NixOS Traefik on 443.
 #
 # Dokploy UI: https://apps.wagou.fr
-# Apps deployed by Dokploy: set traefik.enable=true + traefik labels on the service,
-# NixOS Traefik auto-discovers and routes to *.apps.wagou.fr with no NixOS rebuild needed.
+# Apps deployed by Dokploy: add domain in Dokploy UI + add a NixOS Traefik forward rule.
 #
 # First-time setup (run once after nixos-rebuild switch):
 #   docker swarm init --advertise-addr <server-ip>
@@ -74,10 +77,16 @@
         echo "Docker Swarm already active."
       fi
 
-      # Ensure dokploy overlay network exists
+      # Ensure dokploy-network overlay exists (Dokploy infra: UI, postgres, redis, traefik)
       if ! docker network ls --filter name=dokploy-network --format '{{.Name}}' | grep -q '^dokploy-network$'; then
         echo "Creating dokploy-network overlay..."
         docker network create --driver overlay --attachable dokploy-network
+      fi
+
+      # Ensure apps overlay network exists (isolated network for Dokploy-deployed app containers)
+      if ! docker network ls --filter name=apps --format '{{.Name}}' | grep -q '^apps$'; then
+        echo "Creating apps overlay network..."
+        docker network create --driver overlay --attachable apps
       fi
 
       # Deploy or update dokploy-postgres service
@@ -110,6 +119,30 @@
           --network dokploy-network \
           --mount type=volume,source=dokploy-redis,target=/data \
           redis:7
+      fi
+
+      # Deploy or update dokploy-traefik service
+      # Acts as the internal router for Dokploy-deployed apps.
+      # Published to 127.0.0.1:8080 only — NixOS Traefik forwards app traffic here.
+      # Connected to both dokploy-network (for config/infra) and apps (to reach app containers).
+      if docker service ls --filter name=dokploy-traefik --format '{{.Name}}' | grep -q '^dokploy-traefik$'; then
+        echo "dokploy-traefik already deployed, skipping."
+      else
+        echo "Deploying dokploy-traefik..."
+        docker service create \
+          --detach \
+          --name dokploy-traefik \
+          --constraint 'node.role==manager' \
+          --network dokploy-network \
+          --network apps \
+          --publish published="$DOKPLOY_TRAEFIK_HTTP_PORT",target=80,protocol=tcp,mode=host \
+          --mount type=bind,source=/etc/dokploy/traefik,target=/etc/traefik \
+          traefik:v3.3.5 \
+          --global.sendanonymoususage=false \
+          --providers.file.directory=/etc/traefik/dynamic \
+          --providers.file.watch=true \
+          --entrypoints.web.address=:80 \
+          --log.level=INFO
       fi
 
       # Deploy or update the main dokploy service
