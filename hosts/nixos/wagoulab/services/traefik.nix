@@ -49,6 +49,14 @@ let
           middlewares:
             - secure-headers
           service: dokploy
+        creneau-preview:
+          rule: "Host(`creneau-preview.${host.domain}`)"
+          entrypoints:
+            - websecure
+          tls: {}
+          middlewares:
+            - secure-headers
+          service: dokploy-traefik
       services:
         ttyd:
           loadBalancer:
@@ -62,6 +70,10 @@ let
           loadBalancer:
             servers:
               - url: "http://${host.serverIP}:3001"
+        dokploy-traefik:
+          loadBalancer:
+            servers:
+              - url: "http://127.0.0.1:8080"
   '';
 in
 {
@@ -77,7 +89,6 @@ in
       environmentFiles = [ config.sops.templates."traefik.env".path ];
       volumes = [
         "/run/podman/podman.sock:/run/podman/podman.sock:ro"
-        "/var/run/docker.sock:/var/run/docker.sock:ro"
         "/var/lib/traefik/letsencrypt:/letsencrypt"
         "${dynamicConfig}:/etc/traefik/dynamic.yml:ro"
       ];
@@ -95,11 +106,6 @@ in
         "--providers.docker.endpoint=unix:///run/podman/podman.sock"
         "--providers.docker.exposedbydefault=false"
         "--providers.docker.network=proxy"
-        # Swarm provider — discovers Dokploy-deployed Docker Swarm services
-        "--providers.swarm=true"
-        "--providers.swarm.endpoint=unix:///var/run/docker.sock"
-        "--providers.swarm.exposedbydefault=false"
-        "--providers.swarm.network=dokploy-network"
         "--providers.file.filename=/etc/traefik/dynamic.yml"
         # Entrypoints
         "--entrypoints.web.address=:80"
