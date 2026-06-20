@@ -46,6 +46,7 @@ rec {
     "creneau"
     "apps"
     "*.apps"
+    "creneau-preview"
     "relay"
     "cabas"
     "auth"
