@@ -25,7 +25,7 @@ let
         }) host.serviceTunnelSubdomains)
         ++ (map (sub: {
           hostname = "${sub}.${host.domain}";
-          service = "http://127.0.0.1:8080";
+          service = "http://host.containers.internal:8080";
         }) host.appTunnelSubdomains)
         ++ [ { service = "http_status:404"; } ];
     }
