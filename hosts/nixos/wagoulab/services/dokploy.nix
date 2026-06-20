@@ -148,7 +148,8 @@ in
       # Published to 127.0.0.1:8080 only — NixOS cloudflared forwards app traffic here.
       # Connected to both dokploy-network (to read dynamic config) and apps (to reach containers).
       # Uses a clean static config (not Dokploy's traefik.yml) to avoid port conflicts.
-      if docker service ls --filter name=dokploy-traefik --format '{{.Name}}' | grep -q '^dokploy-traefik$'; then
+      # Use docker service inspect (not ls --filter) to avoid false positives during removal.
+      if docker service inspect dokploy-traefik > /dev/null 2>&1; then
         echo "dokploy-traefik already deployed, skipping."
       else
         echo "Deploying dokploy-traefik..."
