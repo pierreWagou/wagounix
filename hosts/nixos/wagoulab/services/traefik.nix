@@ -49,14 +49,6 @@ let
           middlewares:
             - secure-headers
           service: dokploy
-        creneau-preview:
-          rule: "Host(`creneau-preview.${host.domain}`)"
-          entrypoints:
-            - websecure
-          tls: {}
-          middlewares:
-            - secure-headers
-          service: dokploy-traefik
       services:
         ttyd:
           loadBalancer:
@@ -70,10 +62,6 @@ let
           loadBalancer:
             servers:
               - url: "http://${host.serverIP}:3001"
-        dokploy-traefik:
-          loadBalancer:
-            servers:
-              - url: "http://127.0.0.1:8080"
   '';
 in
 {

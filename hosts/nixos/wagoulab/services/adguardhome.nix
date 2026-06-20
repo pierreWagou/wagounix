@@ -58,7 +58,7 @@ let
         domain = "${sub}.${host.domain}";
         answer = host.serverIP;
         enabled = true;
-      }) host.tunnelSubdomains;
+      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains);
     };
     filters = [
       {

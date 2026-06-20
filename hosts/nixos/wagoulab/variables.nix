@@ -33,9 +33,10 @@ rec {
     webhook = 9000;
   };
 
-  # Subdomains routed through the tunnel, served by Traefik, and rewritten by AdGuard.
-  # "*.apps" covers all Dokploy-deployed apps under apps.wagou.fr without NixOS rebuilds.
-  tunnelSubdomains = [
+  # Subdomains served by NixOS Traefik (services).
+  # Each entry generates a tunnel ingress rule → https://serverIP:443,
+  # an AdGuard DNS rewrite → serverIP, and a Cloudflare CNAME (manual, one-time).
+  serviceTunnelSubdomains = [
     "vault"
     "pixel"
     "dash"
@@ -45,12 +46,18 @@ rec {
     "dev"
     "creneau"
     "apps"
-    "*.apps"
-    "creneau-preview"
     "relay"
     "cabas"
     "auth"
     "disk"
     "assets"
+  ];
+
+  # Subdomains served by Dokploy Traefik (deployed apps).
+  # Each entry generates a tunnel ingress rule → http://127.0.0.1:8080 (Dokploy Traefik),
+  # and an AdGuard DNS rewrite → serverIP.
+  # Cloudflare CNAME must be added manually (one-time) per new app subdomain.
+  appTunnelSubdomains = [
+    "creneau-preview"
   ];
 }

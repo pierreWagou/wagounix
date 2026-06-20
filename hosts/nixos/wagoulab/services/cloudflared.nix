@@ -8,9 +8,11 @@
 let
   inherit (config.virtualisation.quadlet) networks;
 
-  # Tunnel config — routes all subdomains to Traefik inside the Podman network.
-  # Uses HTTPS to avoid the HTTP->HTTPS redirect loop.
-  # noTLSVerify is safe because the connection is internal (container-to-container).
+  # Tunnel config — two sets of ingress rules:
+  #   1. Service subdomains → NixOS Traefik via HTTPS on the host LAN IP.
+  #      noTLSVerify is safe because this is an internal connection.
+  #   2. App subdomains → Dokploy Traefik via HTTP on the host loopback (127.0.0.1:8080).
+  #      Cloudflare handles TLS at the edge; Dokploy Traefik receives plain HTTP.
   configFile = pkgs.writeText "cloudflared-config.yml" (
     builtins.toJSON {
       tunnel = host.cloudflareTunnelId;
@@ -18,9 +20,13 @@ let
       ingress =
         (map (sub: {
           hostname = "${sub}.${host.domain}";
-          service = "https://traefik:443";
+          service = "https://${host.serverIP}:443";
           originRequest.noTLSVerify = true;
-        }) host.tunnelSubdomains)
+        }) host.serviceTunnelSubdomains)
+        ++ (map (sub: {
+          hostname = "${sub}.${host.domain}";
+          service = "http://127.0.0.1:8080";
+        }) host.appTunnelSubdomains)
         ++ [ { service = "http_status:404"; } ];
     }
   );
