@@ -5,6 +5,28 @@
   ...
 }:
 
+let
+  # Clean static config for Dokploy Traefik.
+  # Uses port 80 (not 8080) to avoid conflicts with the Dokploy-generated traefik.yml.
+  # Mounted at /etc/dokploy-traefik/traefik.yml so it takes precedence over
+  # /etc/dokploy/traefik/traefik.yml (which Traefik auto-loads from /etc/traefik/).
+  # Only uses the file provider pointing at Dokploy's dynamic config directory.
+  # No ACME, no dashboard — Cloudflare handles TLS at the edge.
+  dokployTraefikConfig = pkgs.writeText "dokploy-traefik.yml" ''
+    global:
+      sendAnonymousUsage: false
+    providers:
+      file:
+        directory: /etc/dokploy/traefik/dynamic
+        watch: true
+    entryPoints:
+      web:
+        address: ":80"
+    api:
+      insecure: false
+  '';
+in
+
 # Dokploy: self-hosted PaaS for deploying apps via a web UI.
 # It requires Docker Swarm (not Podman) — this file enables Docker alongside Podman
 # and deploys Dokploy as a Docker Swarm service managed by a NixOS systemd unit.
@@ -122,9 +144,10 @@
       fi
 
       # Deploy or update dokploy-traefik service
-      # Acts as the internal router for Dokploy-deployed apps.
-      # Published to 127.0.0.1:8080 only — NixOS Traefik forwards app traffic here.
-      # Connected to both dokploy-network (for config/infra) and apps (to reach app containers).
+      # Internal router for Dokploy-deployed apps.
+      # Published to 127.0.0.1:8080 only — NixOS cloudflared forwards app traffic here.
+      # Connected to both dokploy-network (to read dynamic config) and apps (to reach containers).
+      # Uses a clean static config (not Dokploy's traefik.yml) to avoid port conflicts.
       if docker service ls --filter name=dokploy-traefik --format '{{.Name}}' | grep -q '^dokploy-traefik$'; then
         echo "dokploy-traefik already deployed, skipping."
       else
@@ -136,13 +159,9 @@
           --network dokploy-network \
           --network apps \
           --publish published="$DOKPLOY_TRAEFIK_HTTP_PORT",target=80,protocol=tcp,mode=host \
-          --mount type=bind,source=/etc/dokploy/traefik,target=/etc/traefik \
-          traefik:v3.3.5 \
-          --global.sendanonymoususage=false \
-          --providers.file.directory=/etc/traefik/dynamic \
-          --providers.file.watch=true \
-          --entrypoints.web.address=:80 \
-          --log.level=INFO
+          --mount type=bind,source=/etc/dokploy/traefik,target=/etc/dokploy/traefik \
+          --mount type=bind,source=${dokployTraefikConfig},target=/etc/traefik/traefik.yml,readonly=true \
+          traefik:v3.3.5
       fi
 
       # Deploy or update the main dokploy service
