@@ -6,7 +6,7 @@
 }:
 
 {
-  nixpkgs.config.allowInsecure = true;
+  nixpkgs.config.allowInsecurePredicate = _: true;
 
   programs.zsh.enable = true;
   programs.nix-ld.enable = true;
