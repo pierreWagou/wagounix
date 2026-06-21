@@ -201,7 +201,7 @@ in
           --env TRAEFIK_PORT="$DOKPLOY_TRAEFIK_HTTP_PORT" \
           --env TRAEFIK_SSL_PORT="$DOKPLOY_TRAEFIK_HTTPS_PORT" \
           --env TZ="${host.timezone}" \
-          dokploy/dokploy:latest
+          dokploy/dokploy:v0.29.8
       fi
 
       echo "Dokploy stack deployed. UI available at https://apps.${host.domain}"
