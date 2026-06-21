@@ -113,7 +113,7 @@ in
 
       # Deploy or update dokploy-postgres service
       DB_PASSWORD=$(cat ${config.sops.secrets.dokploy-db-password.path})
-      if docker service ls --filter name=dokploy-postgres --format '{{.Name}}' | grep -q '^dokploy-postgres$'; then
+      if docker service ls --filter name=dokploy-postgres --format '{{.Name}}' 2>/dev/null | grep -qx 'dokploy-postgres'; then
         echo "dokploy-postgres already deployed, skipping."
       else
         echo "Deploying dokploy-postgres..."
@@ -130,7 +130,7 @@ in
       fi
 
       # Deploy or update dokploy-redis service
-      if docker service ls --filter name=dokploy-redis --format '{{.Name}}' | grep -q '^dokploy-redis$'; then
+      if docker service ls --filter name=dokploy-redis --format '{{.Name}}' 2>/dev/null | grep -qx 'dokploy-redis'; then
         echo "dokploy-redis already deployed, skipping."
       else
         echo "Deploying dokploy-redis..."
@@ -148,8 +148,9 @@ in
       # Published to 127.0.0.1:8080 only — NixOS cloudflared forwards app traffic here.
       # Connected to both dokploy-network (to read dynamic config) and apps (to reach containers).
       # Uses a clean static config (not Dokploy's traefik.yml) to avoid port conflicts.
-      # Use docker service inspect (not ls --filter) to avoid false positives during removal.
-      if docker service inspect dokploy-traefik > /dev/null 2>&1; then
+      # Use docker service ls with grep -qx for exact name match (docker service inspect
+      # returns exit code 0 even for non-existent services, making it unreliable).
+      if docker service ls --filter name=dokploy-traefik --format '{{.Name}}' 2>/dev/null | grep -qx 'dokploy-traefik'; then
         echo "dokploy-traefik already deployed, skipping."
       else
         echo "Deploying dokploy-traefik..."
@@ -172,7 +173,7 @@ in
         docker service rm dokploy
         CURRENT_PORT=""
       fi
-      if docker service ls --filter name=dokploy --format '{{.Name}}' | grep -q '^dokploy$'; then
+      if docker service ls --filter name=dokploy --format '{{.Name}}' 2>/dev/null | grep -qx 'dokploy'; then
         echo "Updating dokploy service to latest..."
         docker service update \
           --detach \
