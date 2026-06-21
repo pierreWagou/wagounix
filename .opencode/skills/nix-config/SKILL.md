@@ -52,7 +52,7 @@ wagounix/
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration, packages
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
-│       ├── packages.nix           # NixOS-only packages (ghostty.terminfo)
+│       ├── packages.nix           # NixOS-only packages (ghostty.terminfo, ventoy)
 │       └── wagoulab/              # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
