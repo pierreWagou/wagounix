@@ -59,7 +59,7 @@ let
           { url = "http://${host.serverIP}:${toString host.ports.webhook}"; }
         ];
         dokploy.loadBalancer.servers = [ { url = "http://${host.serverIP}:3001"; } ];
-        dokploy-traefik.loadBalancer.servers = [ { url = "http://127.0.0.1:9080"; } ];
+        dokploy-traefik.loadBalancer.servers = [ { url = "http://host.containers.internal:9080"; } ];
       };
     };
   };
