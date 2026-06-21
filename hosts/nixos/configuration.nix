@@ -6,6 +6,8 @@
 }:
 
 {
+  nixpkgs.config.allowInsecure = true;
+
   programs.zsh.enable = true;
   programs.nix-ld.enable = true;
   nix.settings = {
