@@ -60,9 +60,9 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Service | NixOS config | Container port | Remote URL |
 |---|---|---|---|
 | Vaultwarden | `services/vaultwarden.nix` | 80 (Podman network) | `https://vault.wagou.fr` |
-| Seafile | `services/seafile.nix` | 80 (Podman network) | `https://disk.wagou.fr` |
+| Seafile | `services/seafile/` | 80 (Podman network) | `https://disk.wagou.fr` |
 | Immich | `services/immich.nix` | 2283 (Podman network) | `https://pixel.wagou.fr` |
-| Homepage | `services/homepage.nix` | 3000 (Podman network) | `https://dash.wagou.fr` |
+| Homepage | `services/homepage/` | 3000 (Podman network) | `https://dash.wagou.fr` |
 | Home Assistant | `services/home-assistant.nix` | 8123 (Podman network) | `https://home.wagou.fr` |
 | Jellyfin | `services/jellyfin.nix` | 8096 (Podman network) | `https://tape.wagou.fr` |
 | Traefik | `services/traefik.nix` | 80, 443 (published to host) | - |
@@ -75,7 +75,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Webhook | `services/webhook.nix` | 9000 (host service, native) | `https://relay.wagou.fr` |
 | Renovate | `services/renovate.nix` | - (systemd oneshot + timer) | - |
 | KitchenOwl | `services/kitchenowl.nix` | 8080 (Podman network) | `https://cabas.wagou.fr` |
-| Authentik | `services/authentik.nix` | 9000 (Podman network) | `https://auth.wagou.fr` |
+| Authentik | `services/authentik/` | 9000 (Podman network) | `https://auth.wagou.fr` |
 | Branding (imgproxy) | `services/branding.nix` | 8080 (Podman network) | `https://assets.wagou.fr` |
 | Dokploy | `services/dokploy.nix` | 3001 (UI, published to 127.0.0.1), 9080 (Traefik, internal) | `https://apps.wagou.fr` |
 
@@ -105,13 +105,13 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | `secrets.nix` | sops-nix secret declarations and templates |
 | `traefik.nix` | Traefik reverse proxy container (Let's Encrypt, HSTS headers, Cloudflare trusted IPs) |
 | `vaultwarden.nix` | Password manager container |
-| `seafile.nix` | File sync & sharing (Seafile MC + SeaDoc + MariaDB + Redis, OIDC SSO via Authentik) |
+| `seafile/` | File sync & sharing (Seafile MC + SeaDoc + MariaDB + Redis, OIDC SSO via Authentik) |
 | `immich.nix` | Photo management (server, ML, PostgreSQL, Redis — 4 containers + internal network) |
 | `adguardhome.nix` | DNS server container, ad blocking, blocklists, local DNS rewrites |
 | `cloudflared.nix` | Cloudflare Tunnel container |
 | `tailscale.nix` | Tailscale VPN (native NixOS service, subnet router for `192.168.68.0/24`) |
-| `homepage.nix` | Homepage dashboard container (Catppuccin theme via branding module, service widgets, imgproxy backgrounds) |
-| `authentik.nix` | Identity provider / SSO — OIDC (server, worker, PostgreSQL, Redis) |
+| `homepage/` | Homepage dashboard container (Catppuccin theme via branding module, service widgets, imgproxy backgrounds) |
+| `authentik/` | Identity provider / SSO — OIDC (server, worker, PostgreSQL, Redis) |
 | `branding.nix` | Shared Catppuccin theme + imgproxy assets server (logos, backgrounds, favicon, CSS) |
 | `branding-assets/` | Source images and favicon served via imgproxy (`assets.wagou.fr`) |
 | `home-assistant.nix` | Home automation container |

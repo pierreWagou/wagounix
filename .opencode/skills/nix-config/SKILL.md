@@ -52,7 +52,7 @@ wagounix/
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration, packages
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
-│       ├── packages.nix           # NixOS-only packages (ghostty.terminfo, ventoy)
+│       ├── packages.nix           # NixOS-only packages (ghostty.terminfo)
 │       └── wagoulab/              # Home server (x86_64-linux)
 │           ├── default.nix
 │           ├── variables.nix
@@ -64,15 +64,15 @@ wagounix/
 │               ├── secrets.nix
 │               ├── traefik.nix
 │               ├── vaultwarden.nix
-│               ├── seafile.nix
+│               ├── seafile/
 │               ├── immich.nix
 │               ├── adguardhome.nix
 │               ├── cloudflared.nix
 │               ├── tailscale.nix
-│               ├── homepage.nix
+│               ├── homepage/
 │               ├── branding.nix
 │               ├── branding-assets/
-│               ├── authentik.nix
+│               ├── authentik/
 │               ├── home-assistant.nix
 │               ├── jellyfin.nix
 │               ├── kitchenowl.nix
@@ -149,7 +149,7 @@ rec {
   adminEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
   cloudflareTunnelId = "...";           # NixOS only
-  tunnelSubdomains = [ "vault" "pixel" "dash" "guard" "home" "tape" "dev" "relay" "cabas" "auth" "disk" "assets" ]; # NixOS only — services managed by Podman/quadlet-nix
+  serviceTunnelSubdomains = [ "vault" "pixel" "dash" "guard" "home" "tape" "dev" "apps" "relay" "cabas" "auth" "disk" "assets" ]; # NixOS only — services managed by Podman/quadlet-nix
   appTunnelSubdomains = [ "creneau" "creneau-preview" ]; # NixOS only — apps managed by Dokploy
   valkeyImage = "docker.io/valkey/valkey:9.1.0"; # NixOS only (shared by immich, authentik, seafile Redis)
   podmanCIDRs = [ "10.89.0.0/16" "172.16.0.0/12" ]; # NixOS only

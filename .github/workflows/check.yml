@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
@@ -29,7 +29,7 @@ jobs:
       matrix:
         profile: [wagoumac, alan]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
@@ -42,7 +42,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
       - uses: cachix/cachix-action@v15
         with:
