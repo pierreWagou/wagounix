@@ -8,84 +8,61 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
+  yamlFormat = pkgs.formats.yaml { };
 
-  # Generate a Traefik router entry (inside routers: block) that forwards to Dokploy Traefik.
-  # Used for each entry in host.appTunnelSubdomains.
-  mkAppRouter = sub: ''
-    ${sub}:
-      rule: "Host(`${sub}.${host.domain}`)"
-      entrypoints:
-        - websecure
-      tls: {}
-      middlewares:
-        - secure-headers
-      service: dokploy-traefik
-  '';
+  # Helper to build a standard Traefik router attrset.
+  mkRouter = rule: service: {
+    rule = "Host(`${rule}`)";
+    entrypoints = [ "websecure" ];
+    tls = { };
+    middlewares = [ "secure-headers" ];
+    inherit service;
+  };
+
+  # App routers — auto-generated from host.appTunnelSubdomains.
+  # Each forwards to Dokploy Traefik at 127.0.0.1:8080.
+  appRouters = lib.listToAttrs (
+    map (sub: {
+      name = sub;
+      value = mkRouter "${sub}.${host.domain}" "dokploy-traefik";
+    }) host.appTunnelSubdomains
+  );
 
   # Traefik dynamic config — defines the shared HSTS/security headers middleware
   # and static routes for native (non-container) and Dokploy-forwarded services.
   # Loaded via the file provider so it's available immediately on startup
   # (before Traefik discovers any containers via the Docker provider).
-  dynamicConfig = pkgs.writeText "traefik-dynamic.yml" (
-    ''
-      http:
-        middlewares:
-          secure-headers:
-            headers:
-              stsSeconds: 63072000
-              stsIncludeSubdomains: true
-              stsPreload: true
-              forceSTSHeader: true
-              contentTypeNosniff: true
-              browserXssFilter: true
-              referrerPolicy: strict-origin-when-cross-origin
-        routers:
-          ttyd:
-            rule: "Host(`dev.${host.domain}`)"
-            entrypoints:
-              - websecure
-            tls: {}
-            middlewares:
-              - secure-headers
-            service: ttyd
-          webhook:
-            rule: "Host(`relay.${host.domain}`)"
-            entrypoints:
-              - websecure
-            tls: {}
-            middlewares:
-              - secure-headers
-            service: webhook
-          dokploy:
-            rule: "Host(`apps.${host.domain}`)"
-            entrypoints:
-              - websecure
-            tls: {}
-            middlewares:
-              - secure-headers
-            service: dokploy
-    ''
-    + lib.concatMapStrings mkAppRouter host.appTunnelSubdomains
-    + ''
-      services:
-        ttyd:
-          loadBalancer:
-            servers:
-              - url: "http://${host.serverIP}:${toString host.ports.ttyd}"
-        webhook:
-          loadBalancer:
-            servers:
-              - url: "http://${host.serverIP}:${toString host.ports.webhook}"
-        dokploy:
-          loadBalancer:
-            servers:
-              - url: "http://${host.serverIP}:3001"
-        dokploy-traefik:
-          loadBalancer:
-            servers:
-              - url: "http://127.0.0.1:8080"
-    ''
-  );
+  dynamicConfig = yamlFormat.generate "traefik-dynamic.yml" {
+    http = {
+      middlewares = {
+        secure-headers = {
+          headers = {
+            stsSeconds = 63072000;
+            stsIncludeSubdomains = true;
+            stsPreload = true;
+            forceSTSHeader = true;
+            contentTypeNosniff = true;
+            browserXssFilter = true;
+            referrerPolicy = "strict-origin-when-cross-origin";
+          };
+        };
+      };
+      routers = {
+        ttyd = mkRouter "dev.${host.domain}" "ttyd";
+        webhook = mkRouter "relay.${host.domain}" "webhook";
+        dokploy = mkRouter "apps.${host.domain}" "dokploy";
+      }
+      // appRouters;
+      services = {
+        ttyd.loadBalancer.servers = [ { url = "http://${host.serverIP}:${toString host.ports.ttyd}"; } ];
+        webhook.loadBalancer.servers = [
+          { url = "http://${host.serverIP}:${toString host.ports.webhook}"; }
+        ];
+        dokploy.loadBalancer.servers = [ { url = "http://${host.serverIP}:3001"; } ];
+        dokploy-traefik.loadBalancer.servers = [ { url = "http://127.0.0.1:8080"; } ];
+      };
+    };
+  };
 in
 {
   virtualisation.quadlet.containers.traefik = {
