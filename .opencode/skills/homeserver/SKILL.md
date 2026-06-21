@@ -12,13 +12,41 @@ Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 ## Architecture
 
 ```
-Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service
+Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service/App
 Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Beelink (subnet router) -> 192.168.68.0/24
-Remote access:  Browser -> Tailscale (split DNS) -> AdGuard Home -> 192.168.68.65 -> Traefik -> Service
-Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service
+Remote access:  Browser -> Tailscale (split DNS) -> AdGuard Home -> 192.168.68.65 -> Traefik -> Service/App
+Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service/App
 ```
 
-All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network. Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 via Cloudflare). The tunnel connects to Traefik over HTTPS (container-to-container, `noTLSVerify` since it's internal).
+### Services vs Apps — two-tier deployment model
+
+The homeserver uses a **two-tier deployment model**:
+
+| Tier | What | Managed by | Container runtime | Config location |
+|---|---|---|---|---|
+| **Services** | Infrastructure & homelab services (Vaultwarden, Immich, Jellyfin, etc.) | NixOS / quadlet-nix | Podman | `hosts/nixos/wagoulab/services/*.nix` |
+| **Apps** | User-built applications (creneau, future apps) | Dokploy | Docker (Swarm) | Dokploy UI + app repo `docker-compose.yml` |
+
+**Services** are declared in the wagounix flake and deployed via `nixos-rebuild switch`. They run as Podman containers on the shared `proxy` network, discovered by Traefik via Podman labels.
+
+**Apps** are deployed via **Dokploy** (`apps.wagou.fr`), a self-hosted PaaS running as a Docker Swarm stack on the same server. Dokploy manages container lifecycle, rolling deploys, environment variables, and volumes. Apps use pre-built Docker images from GHCR (built by CI — never built on the server).
+
+### Routing architecture
+
+```
+serviceTunnelSubdomains  →  NixOS Traefik → Podman container (direct)
+appTunnelSubdomains      →  NixOS Traefik → Dokploy Traefik (127.0.0.1:9080) → Docker container
+```
+
+Both lists are defined in `hosts/nixos/wagoulab/variables.nix`. Adding a subdomain to either list automatically wires up:
+- Cloudflare Tunnel ingress rule
+- AdGuard Home DNS rewrite
+- NixOS Traefik router (either direct or forwarded to Dokploy)
+
+### Container runtimes
+
+- **Podman** (quadlet-nix): used for NixOS-managed services. Containers on the `proxy` Podman network. Traefik listens on the Podman socket (`/run/podman/podman.sock`) for label discovery.
+- **Docker Swarm** (Dokploy): used for user apps. Containers on the `apps` Docker overlay network. Dokploy has its own Traefik instance on port 9080 (internal) that NixOS Traefik forwards app subdomains to.
 
 Tailscale runs as a native NixOS service (not a container) and acts as a subnet router, advertising the home LAN (`192.168.68.0/24`). This provides remote SSH access and access to any LAN device from anywhere. The Beelink's Tailscale IP is `100.68.157.70`.
 
@@ -26,6 +54,8 @@ IMPORTANT: AdGuard Home DNS rewrites for `*.wagou.fr` point to the local IP so L
 IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tailscale IP, `127.0.0.1`) on port 53, mapped to container port 5353. This avoids conflicts with Podman's aardvark-dns which binds port 53 on bridge gateway IPs. The firewall restricts access to known interfaces only.
 
 ## Current services
+
+### NixOS-managed services (Podman / quadlet-nix)
 
 | Service | NixOS config | Container port | Remote URL |
 |---|---|---|---|
@@ -42,12 +72,19 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | Fail2ban | `services/fail2ban.nix` | - | - |
 | ttyd | `services/ttyd.nix` | 7681 (native systemd service) | `https://dev.wagou.fr` |
 | rbw | `services/rbw.nix` | - (custom pinentry script) | - |
-| Creneau | `services/creneau.nix` | 3000 (Podman network) | `https://creneau.wagou.fr` |
 | Webhook | `services/webhook.nix` | 9000 (host service, native) | `https://relay.wagou.fr` |
 | Renovate | `services/renovate.nix` | - (systemd oneshot + timer) | - |
 | KitchenOwl | `services/kitchenowl.nix` | 8080 (Podman network) | `https://cabas.wagou.fr` |
 | Authentik | `services/authentik.nix` | 9000 (Podman network) | `https://auth.wagou.fr` |
 | Branding (imgproxy) | `services/branding.nix` | 8080 (Podman network) | `https://assets.wagou.fr` |
+| Dokploy | `services/dokploy.nix` | 3001 (UI, published to 127.0.0.1), 9080 (Traefik, internal) | `https://apps.wagou.fr` |
+
+### Dokploy-managed apps (Docker Swarm)
+
+| App | Image | Remote URL | Notes |
+|---|---|---|---|
+| Creneau (prod) | `ghcr.io/pierrewagou/creneau:latest` | `https://creneau.wagou.fr` | Persistent bind mount `/var/lib/creneau:/app/data`, no `SEED_ON_INIT` |
+| Creneau (preview) | `ghcr.io/pierrewagou/creneau:latest` | `https://creneau-preview.wagou.fr` | `SEED_ON_INIT=true`, seeded with fake data on first boot |
 
 ## Files
 
@@ -55,8 +92,8 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 
 | File | Purpose |
 |---|---|
-| `default.nix` | Imports `hardware.nix` and `services/` |
-| `variables.nix` | Host variables: `username = "wagou"`, `hostname = "wagoulab"`, `domain = "wagou.fr"`, `serverIP = "192.168.68.65"`, `tailscaleIP`, `networkInterface`, `lanSubnet`, `renderGroupGid`, `timezone`, `acmeEmail`, `adminEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `tunnelSubdomains`, `valkeyImage`, `podmanCIDRs`, `ports`, `latitude`, `longitude` |
+| `default.nix` | Imports hardware.nix and services/ |
+| `variables.nix` | Host variables: `username`, `hostname`, `domain`, `serverIP`, `tailscaleIP`, `networkInterface`, `lanSubnet`, `renderGroupGid`, `timezone`, `acmeEmail`, `adminEmail`, `cloudflareAccountId`, `cloudflareTunnelId`, `serviceTunnelSubdomains` (NixOS-managed), `appTunnelSubdomains` (Dokploy-managed), `valkeyImage`, `podmanCIDRs`, `ports`, `latitude`, `longitude` |
 | `hardware.nix` | Auto-generated hardware config from `nixos-generate-config` (boot, filesystems, kernel modules, Intel microcode) |
 
 ### Services: `hosts/nixos/wagoulab/services/`
@@ -83,7 +120,7 @@ IMPORTANT: AdGuard Home DNS is published on specific IPs (`192.168.68.65`, Tails
 | `firewall.nix` | Firewall rules (ports 22, 53, 80, 443) |
 | `ttyd.nix` | Web terminal for remote dev access (Catppuccin theme, Nerd Font, native systemd service) |
 | `rbw.nix` | Custom pinentry script for rbw (reads master password from sops secret) |
-| `creneau.nix` | Appointment scheduling container |
+| `dokploy.nix` | Dokploy PaaS — Docker Swarm stack (postgres, redis, traefik, ui), published at `apps.wagou.fr` |
 | `webhook.nix` | GitHub webhook receiver (triggers rebuilds + Renovate) |
 | `renovate.nix` | Dependency update bot (systemd oneshot + timer + token script) |
 | `kitchenowl.nix` | Recipes & grocery lists container |
@@ -280,9 +317,52 @@ Routing is determined by `Host()` rules matching the subdomain:
 | `home.wagou.fr` | home-assistant | 8123 | - |
 | `tape.wagou.fr` | jellyfin | 8096 | Intel VAAPI/QSV hardware transcoding |
 | `dev.wagou.fr` | ttyd (host service) | 7681 | Routed via file provider dynamic config (not container labels) |
-| `creneau.wagou.fr` | creneau | 3000 | - |
 | `relay.wagou.fr` | webhook (host service) | 9000 | File provider dynamic config (not container labels) |
 | `cabas.wagou.fr` | kitchenowl | 8080 | - |
+| `apps.wagou.fr` | dokploy UI | 3001 | File provider dynamic config |
+| `creneau.wagou.fr` | Dokploy app | 3000 | Forwarded to Dokploy Traefik at 127.0.0.1:9080 |
+| `creneau-preview.wagou.fr` | Dokploy app | 3000 | Forwarded to Dokploy Traefik at 127.0.0.1:9080 |
+
+## Dokploy — deploying apps
+
+Dokploy is the PaaS layer for user-built applications. Access it at `https://apps.wagou.fr`.
+
+### Adding a new Dokploy app
+
+**1. In `variables.nix`** — add the subdomain to `appTunnelSubdomains`:
+```nix
+appTunnelSubdomains = [
+  "creneau-preview"
+  "creneau"
+  "mynewapp"  # <-- add here
+];
+```
+This auto-wires the Cloudflare Tunnel ingress, AdGuard DNS rewrite, and NixOS Traefik → Dokploy forward router.
+
+**2. Run `nixos-rebuild switch`** to apply the routing changes.
+
+**3. In Dokploy UI** — create the application:
+- Source: **Docker image** → `ghcr.io/<owner>/<app>:latest` (pre-built in CI, never build on server)
+- Domain: `mynewapp.wagou.fr` port `<app port>`
+- Volume: **bind mount** `/var/lib/<appname>:/data` for persistence
+- Env vars: configure per environment (preview vs prod)
+
+### Preview vs production environments
+
+Apps should have two Dokploy environments:
+- **Preview** (`app-preview.wagou.fr`): `SEED_ON_INIT=true` or equivalent, uses `latest` image tag
+- **Production** (`app.wagou.fr`): no seed, uses `latest` or pinned image tag, persistent bind mount
+
+Key principle: **same image, different env vars** — never separate Dockerfiles or images per environment.
+
+### Deployment best practices
+
+- **Build in CI** (GitHub Actions), push to GHCR, Dokploy pulls the pre-built image
+- **Docker image source** — not Git provider (avoids building on the server)
+- **Bind mounts** for persistent data (not named volumes) — easier to backup and inspect
+- **Persistent data** lives at `/var/lib/<appname>/` on the host
+- **To reset an app's DB**: `ssh wagoulab`, `rm /var/lib/<appname>/<db file>`, redeploy in Dokploy UI
+- **GHCR public images**: no registry registration needed in Dokploy — just use full image reference `ghcr.io/<owner>/<app>:<tag>`
 
 ## SSH access
 
@@ -307,7 +387,9 @@ Connect with: `ssh wagoulab`
 
 The homeserver SSH public key is declared in `hosts/nixos/configuration.nix` under `users.users.wagou.openssh.authorizedKeys.keys`. This is the `id_ed25519_homeserver` key (separate from the work SSH key for identity separation).
 
-## Adding a new service
+## Adding a new NixOS service
+
+This is for **infrastructure/homelab services** managed by NixOS (Podman/quadlet-nix). For user-built apps, use Dokploy instead (see section above).
 
 ### Step 1 — Create the service file
 
@@ -348,12 +430,12 @@ Add `./newservice.nix` to the imports in `services/default.nix`.
 
 ### Step 3 — Add subdomain to variables
 
-Add the subdomain to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
+Add the subdomain to `serviceTunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`:
 
 ```nix
-tunnelSubdomains = [
+serviceTunnelSubdomains = [
   "vault" "pixel" "dash" "guard" "home" "tape"
-  "dev" "creneau" "relay" "cabas" "auth" "disk" "assets"
+  "dev" "apps" "relay" "cabas" "auth" "disk" "assets"
   "newservice" # <-- add your new subdomain here
 ];
 ```
@@ -361,6 +443,7 @@ tunnelSubdomains = [
 This automatically wires up:
 - DNS rewrite in AdGuard Home (local HTTPS bypass)
 - Tunnel ingress rule in cloudflared (remote access)
+- NixOS Traefik router pointing directly to the Podman container
 
 ### Step 4 — Add secrets (if needed)
 
@@ -451,7 +534,9 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 ## Important rules
 
 - Each service gets its own file in `services/` — one service per file
-- All services run as Podman containers via quadlet-nix on the `proxy` network
+- All **NixOS-managed services** run as Podman containers via quadlet-nix on the `proxy` network
+- **User-built apps** go through Dokploy — do NOT add app containers to NixOS config
+- To expose a new app subdomain, add it to `appTunnelSubdomains` in `variables.nix` (not `serviceTunnelSubdomains`)
 - Traefik discovers services via Docker/Podman labels — no manual routing config needed
 - Secrets go in `hosts/nixos/wagoulab/secrets.yaml` (encrypted with sops, colocated with the host config) — NEVER as plain files on the server
 - AdGuard Home DNS rewrites need `enabled = true` — defaults to `false`
