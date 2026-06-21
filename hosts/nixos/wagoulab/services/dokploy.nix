@@ -88,7 +88,7 @@ in
 
       ADVERTISE_ADDR="${host.serverIP}"
       DOKPLOY_HOST_PORT="3001"     # Port 3000 is taken by AdGuard web UI (127.0.0.1:3000)
-      DOKPLOY_TRAEFIK_HTTP_PORT="8080"
+      DOKPLOY_TRAEFIK_HTTP_PORT="9080"
       DOKPLOY_TRAEFIK_HTTPS_PORT="8443"
 
       # Ensure Docker Swarm is initialized
