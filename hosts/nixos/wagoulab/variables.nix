@@ -34,8 +34,8 @@ rec {
   };
 
   # Subdomains served by NixOS Traefik (services).
-  # Each entry generates a tunnel ingress rule → https://serverIP:443,
-  # an AdGuard DNS rewrite → serverIP, and a Cloudflare CNAME (manual, one-time).
+  # Each entry generates: tunnel ingress rule → NixOS Traefik,
+  # AdGuard DNS rewrite → serverIP, Cloudflare CNAME (manual, one-time).
   serviceTunnelSubdomains = [
     "vault"
     "pixel"
@@ -53,9 +53,9 @@ rec {
     "assets"
   ];
 
-  # Subdomains served by Dokploy Traefik (deployed apps).
-  # Each entry generates a tunnel ingress rule → http://127.0.0.1:8080 (Dokploy Traefik),
-  # and an AdGuard DNS rewrite → serverIP.
+  # Subdomains for Dokploy-deployed apps.
+  # Each entry generates: tunnel ingress rule → NixOS Traefik (which forwards to Dokploy Traefik),
+  # AdGuard DNS rewrite → serverIP, NixOS Traefik forward rule → http://127.0.0.1:8080.
   # Cloudflare CNAME must be added manually (one-time) per new app subdomain.
   appTunnelSubdomains = [
     "creneau-preview"
