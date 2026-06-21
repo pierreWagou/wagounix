@@ -44,7 +44,6 @@ rec {
     "home"
     "tape"
     "dev"
-    "creneau"
     "apps"
     "relay"
     "cabas"
@@ -59,5 +58,6 @@ rec {
   # Cloudflare CNAME must be added manually (one-time) per new app subdomain.
   appTunnelSubdomains = [
     "creneau-preview"
+    "creneau"
   ];
 }
