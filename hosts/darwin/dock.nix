@@ -25,7 +25,6 @@ in
     development = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [
-        "/Applications/Visual Studio Code.app/"
         "/Applications/Ghostty.app/"
       ];
       description = "Development apps in the dock.";
