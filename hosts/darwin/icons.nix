@@ -77,6 +77,14 @@
         icon = ./icons/vscode.icns;
       }
       {
+        path = "/Applications/Obsidian.app";
+        icon = ./icons/obsidian.icns;
+      }
+      {
+        path = "/Applications/Tailscale.app";
+        icon = ./icons/tailscale.icns;
+      }
+      {
         path = "/Applications/VLC.app";
         icon = ./icons/vlc.icns;
       }
