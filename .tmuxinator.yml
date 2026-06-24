@@ -1,0 +1,11 @@
+windows:
+  - workspace:
+      panes:
+        - workspace:
+            - tmux split-window -h -l 40% -d
+            - tmux split-window -v -t .1 -l 25% -d
+            - tmux send-keys -t .3 'opencode' Enter
+            - nvim
+  - wagoulab:
+      panes:
+        - ssh wagoulab
