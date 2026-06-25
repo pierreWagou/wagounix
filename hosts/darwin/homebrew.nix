@@ -33,6 +33,7 @@
     taps = builtins.attrNames config.nix-homebrew.taps;
     brews = [
       "alerter"
+      "aoe"
       "dashlane-cli"
       "yarn"
     ];
