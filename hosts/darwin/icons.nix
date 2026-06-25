@@ -17,6 +17,10 @@
         icon = ./icons/claude.icns;
       }
       {
+        path = "/Applications/Quill.app";
+        icon = ./icons/quill.icns;
+      }
+      {
         path = "/Applications/Cloudflare WARP.app";
         icon = ./icons/cloudflare.icns;
       }
