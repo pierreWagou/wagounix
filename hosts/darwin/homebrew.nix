@@ -66,6 +66,7 @@
       "synology-drive"
       "tailscale-app"
       "thunderbird"
+      "upscayl"
       "visual-studio-code"
       "vlc"
       "zen"
