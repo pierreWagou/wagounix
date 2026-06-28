@@ -14,6 +14,7 @@ in
       ];
       environments = {
         OPEN_REGISTRATION = "false";
+        DISABLE_USERNAME_PASSWORD_LOGIN = "true";
         OIDC_ISSUER = "https://auth.${host.domain}/application/o/kitchen-owl/";
         OIDC_CLIENT_ID = "kitchenowl";
         FRONT_URL = "https://cabas.${host.domain}";
