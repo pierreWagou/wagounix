@@ -101,6 +101,6 @@ in
     "d /var/lib/immich 0755 root root -"
     "d /var/lib/immich-ml-cache 0755 root root -"
     "d /var/lib/immich-postgres 0755 root root -"
-    "d /var/lib/immich-redis 0755 root root -"
+    "d /var/lib/immich-redis 0755 999 999 -"
   ];
 }
