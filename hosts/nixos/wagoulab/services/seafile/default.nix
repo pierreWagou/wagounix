@@ -103,7 +103,7 @@ in
   virtualisation.quadlet.containers = {
     seafile = {
       containerConfig = {
-        image = "docker.io/seafileltd/seafile-mc:13.0.21";
+        image = "docker.io/seafileltd/seafile-mc:13.0.24";
         noNewPrivileges = true;
         networks = [
           networks.proxy.ref
