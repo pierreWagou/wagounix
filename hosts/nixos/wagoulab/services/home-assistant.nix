@@ -37,6 +37,9 @@ in
       image = "homeassistant/home-assistant:2026.5.4";
       noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
+      devices = [
+        "/dev/zigbee:/dev/zigbee:rwm"
+      ];
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
