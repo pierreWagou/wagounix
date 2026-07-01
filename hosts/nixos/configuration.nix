@@ -28,6 +28,10 @@
     firewall.enable = true;
   };
 
+  services.udev.extraRules = ''
+    SUBSYSTEM=="tty", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="1001", SYMLINK+="zigbee"
+  '';
+
   services.openssh = {
     enable = true;
     settings = {
