@@ -30,7 +30,7 @@ let
 
         lovelace:
           dashboards:
-            heatmap:
+            heatmap-weather:
               mode: yaml
               title: Heatmap
               icon: mdi:home-thermometer
