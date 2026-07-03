@@ -5,69 +5,59 @@ views:
       - cards:
           - type: heading
             heading: Zigbheat Living Room
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.thermalmap_living_room_battery
             name: Battery
             icon: mdi:battery
-            icon_color: green
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: update.thermalmap_living_room_firmware
             name: Firmware
             icon: mdi:update
-            icon_color: teal
 
       - cards:
           - type: heading
             heading: Zigbheat Balcony
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_balcony_battery
             name: Battery
             icon: mdi:battery
-            icon_color: green
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: update.zigbheat_balcony_firmware
             name: Firmware
             icon: mdi:update
-            icon_color: teal
 
       - cards:
           - type: heading
             heading: Zigbheat Bedroom
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_bedroom_battery
             name: Battery
             icon: mdi:battery
-            icon_color: green
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: update.zigbheat_bedroom_firmware
             name: Firmware
             icon: mdi:update
-            icon_color: teal
 
       - cards:
           - type: heading
             heading: Zigbheat Office
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_office_battery
             name: Battery
             icon: mdi:battery
-            icon_color: green
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: update.zigbheat_office_firmware
             name: Firmware
             icon: mdi:update
-            icon_color: teal
 
       - cards:
           - type: heading
             heading: L40 Ultra
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.l40_ultra_battery_level
             name: Battery
             icon: mdi:battery
-            icon_color: green
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: update.dreame_vacuum_update
             name: Firmware
             icon: mdi:update
-            icon_color: teal

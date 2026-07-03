@@ -5,52 +5,44 @@ views:
       - cards:
           - type: heading
             heading: Living Room
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.thermalmap_living_room_temperature
             name: Temperature
             icon: mdi:thermometer
-            icon_color: orange
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.thermalmap_living_room_humidity
             name: Humidity
             icon: mdi:water-percent
-            icon_color: blue
       - cards:
           - type: heading
             heading: Balcony
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_balcony_temperature
             name: Temperature
             icon: mdi:thermometer
-            icon_color: orange
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_balcony_humidity
             name: Humidity
             icon: mdi:water-percent
-            icon_color: blue
       - cards:
           - type: heading
             heading: Bedroom
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_bedroom_temperature
             name: Temperature
             icon: mdi:thermometer
-            icon_color: orange
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_bedroom_humidity
             name: Humidity
             icon: mdi:water-percent
-            icon_color: blue
       - cards:
           - type: heading
             heading: Office
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_office_temperature
             name: Temperature
             icon: mdi:thermometer
-            icon_color: orange
-          - type: custom:mushroom-entity-card
+          - type: entity
             entity: sensor.zigbheat_office_humidity
             name: Humidity
             icon: mdi:water-percent
-            icon_color: blue
