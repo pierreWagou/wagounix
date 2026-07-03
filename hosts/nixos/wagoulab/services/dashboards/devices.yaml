@@ -10,7 +10,7 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.thermalmap_living_room_(battery|lqi|rssi)/"
+                - entity_id: "sensor.thermalmap_living_room_battery"
                 - entity_id: "update.thermalmap_living_room_firmware"
             sort:
               method: friendly_name
@@ -23,7 +23,7 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.zigbheat_balcony_(battery|lqi|rssi)/"
+                - entity_id: "sensor.zigbheat_balcony_battery"
                 - entity_id: "update.zigbheat_balcony_firmware"
             sort:
               method: friendly_name
@@ -36,7 +36,7 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.zigbheat_bedroom_(battery|lqi|rssi)/"
+                - entity_id: "sensor.zigbheat_bedroom_battery"
                 - entity_id: "update.zigbheat_bedroom_firmware"
             sort:
               method: friendly_name
@@ -49,7 +49,7 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.zigbheat_office_(battery|lqi|rssi)/"
+                - entity_id: "sensor.zigbheat_office_battery"
                 - entity_id: "update.zigbheat_office_firmware"
             sort:
               method: friendly_name
@@ -62,8 +62,7 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.l40_ultra_(status|battery_level|charging_status|relocation_status|task_status)/"
-                - entity_id: "/sensor\\.l40_ultra_(clean_water_tank_status|dirty_water_tank_status|dust_bag_status|detergent_status)/"
+                - entity_id: "sensor.l40_ultra_battery_level"
                 - entity_id: "update.dreame_vacuum_update"
             sort:
               method: friendly_name
@@ -76,6 +75,6 @@ views:
               type: entities
             filter:
               include:
-                - entity_id: "/sensor\\.wagous_iphone_(battery_level|battery_state)/"
+                - entity_id: "sensor.wagous_iphone_battery_level_2"
             sort:
               method: friendly_name
