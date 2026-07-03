@@ -5,8 +5,9 @@ views:
       - cards:
           - type: custom:mushroom-template-card
             primary: Zigbheat Living Room
-            secondary: "Battery: {{ states('sensor.thermalmap_living_room_battery') }}% · Firmware: {{ states('update.thermalmap_living_room_firmware') }}"
+            secondary: "Battery: {{ states('sensor.thermalmap_living_room_battery') }}%\nFirmware: {{ 'Update available' if is_state('update.thermalmap_living_room_firmware', 'on') else 'Up to date' }}"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:zigbee
             icon_color: green
             tap_action:
@@ -16,8 +17,9 @@ views:
       - cards:
           - type: custom:mushroom-template-card
             primary: Zigbheat Balcony
-            secondary: "Battery: {{ states('sensor.zigbheat_balcony_battery') }}% · Firmware: {{ states('update.zigbheat_balcony_firmware') }}"
+            secondary: "Battery: {{ states('sensor.zigbheat_balcony_battery') }}%\nFirmware: {{ 'Update available' if is_state('update.zigbheat_balcony_firmware', 'on') else 'Up to date' }}"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:zigbee
             icon_color: green
             tap_action:
@@ -27,8 +29,9 @@ views:
       - cards:
           - type: custom:mushroom-template-card
             primary: Zigbheat Bedroom
-            secondary: "Battery: {{ states('sensor.zigbheat_bedroom_battery') }}% · Firmware: {{ states('update.zigbheat_bedroom_firmware') }}"
+            secondary: "Battery: {{ states('sensor.zigbheat_bedroom_battery') }}%\nFirmware: {{ 'Update available' if is_state('update.zigbheat_bedroom_firmware', 'on') else 'Up to date' }}"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:zigbee
             icon_color: green
             tap_action:
@@ -38,8 +41,9 @@ views:
       - cards:
           - type: custom:mushroom-template-card
             primary: Zigbheat Office
-            secondary: "Battery: {{ states('sensor.zigbheat_office_battery') }}% · Firmware: {{ states('update.zigbheat_office_firmware') }}"
+            secondary: "Battery: {{ states('sensor.zigbheat_office_battery') }}%\nFirmware: {{ 'Update available' if is_state('update.zigbheat_office_firmware', 'on') else 'Up to date' }}"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:zigbee
             icon_color: green
             tap_action:
@@ -49,8 +53,9 @@ views:
       - cards:
           - type: custom:mushroom-template-card
             primary: L40 Ultra
-            secondary: "Battery: {{ states('sensor.l40_ultra_battery_level') }}% · Firmware: {{ states('update.dreame_vacuum_update') }}"
+            secondary: "Battery: {{ states('sensor.l40_ultra_battery_level') }}%\nFirmware: {{ 'Update available' if is_state('update.dreame_vacuum_update', 'on') else 'Up to date' }}"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:robot-vacuum
             icon_color: blue
             tap_action:
@@ -62,6 +67,7 @@ views:
             primary: Wagou's iPhone
             secondary: "Battery: {{ states('sensor.wagous_iphone_battery_level_2') }}%"
             multiline_secondary: true
+            fill_container: true
             icon: mdi:apple
             icon_color: gray
             tap_action:
