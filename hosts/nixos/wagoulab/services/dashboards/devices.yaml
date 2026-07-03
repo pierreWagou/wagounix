@@ -3,9 +3,9 @@ views:
     type: sections
     sections:
       - cards:
-          - type: custom:mushroom-title-card
-            title: Zigbheat Living Room
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: Zigbheat Living Room
+            tap_action:
               action: navigate
               navigation_path: /device/1b07c3dcfc1fa26af2532202ca4657aa
           - type: custom:auto-entities
@@ -19,9 +19,9 @@ views:
               method: friendly_name
 
       - cards:
-          - type: custom:mushroom-title-card
-            title: Zigbheat Balcony
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: Zigbheat Balcony
+            tap_action:
               action: navigate
               navigation_path: /device/9f03940cc6a8ec073a0945178531491a
           - type: custom:auto-entities
@@ -35,9 +35,9 @@ views:
               method: friendly_name
 
       - cards:
-          - type: custom:mushroom-title-card
-            title: Zigbheat Bedroom
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: Zigbheat Bedroom
+            tap_action:
               action: navigate
               navigation_path: /device/2ac5219a86fa8bc615585d8896b45433
           - type: custom:auto-entities
@@ -51,9 +51,9 @@ views:
               method: friendly_name
 
       - cards:
-          - type: custom:mushroom-title-card
-            title: Zigbheat Office
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: Zigbheat Office
+            tap_action:
               action: navigate
               navigation_path: /device/6f8bb61739ea8644fbeb75b146d0b1e5
           - type: custom:auto-entities
@@ -67,9 +67,9 @@ views:
               method: friendly_name
 
       - cards:
-          - type: custom:mushroom-title-card
-            title: L40 Ultra
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: L40 Ultra
+            tap_action:
               action: navigate
               navigation_path: /device/8ec455a3c9a28efc7f95693c7e86a3ed
           - type: custom:auto-entities
@@ -83,9 +83,9 @@ views:
               method: friendly_name
 
       - cards:
-          - type: custom:mushroom-title-card
-            title: Wagou's iPhone
-            title_tap_action:
+          - type: custom:mushroom-template-card
+            primary: Wagou's iPhone
+            tap_action:
               action: navigate
               navigation_path: /device/dc00a7c0fb376424c554d3a4dbc4b4f3
           - type: custom:auto-entities
