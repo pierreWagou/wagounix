@@ -69,6 +69,7 @@
       "upscayl"
       "visual-studio-code"
       "vlc"
+      "whatsapp"
       "zen"
       "zoom"
     ];
