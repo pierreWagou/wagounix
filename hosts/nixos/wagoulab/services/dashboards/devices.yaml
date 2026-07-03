@@ -3,8 +3,11 @@ views:
     type: sections
     sections:
       - cards:
-          - type: heading
-            heading: Living Room Sensor
+          - type: custom:mushroom-title-card
+            title: Zigbheat Living Room
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/1b07c3dcfc1fa26af2532202ca4657aa
           - type: custom:auto-entities
             card:
               type: entities
@@ -16,8 +19,11 @@ views:
               method: friendly_name
 
       - cards:
-          - type: heading
-            heading: Balcony Sensor
+          - type: custom:mushroom-title-card
+            title: Zigbheat Balcony
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/9f03940cc6a8ec073a0945178531491a
           - type: custom:auto-entities
             card:
               type: entities
@@ -29,8 +35,11 @@ views:
               method: friendly_name
 
       - cards:
-          - type: heading
-            heading: Bedroom Sensor
+          - type: custom:mushroom-title-card
+            title: Zigbheat Bedroom
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/2ac5219a86fa8bc615585d8896b45433
           - type: custom:auto-entities
             card:
               type: entities
@@ -42,8 +51,11 @@ views:
               method: friendly_name
 
       - cards:
-          - type: heading
-            heading: Office Sensor
+          - type: custom:mushroom-title-card
+            title: Zigbheat Office
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/6f8bb61739ea8644fbeb75b146d0b1e5
           - type: custom:auto-entities
             card:
               type: entities
@@ -55,8 +67,11 @@ views:
               method: friendly_name
 
       - cards:
-          - type: heading
-            heading: Vacuum (L40 Ultra)
+          - type: custom:mushroom-title-card
+            title: L40 Ultra
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/8ec455a3c9a28efc7f95693c7e86a3ed
           - type: custom:auto-entities
             card:
               type: entities
@@ -68,8 +83,11 @@ views:
               method: friendly_name
 
       - cards:
-          - type: heading
-            heading: iPhone
+          - type: custom:mushroom-title-card
+            title: Wagou's iPhone
+            title_tap_action:
+              action: navigate
+              navigation_path: /device/dc00a7c0fb376424c554d3a4dbc4b4f3
           - type: custom:auto-entities
             card:
               type: entities
