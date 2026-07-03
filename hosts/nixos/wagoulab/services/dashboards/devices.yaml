@@ -65,7 +65,7 @@ views:
             entity: sensor.l40_ultra_battery_level
             name: Battery
             icon: mdi:battery
-            icon_color: blue
+            icon_color: green
           - type: custom:mushroom-entity-card
             entity: update.dreame_vacuum_update
             name: Firmware
