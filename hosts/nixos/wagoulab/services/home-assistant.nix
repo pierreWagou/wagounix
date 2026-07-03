@@ -8,6 +8,8 @@
 let
   inherit (config.virtualisation.quadlet) networks;
 
+  heatmapDashboard = ./dashboards/heatmap.yaml;
+
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
         default_config:
 
@@ -26,6 +28,16 @@ let
         frontend:
           themes: !include_dir_merge_named themes
 
+        lovelace:
+          dashboards:
+            heatmap:
+              mode: yaml
+              title: Heatmap
+              icon: mdi:home-thermometer
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/heatmap.yaml
+
         automation: !include automations.yaml
         script: !include scripts.yaml
         scene: !include scenes.yaml
@@ -40,6 +52,7 @@ in
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
+        "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
       ];
       environments = {
         TZ = host.timezone;
@@ -58,6 +71,7 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/home-assistant 0755 root root -"
     "d /var/lib/home-assistant/custom_components 0755 root root -"
+    "d /var/lib/home-assistant/dashboards 0755 root root -"
   ];
 
   systemd.services.hacs-install = {
