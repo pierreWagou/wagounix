@@ -9,6 +9,7 @@ let
   inherit (config.virtualisation.quadlet) networks;
 
   heatmapDashboard = ./dashboards/heatmap.yaml;
+  devicesDashboard = ./dashboards/devices.yaml;
 
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
         default_config:
@@ -37,6 +38,13 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/heatmap.yaml
+            devices-weather:
+              mode: yaml
+              title: Devices
+              icon: mdi:devices
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/devices.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
@@ -53,6 +61,7 @@ in
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
         "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
+        "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
       ];
       environments = {
         TZ = host.timezone;
