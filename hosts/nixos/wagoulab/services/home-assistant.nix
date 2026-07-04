@@ -52,7 +52,7 @@ in
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
       image = "homeassistant/home-assistant:2026.5.4";
-      globalArgs = [ "--network=host" ];
+      networks = [ "host" ];
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
