@@ -36,6 +36,7 @@
       seafile-secret-key.mode = "0400";
 
       dokploy-db-password.mode = "0400";
+      oidc-client-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -118,6 +119,10 @@
 
       "dokploy-postgres.env" = {
         content = "POSTGRES_PASSWORD=${config.sops.placeholder.dokploy-db-password}\n";
+      };
+
+      "ha-secrets.yaml" = {
+        content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\n";
       };
     };
   };
