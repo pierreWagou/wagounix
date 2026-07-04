@@ -44,7 +44,7 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/devices.yaml
-            lights:
+            hue-lights:
               mode: yaml
               title: Lights
               icon: mdi:lightbulb
