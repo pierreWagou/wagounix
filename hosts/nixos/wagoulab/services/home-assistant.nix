@@ -53,7 +53,7 @@ let
           client_secret: !secret oidc_client_secret
           discovery_url: "https://auth.wagou.fr/application/o/home-assistant/.well-known/openid-configuration"
           features:
-            automatic_user_linking: true
+            automatic_user_linking: false
             automatic_person_creation: true
             default_redirect: true
           roles:
