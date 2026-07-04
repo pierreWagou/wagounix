@@ -57,6 +57,10 @@ in
       image = "homeassistant/home-assistant:2026.5.4";
       noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
+      publishPorts = [
+        "8200:8200" # SofaBaton hub connect-back
+        "8060:8060" # SofaBaton Wifi Commands
+      ];
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
