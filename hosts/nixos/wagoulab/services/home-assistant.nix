@@ -1,13 +1,10 @@
 {
-  config,
   pkgs,
   host,
   ...
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
-
   heatmapDashboard = ./dashboards/heatmap.yaml;
   devicesDashboard = ./dashboards/devices.yaml;
 
@@ -49,22 +46,13 @@ let
         automation: !include automations.yaml
         script: !include scripts.yaml
         scene: !include scenes.yaml
-
-        logger:
-          default: warning
-          logs:
-            custom_components.sofabaton_x1s: debug
   '';
 in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
       image = "homeassistant/home-assistant:2026.5.4";
-      networks = [ networks.proxy.ref ];
-      publishPorts = [
-        "8200:8200" # SofaBaton hub connect-back
-        "8060:8060" # SofaBaton Wifi Commands
-      ];
+      globalArgs = [ "--network=host" ];
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
@@ -73,14 +61,6 @@ in
       ];
       environments = {
         TZ = host.timezone;
-      };
-      labels = {
-        "traefik.enable" = "true";
-        "traefik.http.routers.homeassistant.rule" = "Host(`home.${host.domain}`)";
-        "traefik.http.routers.homeassistant.entrypoints" = "websecure";
-        "traefik.http.routers.homeassistant.tls" = "true";
-        "traefik.http.routers.homeassistant.middlewares" = "secure-headers@file";
-        "traefik.http.services.homeassistant.loadbalancer.server.port" = "8123";
       };
     };
   };
