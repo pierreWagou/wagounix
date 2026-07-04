@@ -19,6 +19,7 @@
       "podman+".allowedUDPPorts = [ 53 ];
       # Allow Traefik container to reach ttyd and webhook on the host
       "podman+".allowedTCPPorts = [
+        8123 # Home Assistant
         host.ports.ttyd
         host.ports.webhook
       ];
