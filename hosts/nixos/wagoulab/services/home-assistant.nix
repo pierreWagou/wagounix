@@ -49,13 +49,17 @@ let
         automation: !include automations.yaml
         script: !include scripts.yaml
         scene: !include scenes.yaml
+
+        logger:
+          default: warning
+          logs:
+            custom_components.sofabaton_x1s: debug
   '';
 in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
       image = "homeassistant/home-assistant:2026.5.4";
-      noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
       publishPorts = [
         "8200:8200" # SofaBaton hub connect-back
