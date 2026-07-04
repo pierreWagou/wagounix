@@ -8,6 +8,7 @@
 let
   heatmapDashboard = ./dashboards/heatmap.yaml;
   devicesDashboard = ./dashboards/devices.yaml;
+  lightsDashboard = ./dashboards/lights.yaml;
 
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
         default_config:
@@ -43,6 +44,13 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/devices.yaml
+            lights:
+              mode: yaml
+              title: Lights
+              icon: mdi:lightbulb
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/lights.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
@@ -71,6 +79,7 @@ in
         "${config.sops.templates."ha-secrets.yaml".path}:/config/secrets.yaml:ro"
         "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
         "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
+        "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
       ];
       environments = {
         TZ = host.timezone;
