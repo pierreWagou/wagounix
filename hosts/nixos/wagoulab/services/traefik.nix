@@ -61,7 +61,7 @@ let
         ];
         dokploy.loadBalancer.servers = [ { url = "http://${host.serverIP}:3001"; } ];
         dokploy-traefik.loadBalancer.servers = [ { url = "http://host.containers.internal:9080"; } ];
-        homeassistant-service.loadBalancer.servers = [ { url = "http://${host.serverIP}:8123"; } ];
+        homeassistant-service.loadBalancer.servers = [ { url = "http://host.containers.internal:8123"; } ];
       };
     };
   };
