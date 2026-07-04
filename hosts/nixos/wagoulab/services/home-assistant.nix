@@ -1,6 +1,7 @@
 {
   pkgs,
   host,
+  config,
   ...
 }:
 
@@ -46,6 +47,17 @@ let
         automation: !include automations.yaml
         script: !include scripts.yaml
         scene: !include scenes.yaml
+
+        auth_oidc:
+          client_id: "B5xh86aOL0cHkNRHze8iA1HsDtZpwWSjmVL8j2K7"
+          client_secret: !secret oidc_client_secret
+          discovery_url: "https://auth.wagou.fr/application/o/home-assistant/.well-known/openid-configuration"
+          features:
+            automatic_user_linking: true
+            automatic_person_creation: true
+            default_redirect: true
+          roles:
+            admin: "admins"
   '';
 in
 {
@@ -56,6 +68,7 @@ in
       volumes = [
         "/var/lib/home-assistant:/config"
         "${configFile}:/config/configuration.yaml:ro"
+        "${config.sops.templates."ha-secrets.yaml".path}:/config/secrets.yaml:ro"
         "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
         "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
       ];
