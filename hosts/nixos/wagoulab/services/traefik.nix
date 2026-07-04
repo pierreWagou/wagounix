@@ -51,6 +51,7 @@ let
         ttyd = mkRouter "dev.${host.domain}" "ttyd";
         webhook = mkRouter "relay.${host.domain}" "webhook";
         dokploy = mkRouter "apps.${host.domain}" "dokploy";
+        homeassistant = mkRouter "home.${host.domain}" "homeassistant-service";
       }
       // appRouters;
       services = {
@@ -60,6 +61,7 @@ let
         ];
         dokploy.loadBalancer.servers = [ { url = "http://${host.serverIP}:3001"; } ];
         dokploy-traefik.loadBalancer.servers = [ { url = "http://host.containers.internal:9080"; } ];
+        homeassistant-service.loadBalancer.servers = [ { url = "http://${host.serverIP}:8123"; } ];
       };
     };
   };
