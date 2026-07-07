@@ -39,6 +39,8 @@ let
       upstream_dns = [
         "https://dns.cloudflare.com/dns-query"
         "https://dns.google/dns-query"
+        "1.1.1.1:53"
+        "8.8.8.8:53"
       ];
       upstream_mode = "load_balance";
       # Disable private reverse DNS — AdGuard runs in a container and has no
