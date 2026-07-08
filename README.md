@@ -33,8 +33,8 @@ Each configuration is assembled from layered modules — common packages are sha
   ├──────────────────────────────────┬────────────────────────────┤
   │         hosts/darwin/            │        hosts/nixos/        │  platform
   ├────────────────┬─────────────────┼────────────────────────────┤
-  │   personal/    │     work/       │        wagoulab/           │  layer / host
-  │   wagoumac     │      alan       │                            │
+  │   personal/    │     alan/        │        wagoulab/           │  layer / host
+  │   wagoumac     │                  │                            │
   └────────────────┴─────────────────┴────────────────────────────┘
 ```
 
@@ -47,7 +47,7 @@ wagounix/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
     │   ├── personal/  # Personal Mac (wagoumac)
-    │   └── work/      # Work Mac (alan)
+    │   └── alan/      # Work Mac (alan)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
 ```
@@ -95,13 +95,11 @@ wagounix/
     │   │   └── wagoumac/
     │   │       ├── default.nix
     │   │       └── variables.nix
-    │   └── work/
+    │   └── alan/
     │       ├── default.nix
-    │       └── alan/
-    │           ├── default.nix
-    │           ├── variables.nix
-    │           ├── homebrew.nix
-    │           └── packages.nix
+    │       ├── variables.nix
+    │       ├── homebrew.nix
+    │       └── packages.nix
     └── nixos/
         ├── default.nix
         ├── configuration.nix

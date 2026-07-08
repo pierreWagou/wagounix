@@ -84,12 +84,11 @@
           modules = [
             ./hosts/common
             ./hosts/darwin
-            ./hosts/darwin/work
-            ./hosts/darwin/work/alan
+            ./hosts/darwin/alan
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/darwin/work/alan/variables.nix;
+            host = import ./hosts/darwin/alan/variables.nix;
           };
         };
 
