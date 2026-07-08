@@ -42,13 +42,11 @@ wagounix/
 │   │   │   └── wagoumac/          # Personal Mac (aarch64-darwin)
 │   │   │       ├── default.nix
 │   │   │       └── variables.nix
-│   │   └── work/                  # Work Mac layer
-│   │       ├── default.nix        # No-op layer entry point (all config at host level)
-│   │       └── alan/              # Work Mac (aarch64-darwin)
-│   │           ├── default.nix    # Imports homebrew, packages; sets wagou.dock
-│   │           ├── variables.nix
-│   │           ├── homebrew.nix   # 1password, figma, notion, slack
-│   │           └── packages.nix   # awscli2, 1password-cli
+│   │   └── alan/                  # Work Mac (aarch64-darwin)
+│   │       ├── default.nix    # Imports homebrew, packages; sets wagou.dock
+│   │       ├── variables.nix
+│   │       ├── homebrew.nix   # 1password, figma, notion, slack
+│   │       └── packages.nix   # awscli2, 1password-cli
 │   └── nixos/                     # NixOS platform base
 │       ├── default.nix            # Imports configuration, packages
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
@@ -95,8 +93,7 @@ Each configuration loads modules in order:
 
 1. **Common** (cross-platform) — `hosts/common` (packages, fonts, users)
 2. **Platform** — `hosts/darwin` or `hosts/nixos`
-3. **Layer** (darwin only) — `hosts/darwin/personal` or `hosts/darwin/work`
-4. **Host** — `hosts/<platform>/<layer>/<host>`
+3. **Host** — `hosts/<platform>/<host>` (or `hosts/<platform>/<layer>/<host>` when a layer is used)
 
 In `flake.nix`, this is expressed as:
 
@@ -107,10 +104,9 @@ alan = nix-darwin.lib.darwinSystem {
   modules = [
     ./hosts/common              # common
     ./hosts/darwin              # platform
-    ./hosts/darwin/work         # layer
-    ./hosts/darwin/work/alan    # host
+    ./hosts/darwin/alan         # host
   ];
-  specialArgs = { inherit inputs; host = import ./hosts/darwin/work/alan/variables.nix; };
+  specialArgs = { inherit inputs; host = import ./hosts/darwin/alan/variables.nix; };
 };
 
 # NixOS host
