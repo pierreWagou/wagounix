@@ -46,11 +46,29 @@ let
             referrerPolicy = "strict-origin-when-cross-origin";
           };
         };
+        authentik-forward-auth = {
+          forwardAuth = {
+            address = "http://authentik-server:9000/outpost.goauthentik.io/auth/traefik";
+            trustForwardHeader = true;
+            authResponseHeaders = [
+              "X-authentik-username"
+              "X-authentik-email"
+              "X-authentik-name"
+              "X-authentik-groups"
+              "X-authentik-uid"
+            ];
+          };
+        };
       };
       routers = {
         ttyd = mkRouter "dev.${host.domain}" "ttyd";
         webhook = mkRouter "relay.${host.domain}" "webhook";
-        dokploy = mkRouter "apps.${host.domain}" "dokploy";
+        dokploy = (mkRouter "apps.${host.domain}" "dokploy") // {
+          middlewares = [
+            "secure-headers"
+            "authentik-forward-auth"
+          ];
+        };
         homeassistant = mkRouter "home.${host.domain}" "homeassistant-service";
       }
       // appRouters;
