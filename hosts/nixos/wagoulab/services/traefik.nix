@@ -63,12 +63,7 @@ let
       routers = {
         ttyd = mkRouter "dev.${host.domain}" "ttyd";
         webhook = mkRouter "relay.${host.domain}" "webhook";
-        dokploy = (mkRouter "apps.${host.domain}" "dokploy") // {
-          middlewares = [
-            "secure-headers"
-            "authentik-forward-auth"
-          ];
-        };
+        dokploy = mkRouter "apps.${host.domain}" "dokploy";
         homeassistant = mkRouter "home.${host.domain}" "homeassistant-service";
       }
       // appRouters;
