@@ -2,7 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
-  immichVersion = "v2.7.5";
+  immichVersion = "v3.0.3";
 in
 {
   # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
@@ -64,7 +64,7 @@ in
 
     immich-postgres = {
       containerConfig = {
-        image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
+        image = "ghcr.io/immich-app/postgres:16-vectorchord0.4.3-pgvectors0.2.0";
         noNewPrivileges = true;
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
