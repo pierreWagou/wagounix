@@ -1,0 +1,33 @@
+views:
+  - title: Pets
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Eversweet Max 2 UVC
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 3
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - integration: petkit
+                  options:
+                    type: tile
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: All Petkit Entities
+          - type: custom:auto-entities
+            card:
+              type: entities
+            card_param: entities
+            filter:
+              include:
+                - integration: petkit
+                  options:
+                    type: sensor
