@@ -111,8 +111,10 @@ in
         "home-assistant.service"
         "network-online.target"
       ];
-      wants = [ "network-online.target" ];
-      requires = [ "home-assistant.service" ];
+      wants = [
+        "home-assistant.service"
+        "network-online.target"
+      ];
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -120,6 +122,13 @@ in
       path = with pkgs; [ podman ];
       script = ''
         set -euo pipefail
+        # Wait for HA to be responsive
+        for i in $(seq 1 30); do
+          if podman exec home-assistant python -c "import homeassistant" 2>/dev/null; then
+            break
+          fi
+          sleep 2
+        done
         INSTALLED=$(podman exec home-assistant pip show pypetkitapi 2>/dev/null | grep -q "Version: 1.26.1" && echo "yes" || echo "no")
         if [ "$INSTALLED" = "no" ]; then
           echo "Installing pypetkitapi==1.26.1 inside HA container..."
