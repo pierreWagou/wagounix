@@ -104,43 +104,6 @@ in
       "d /var/lib/home-assistant/dashboards 0755 root root -"
     ];
 
-    services.petkit-deps = {
-      description = "Install pypetkitapi inside Home Assistant container";
-      wantedBy = [ "multi-user.target" ];
-      after = [
-        "home-assistant.service"
-        "network-online.target"
-      ];
-      wants = [
-        "home-assistant.service"
-        "network-online.target"
-      ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
-      path = with pkgs; [ podman ];
-      script = ''
-        set -euo pipefail
-        # Wait for HA to be responsive
-        for i in $(seq 1 30); do
-          if podman exec home-assistant python -c "import homeassistant" 2>/dev/null; then
-            break
-          fi
-          sleep 2
-        done
-        INSTALLED=$(podman exec home-assistant pip show pypetkitapi 2>/dev/null | grep -q "Version: 1.26.1" && echo "yes" || echo "no")
-        if [ "$INSTALLED" = "no" ]; then
-          echo "Installing pypetkitapi==1.26.1 inside HA container..."
-          podman exec home-assistant pip install --no-deps pypetkitapi==1.26.1
-          echo "pypetkitapi installed. Restarting Home Assistant..."
-          systemctl restart home-assistant.service
-        else
-          echo "pypetkitapi 1.26.1 already installed, skipping"
-        fi
-      '';
-    };
-
     services.hacs-install = {
       description = "Install HACS into Home Assistant";
       wantedBy = [ "multi-user.target" ];
