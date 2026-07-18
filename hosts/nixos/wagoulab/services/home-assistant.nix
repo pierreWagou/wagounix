@@ -79,7 +79,7 @@ in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
-      image = "homeassistant/home-assistant:2026.7.2";
+      image = "homeassistant/home-assistant:2026.5.4";
       networks = [ "host" ];
       volumes = [
         "/var/lib/home-assistant:/config"
@@ -97,39 +97,69 @@ in
     };
   };
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/home-assistant 0755 root root -"
-    "d /var/lib/home-assistant/custom_components 0755 root root -"
-    "d /var/lib/home-assistant/dashboards 0755 root root -"
-  ];
-
-  systemd.services.hacs-install = {
-    description = "Install HACS into Home Assistant";
-    wantedBy = [ "multi-user.target" ];
-    after = [
-      "home-assistant.service"
-      "network-online.target"
+  systemd = {
+    tmpfiles.rules = [
+      "d /var/lib/home-assistant 0755 root root -"
+      "d /var/lib/home-assistant/custom_components 0755 root root -"
+      "d /var/lib/home-assistant/dashboards 0755 root root -"
     ];
-    wants = [ "network-online.target" ];
-    requires = [ "home-assistant.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
+
+    services.petkit-deps = {
+      description = "Install pypetkitapi inside Home Assistant container";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "home-assistant.service"
+        "network-online.target"
+      ];
+      wants = [ "network-online.target" ];
+      requires = [ "home-assistant.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      path = with pkgs; [ podman ];
+      script = ''
+        set -euo pipefail
+        INSTALLED=$(podman exec home-assistant pip show pypetkitapi 2>/dev/null | grep -q "Version: 1.26.1" && echo "yes" || echo "no")
+        if [ "$INSTALLED" = "no" ]; then
+          echo "Installing pypetkitapi==1.26.1 inside HA container..."
+          podman exec home-assistant pip install --no-deps pypetkitapi==1.26.1
+          echo "pypetkitapi installed. Restarting Home Assistant..."
+          systemctl restart home-assistant.service
+        else
+          echo "pypetkitapi 1.26.1 already installed, skipping"
+        fi
+      '';
     };
-    path = with pkgs; [ podman ];
-    script = ''
-      set -euo pipefail
-      HACS_DIR="/var/lib/home-assistant/custom_components/hacs"
-      if [ ! -d "$HACS_DIR" ]; then
-        echo "Installing HACS via official script inside container..."
-        # TODO: Pin HACS to a specific release and verify checksum.
-        # Current approach fetches and executes an unpinned remote script (supply chain risk).
-        podman exec home-assistant bash -c "wget -O - https://get.hacs.xyz | bash -"
-        echo "HACS installed. Restarting Home Assistant..."
-        systemctl restart home-assistant.service
-      else
-        echo "HACS already installed, skipping"
-      fi
-    '';
+
+    services.hacs-install = {
+      description = "Install HACS into Home Assistant";
+      wantedBy = [ "multi-user.target" ];
+      after = [
+        "home-assistant.service"
+        "network-online.target"
+      ];
+      wants = [ "network-online.target" ];
+      requires = [ "home-assistant.service" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      path = with pkgs; [ podman ];
+      script = ''
+        set -euo pipefail
+        HACS_DIR="/var/lib/home-assistant/custom_components/hacs"
+        if [ ! -d "$HACS_DIR" ]; then
+          echo "Installing HACS via official script inside container..."
+          # TODO: Pin HACS to a specific release and verify checksum.
+          # Current approach fetches and executes an unpinned remote script (supply chain risk).
+          podman exec home-assistant bash -c "wget -O - https://get.hacs.xyz | bash -"
+          echo "HACS installed. Restarting Home Assistant..."
+          systemctl restart home-assistant.service
+        else
+          echo "HACS already installed, skipping"
+        fi
+      '';
+    };
   };
 }
