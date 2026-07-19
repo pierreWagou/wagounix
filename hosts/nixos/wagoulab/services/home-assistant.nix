@@ -9,6 +9,7 @@ let
   heatmapDashboard = ./dashboards/heatmap.yaml;
   devicesDashboard = ./dashboards/devices.yaml;
   lightsDashboard = ./dashboards/lights.yaml;
+  mietteDashboard = ./dashboards/miette.yaml;
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
         default_config:
 
@@ -50,6 +51,13 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/lights.yaml
+            miette:
+              mode: yaml
+              title: Miette
+              icon: mdi:cat
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/miette.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
@@ -79,6 +87,7 @@ in
         "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
         "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
         "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
+        "${mietteDashboard}:/config/dashboards/miette.yaml:ro"
         "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro"
       ];
       environments = {
