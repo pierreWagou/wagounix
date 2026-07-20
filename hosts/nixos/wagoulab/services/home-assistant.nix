@@ -51,7 +51,7 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/lights.yaml
-            miette:
+            miette-pets:
               mode: yaml
               title: Miette
               icon: mdi:cat
