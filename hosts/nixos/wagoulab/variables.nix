@@ -31,6 +31,8 @@ rec {
   ports = {
     ttyd = 7681;
     webhook = 9000;
+    satisfactory = 7777;
+    satisfactoryReliable = 8888;
   };
 
   # Subdomains served by NixOS Traefik (services).
