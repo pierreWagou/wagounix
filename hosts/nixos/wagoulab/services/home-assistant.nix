@@ -78,7 +78,7 @@ in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
-      image = "homeassistant/home-assistant:2026.7.0";
+      image = "homeassistant/home-assistant:2026.5.4";
       networks = [ "host" ];
       volumes = [
         "/var/lib/home-assistant:/config"
