@@ -27,5 +27,6 @@ _: {
     ./seafile
     ./branding.nix
     ./dokploy.nix
+    ./satisfactory.nix
   ];
 }
