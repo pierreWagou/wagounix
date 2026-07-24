@@ -29,7 +29,7 @@ in
 {
   virtualisation.quadlet.containers.cloudflared = {
     containerConfig = {
-      image = "cloudflare/cloudflared:2026.5.1";
+      image = "cloudflare/cloudflared:2026.7.3";
       noNewPrivileges = true;
       networks = [ networks.proxy.ref ];
       volumes = [
