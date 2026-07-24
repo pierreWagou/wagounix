@@ -82,7 +82,7 @@ in
           --env RENOVATE_AUTODISCOVER=true \
           --env RENOVATE_TOKEN="$TOKEN" \
           --env LOG_LEVEL=info \
-          ghcr.io/renovatebot/renovate:43.196.1
+          ghcr.io/renovatebot/renovate:43.279.0
       '';
       # Hardening
       PrivateTmp = true;
