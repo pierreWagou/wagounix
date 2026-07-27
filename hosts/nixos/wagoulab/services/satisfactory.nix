@@ -6,6 +6,7 @@ _:
       image = "wolveix/satisfactory-server:latest";
       noNewPrivileges = true;
       healthCmd = "none";
+      networks = [ "host" ];
       volumes = [ "/var/lib/satisfactory:/config" ];
       environments = {
         MAXPLAYERS = "4";
@@ -14,11 +15,6 @@ _:
         STEAMBETA = "false";
       };
     };
-    # Host networking — game servers need raw UDP, bridge NAT causes issues
-    rawConfig = ''
-      [Container]
-      Network=host
-    '';
   };
 
   systemd.tmpfiles.rules = [
