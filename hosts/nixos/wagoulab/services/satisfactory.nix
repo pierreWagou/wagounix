@@ -9,7 +9,7 @@ _:
       networks = [ "host" ];
       volumes = [ "/var/lib/satisfactory:/config" ];
       environments = {
-        MAXPLAYERS = "4";
+        MAXPLAYERS = "8";
         PUID = "1000";
         PGID = "1000";
         STEAMBETA = "false";
