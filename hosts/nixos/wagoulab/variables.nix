@@ -62,4 +62,11 @@ rec {
     "creneau-preview"
     "creneau"
   ];
+
+  # Subdomains that only need an AdGuard DNS rewrite (no Traefik, no tunnel).
+  # Use for services that run on raw TCP/UDP ports (e.g. game servers).
+  # Cloudflare A record (proxy OFF) + router port forwarding needed for external access.
+  dnsOnlySubdomains = [
+    "satisfactory"
+  ];
 }

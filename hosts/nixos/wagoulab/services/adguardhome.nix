@@ -60,7 +60,7 @@ let
         domain = "${sub}.${host.domain}";
         answer = host.serverIP;
         enabled = true;
-      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains);
+      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
     };
     filters = [
       {
