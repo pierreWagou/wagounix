@@ -33,6 +33,8 @@ rec {
     webhook = 9000;
     satisfactory = 7777;
     satisfactoryReliable = 8888;
+    marieland = 7778;
+    marielandReliable = 8889;
   };
 
   # Subdomains served by NixOS Traefik (services).
@@ -68,5 +70,6 @@ rec {
   # Cloudflare A record (proxy OFF) + router port forwarding needed for external access.
   dnsOnlySubdomains = [
     "satisfactory"
+    "marieland"
   ];
 }
