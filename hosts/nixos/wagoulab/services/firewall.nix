@@ -8,13 +8,16 @@
       80 # HTTP (Traefik redirect to HTTPS)
       443 # HTTPS (Traefik)
       7777 # Satisfactory server
+      7778 # Marieland server
       8200 # SofaBaton hub connect-back
       8060 # SofaBaton Wifi Commands
       8888 # Satisfactory reliable messaging
+      8889 # Marieland reliable messaging
     ];
     allowedUDPPorts = [
       53 # DNS (AdGuard Home)
       7777 # Satisfactory game traffic
+      7778 # Marieland game traffic
     ];
 
     interfaces = {
