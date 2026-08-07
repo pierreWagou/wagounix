@@ -13,6 +13,12 @@
       8060 # SofaBaton Wifi Commands
       8888 # Satisfactory reliable messaging
       8889 # Marieland reliable messaging
+      25 # SMTP (Stalwart)
+      465 # SMTPS (Stalwart)
+      587 # Submission (Stalwart)
+      143 # IMAP (Stalwart)
+      993 # IMAPS (Stalwart)
+      4190 # ManageSieve (Stalwart)
     ];
     allowedUDPPorts = [
       53 # DNS (AdGuard Home)

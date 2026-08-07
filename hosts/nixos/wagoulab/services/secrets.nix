@@ -37,6 +37,7 @@
 
       dokploy-db-password.mode = "0400";
       oidc-client-secret.mode = "0400";
+      stalwart-admin-password.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -123,6 +124,10 @@
 
       "ha-secrets.yaml" = {
         content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\n";
+      };
+
+      "stalwart.env" = {
+        content = "STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}\n";
       };
     };
   };
