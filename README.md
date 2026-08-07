@@ -160,11 +160,15 @@ wagounix/
 Profiles: `wagoumac`, `alan`
 
 ```bash
-# 1. Install Lix (Nix)
-curl -sSf -L https://install.lix.systems/lix | sh -s -- install
+# 1. Install Nix
+curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh
 . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
 
-# 2. Apply the configuration
+# 2. Enable flakes
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
+
+# 3. Apply the configuration
 sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 ```
 
@@ -173,8 +177,8 @@ sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 Profiles: `wagoulab`
 
 ```bash
-# 1. Install NixOS with Lix
-sh <(curl -L https://install.lix.systems/lix) install
+# 1. Install NixOS with Nix
+sh <(curl -L https://nixos.org/nix/install) install
 
 # 2. Apply the configuration
 sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh

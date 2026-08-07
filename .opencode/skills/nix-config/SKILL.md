@@ -375,7 +375,7 @@ nix flake check      # runs all checks + builds
 - `onActivation.cleanup = "uninstall"` — removing a cask/brew from config WILL uninstall it
 - `mutableTaps = false` — add new taps as flake inputs
 - No home-manager — user dotfiles are managed by chezmoi separately
-- macOS: Nix daemon is managed by Lix installer (`nix.enable = false` in darwin config)
+- macOS: Nix daemon is managed by the standard Nix installer (`nix.enable = false` in darwin config)
 - NixOS: `system.stateVersion` must match the version at install time — never change it
 - NixOS: `hardware.nix` is auto-generated — replace placeholder with real one from the server
 - Commit and push after successful rebuilds

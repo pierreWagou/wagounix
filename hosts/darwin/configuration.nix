@@ -1,8 +1,8 @@
 { host, ... }:
 
 {
-  # Nix daemon is managed externally by Lix installer.
-  # Settings are in /etc/nix/nix.conf (managed by Lix, not nix-darwin).
+  # Nix daemon is managed externally by the standard Nix installer.
+  # Settings are in /etc/nix/nix.conf (managed by Nix, not nix-darwin).
   nix.enable = false;
 
   system = {
