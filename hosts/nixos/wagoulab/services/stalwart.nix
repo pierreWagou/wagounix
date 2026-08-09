@@ -38,7 +38,7 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/lib/stalwart 0755 root root -"
-    "d /var/lib/stalwart-config 0755 root root -"
+    "d /var/lib/stalwart 0755 2000 2000 -"
+    "d /var/lib/stalwart-config 0755 2000 2000 -"
   ];
 }
