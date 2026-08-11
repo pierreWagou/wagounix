@@ -54,7 +54,7 @@ rec {
     "auth"
     "disk"
     "assets"
-    "mail"
+    "mailbox"
   ];
 
   # Subdomains for Dokploy-deployed apps.
