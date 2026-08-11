@@ -8,6 +8,7 @@ in
     containerConfig = {
       image = "stalwartlabs/stalwart:v0.16";
       noNewPrivileges = true;
+      addCapabilities = [ "NET_BIND_SERVICE" ];
       networks = [ networks.proxy.ref ];
       publishPorts = [
         "0.0.0.0:25:25/tcp"
