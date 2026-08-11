@@ -25,11 +25,11 @@ in
       environmentFiles = [ config.sops.templates."stalwart.env".path ];
       environments = {
         STALWART_HOSTNAME = host.domain;
-        STALWART_PUBLIC_URL = "https://mail.${host.domain}";
+        STALWART_PUBLIC_URL = "https://mailbox.${host.domain}";
       };
       labels = {
         "traefik.enable" = "true";
-        "traefik.http.routers.stalwart.rule" = "Host(`mail.${host.domain}`)";
+        "traefik.http.routers.stalwart.rule" = "Host(`mailbox.${host.domain}`)";
         "traefik.http.routers.stalwart.entrypoints" = "websecure";
         "traefik.http.routers.stalwart.tls" = "true";
         "traefik.http.routers.stalwart.middlewares" = "secure-headers@file";
