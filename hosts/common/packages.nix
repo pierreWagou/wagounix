@@ -29,6 +29,7 @@
     sheldon
     sops
     starship
+    swaks
     television
     tmux
     tmuxinator
