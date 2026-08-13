@@ -7,7 +7,7 @@ views:
           - type: heading
             heading: Alerts
           - type: grid
-            columns: 4
+            columns: 2
             square: false
             cards:
               - type: conditional
@@ -57,7 +57,7 @@ views:
           - type: heading
             heading: Moisture
           - type: grid
-            columns: 4
+            columns: 2
             square: false
             cards:
               - type: tile
