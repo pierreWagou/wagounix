@@ -9,7 +9,9 @@ views:
             cards:
               - type: heading
                 heading: Alerts
-              - type: horizontal-stack
+              - type: grid
+                columns: 4
+                square: false
                 cards:
                   - type: conditional
                     conditions:
@@ -61,7 +63,9 @@ views:
             cards:
               - type: heading
                 heading: Moisture
-              - type: horizontal-stack
+              - type: grid
+                columns: 4
+                square: false
                 cards:
                   - type: tile
                     entity: sensor.soil_sensor_tomate_soil_moisture
