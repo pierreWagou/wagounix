@@ -59,7 +59,7 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/miette.yaml
-            plants:
+            plant-monitor:
               mode: yaml
               title: Plants
               icon: mdi:flower
