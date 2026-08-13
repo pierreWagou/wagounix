@@ -3,10 +3,11 @@ views:
   - title: Overview
     type: sections
     sections:
-      # Alerts
       - type: grid
         columns: 4
         cards:
+          - type: heading
+            heading: Alerts
           - type: conditional
             conditions:
               - condition: numeric_state
@@ -51,11 +52,8 @@ views:
               name: "Malva Jaune"
               icon: mdi:water-alert
               color: red
-
-      # Moisture
-      - type: grid
-        columns: 4
-        cards:
+          - type: heading
+            heading: Moisture
           - type: tile
             entity: sensor.soil_sensor_tomate_soil_moisture
             name: "Tomate"
@@ -76,9 +74,6 @@ views:
             name: "Malva Jaune"
             icon: mdi:flower-tulip
             color: blue
-
-      # Moisture Trends
-      - cards:
           - type: heading
             heading: Moisture Trends (7 days)
           - type: history-graph
@@ -92,9 +87,6 @@ views:
               - entity: sensor.soil_sensor_malva_jaune_soil_moisture
                 name: Malva Jaune
             hours_to_show: 168
-
-      # Temperature Trends
-      - cards:
           - type: heading
             heading: Temperature Trends (7 days)
           - type: history-graph
