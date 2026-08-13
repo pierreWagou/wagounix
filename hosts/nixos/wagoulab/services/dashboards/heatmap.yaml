@@ -58,12 +58,12 @@ views:
           - type: heading
             heading: Bathroom
           - type: tile
-            entity: sensor.zigheat_bathroom_temperature
+            entity: sensor.zigbheat_bathroom_temperature
             name: Temperature
             icon: mdi:thermometer
             color: orange
           - type: tile
-            entity: sensor.zigheat_bathroom_humidity
+            entity: sensor.zigbheat_bathroom_humidity
             name: Humidity
             icon: mdi:water-percent
             color: blue
@@ -71,12 +71,12 @@ views:
           - type: heading
             heading: Toilet
           - type: tile
-            entity: sensor.zigheat_restroom_temperature
+            entity: sensor.zigbheat_restroom_temperature
             name: Temperature
             icon: mdi:thermometer
             color: orange
           - type: tile
-            entity: sensor.zigheat_restroom_humidity
+            entity: sensor.zigbheat_restroom_humidity
             name: Humidity
             icon: mdi:water-percent
             color: blue
