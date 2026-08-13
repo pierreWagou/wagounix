@@ -1,123 +1,127 @@
 views:
   # ── View 1: Overview ──
   - title: Overview
-    type: masonry
-    cards:
-      # Alerts
-      - type: vertical-stack
-        cards:
-          - type: heading
-            heading: Alerts
-          - type: horizontal-stack
+    type: sections
+    sections:
+      - cards:
+          # Alerts
+          - type: vertical-stack
             cards:
-              - type: conditional
-                conditions:
-                  - condition: numeric_state
+              - type: heading
+                heading: Alerts
+              - type: horizontal-stack
+                cards:
+                  - type: conditional
+                    conditions:
+                      - condition: numeric_state
+                        entity: sensor.soil_sensor_tomate_soil_moisture
+                        below: 35
+                    card:
+                      type: tile
+                      entity: sensor.soil_sensor_tomate_soil_moisture
+                      name: "Tomate"
+                      icon: mdi:water-alert
+                      color: red
+                  - type: conditional
+                    conditions:
+                      - condition: numeric_state
+                        entity: sensor.soil_sensor_lavande_soil_moisture
+                        below: 15
+                    card:
+                      type: tile
+                      entity: sensor.soil_sensor_lavande_soil_moisture
+                      name: "Lavande"
+                      icon: mdi:water-alert
+                      color: red
+                  - type: conditional
+                    conditions:
+                      - condition: numeric_state
+                        entity: sensor.soil_sensor_malva_bleu_soil_moisture
+                        below: 25
+                    card:
+                      type: tile
+                      entity: sensor.soil_sensor_malva_bleu_soil_moisture
+                      name: "Malva Bleu"
+                      icon: mdi:water-alert
+                      color: red
+                  - type: conditional
+                    conditions:
+                      - condition: numeric_state
+                        entity: sensor.soil_sensor_malva_jaune_soil_moisture
+                        below: 25
+                    card:
+                      type: tile
+                      entity: sensor.soil_sensor_malva_jaune_soil_moisture
+                      name: "Malva Jaune"
+                      icon: mdi:water-alert
+                      color: red
+
+          # Moisture
+          - type: vertical-stack
+            cards:
+              - type: heading
+                heading: Moisture
+              - type: horizontal-stack
+                cards:
+                  - type: tile
                     entity: sensor.soil_sensor_tomate_soil_moisture
-                    below: 35
-                card:
-                  type: tile
-                  entity: sensor.soil_sensor_tomate_soil_moisture
-                  name: "Tomate"
-                  icon: mdi:water-alert
-                  color: red
-              - type: conditional
-                conditions:
-                  - condition: numeric_state
+                    name: "Tomate"
+                    icon: mdi:flower-tulip
+                    color: blue
+                  - type: tile
                     entity: sensor.soil_sensor_lavande_soil_moisture
-                    below: 15
-                card:
-                  type: tile
-                  entity: sensor.soil_sensor_lavande_soil_moisture
-                  name: "Lavande"
-                  icon: mdi:water-alert
-                  color: red
-              - type: conditional
-                conditions:
-                  - condition: numeric_state
+                    name: "Lavande"
+                    icon: mdi:flower-tulip
+                    color: blue
+                  - type: tile
                     entity: sensor.soil_sensor_malva_bleu_soil_moisture
-                    below: 25
-                card:
-                  type: tile
-                  entity: sensor.soil_sensor_malva_bleu_soil_moisture
-                  name: "Malva Bleu"
-                  icon: mdi:water-alert
-                  color: red
-              - type: conditional
-                conditions:
-                  - condition: numeric_state
+                    name: "Malva Bleu"
+                    icon: mdi:flower-tulip
+                    color: blue
+                  - type: tile
                     entity: sensor.soil_sensor_malva_jaune_soil_moisture
-                    below: 25
-                card:
-                  type: tile
-                  entity: sensor.soil_sensor_malva_jaune_soil_moisture
-                  name: "Malva Jaune"
-                  icon: mdi:water-alert
-                  color: red
+                    name: "Malva Jaune"
+                    icon: mdi:flower-tulip
+                    color: blue
 
-      # Moisture
-      - type: vertical-stack
-        cards:
-          - type: heading
-            heading: Moisture
-          - type: horizontal-stack
+          # Moisture Trends
+          - type: vertical-stack
             cards:
-              - type: tile
-                entity: sensor.soil_sensor_tomate_soil_moisture
-                name: "Tomate"
-                icon: mdi:flower-tulip
-                color: blue
-              - type: tile
-                entity: sensor.soil_sensor_lavande_soil_moisture
-                name: "Lavande"
-                icon: mdi:flower-tulip
-                color: blue
-              - type: tile
-                entity: sensor.soil_sensor_malva_bleu_soil_moisture
-                name: "Malva Bleu"
-                icon: mdi:flower-tulip
-                color: blue
-              - type: tile
-                entity: sensor.soil_sensor_malva_jaune_soil_moisture
-                name: "Malva Jaune"
-                icon: mdi:flower-tulip
-                color: blue
+              - type: heading
+                heading: Moisture Trends (7 days)
+              - type: history-graph
+                entities:
+                  - entity: sensor.soil_sensor_tomate_soil_moisture
+                    name: Tomate
+                  - entity: sensor.soil_sensor_lavande_soil_moisture
+                    name: Lavande
+                  - entity: sensor.soil_sensor_malva_bleu_soil_moisture
+                    name: Malva Bleu
+                  - entity: sensor.soil_sensor_malva_jaune_soil_moisture
+                    name: Malva Jaune
+                hours_to_show: 168
 
-      # Moisture Trends
-      - type: heading
-        heading: Moisture Trends (7 days)
-      - type: history-graph
-        entities:
-          - entity: sensor.soil_sensor_tomate_soil_moisture
-            name: Tomate
-          - entity: sensor.soil_sensor_lavande_soil_moisture
-            name: Lavande
-          - entity: sensor.soil_sensor_malva_bleu_soil_moisture
-            name: Malva Bleu
-          - entity: sensor.soil_sensor_malva_jaune_soil_moisture
-            name: Malva Jaune
-        hours_to_show: 168
-
-      # Temperature Trends
-      - type: heading
-        heading: Temperature Trends (7 days)
-      - type: history-graph
-        entities:
-          - entity: sensor.soil_sensor_tomate_temperature
-            name: Tomate
-          - entity: sensor.soil_sensor_lavande_temperature
-            name: Lavande
-          - entity: sensor.soil_sensor_malva_bleu_temperature
-            name: Malva Bleu
-          - entity: sensor.soil_sensor_malva_jaune_temperature
-            name: Malva Jaune
-        hours_to_show: 168
+          # Temperature Trends
+          - type: vertical-stack
+            cards:
+              - type: heading
+                heading: Temperature Trends (7 days)
+              - type: history-graph
+                entities:
+                  - entity: sensor.soil_sensor_tomate_temperature
+                    name: Tomate
+                  - entity: sensor.soil_sensor_lavande_temperature
+                    name: Lavande
+                  - entity: sensor.soil_sensor_malva_bleu_temperature
+                    name: Malva Bleu
+                  - entity: sensor.soil_sensor_malva_jaune_temperature
+                    name: Malva Jaune
+                hours_to_show: 168
 
   # ── View 2: Details ──
   - title: Details
     type: sections
     sections:
-      # Tomato
       - type: grid
         cards:
           - type: heading
@@ -143,7 +147,6 @@ views:
               - sensor.soil_sensor_tomate_soil_moisture
             hours_to_show: 24
 
-      # Lavande
       - type: grid
         cards:
           - type: heading
@@ -169,7 +172,6 @@ views:
               - sensor.soil_sensor_lavande_soil_moisture
             hours_to_show: 24
 
-      # Malva Bleu
       - type: grid
         cards:
           - type: heading
@@ -195,7 +197,6 @@ views:
               - sensor.soil_sensor_malva_bleu_soil_moisture
             hours_to_show: 24
 
-      # Malva Jaune
       - type: grid
         cards:
           - type: heading
