@@ -28,6 +28,7 @@
     sesh
     sheldon
     sops
+    stalwart-cli
     starship
     swaks
     television
