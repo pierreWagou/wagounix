@@ -26,6 +26,7 @@ in
       environments = {
         STALWART_HOSTNAME = host.domain;
         STALWART_PUBLIC_URL = "https://mailbox.${host.domain}";
+        STALWART_ROLE = "default";
       };
       labels = {
         "traefik.enable" = "true";
