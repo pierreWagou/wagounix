@@ -4,8 +4,7 @@ views:
     type: sections
     sections:
       # Alerts
-      - type: grid
-        cards:
+      - cards:
           - type: heading
             heading: Alerts
           - type: conditional
@@ -54,8 +53,7 @@ views:
               color: red
 
       # Moisture
-      - type: grid
-        cards:
+      - cards:
           - type: heading
             heading: Moisture
           - type: tile
