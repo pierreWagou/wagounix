@@ -54,3 +54,29 @@ views:
             name: Humidity
             icon: mdi:water-percent
             color: blue
+      - cards:
+          - type: heading
+            heading: Bathroom
+          - type: tile
+            entity: sensor.zigheat_bathroom_temperature
+            name: Temperature
+            icon: mdi:thermometer
+            color: orange
+          - type: tile
+            entity: sensor.zigheat_bathroom_humidity
+            name: Humidity
+            icon: mdi:water-percent
+            color: blue
+      - cards:
+          - type: heading
+            heading: Toilet
+          - type: tile
+            entity: sensor.zigheat_restroom_temperature
+            name: Temperature
+            icon: mdi:thermometer
+            color: orange
+          - type: tile
+            entity: sensor.zigheat_restroom_humidity
+            name: Humidity
+            icon: mdi:water-percent
+            color: blue
