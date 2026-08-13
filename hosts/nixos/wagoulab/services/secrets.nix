@@ -127,7 +127,10 @@
       };
 
       "stalwart.env" = {
-        content = "STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}\n";
+        content = builtins.concatStringsSep "\n" [
+          "STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}"
+          "STALWART_ROLE=default"
+        ];
       };
     };
   };
