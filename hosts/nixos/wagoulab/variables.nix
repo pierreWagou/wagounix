@@ -72,5 +72,6 @@ rec {
   dnsOnlySubdomains = [
     "satisfactory"
     "marieland"
+    "mail"
   ];
 }
