@@ -127,7 +127,10 @@
       };
 
       "stalwart.env" = {
-        content = "STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}\n";
+        content = ''
+          STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}
+          CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}
+        '';
       };
     };
   };
