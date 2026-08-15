@@ -38,6 +38,7 @@
       dokploy-db-password.mode = "0400";
       oidc-client-secret.mode = "0400";
       stalwart-admin-password.mode = "0400";
+      mailgun-api-key.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -130,6 +131,10 @@
         content = ''
           STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}
           CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}
+          SMTP_RELAY_HOST=smtp.eu.mailgun.org
+          SMTP_RELAY_PORT=587
+          SMTP_RELAY_USERNAME=postmaster@wagou.fr
+          SMTP_RELAY_PASSWORD=${config.sops.placeholder.mailgun-api-key}
         '';
       };
     };
