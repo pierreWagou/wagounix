@@ -24,7 +24,7 @@ in
       ];
       environmentFiles = [ config.sops.templates."stalwart.env".path ];
       environments = {
-        STALWART_HOSTNAME = host.domain;
+        STALWART_HOSTNAME = "mail.${host.domain}";
         STALWART_PUBLIC_URL = "https://mailbox.${host.domain}";
         STALWART_RECOVERY_MODE = "1";
       };
