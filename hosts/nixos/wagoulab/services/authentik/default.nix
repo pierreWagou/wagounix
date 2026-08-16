@@ -201,22 +201,6 @@ in
         volumes = [ "/var/lib/authentik-redis:/data" ];
       };
     };
-
-    authentik-ldap = {
-      containerConfig = {
-        image = "ghcr.io/goauthentik/ldap:${authentikVersion}";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.authentik-internal.ref
-        ];
-        environments = {
-          AUTHENTIK_HOST = "http://authentik-server:9000";
-          AUTHENTIK_INSECURE = "true";
-        };
-        environmentFiles = [ config.sops.templates."authentik-ldap.env".path ];
-      };
-    };
   };
 
   systemd.tmpfiles.rules = [
