@@ -19,6 +19,8 @@
       143 # IMAP (Stalwart)
       993 # IMAPS (Stalwart)
       4190 # ManageSieve (Stalwart)
+      389 # LDAP (Authentik outpost)
+      636 # LDAPS (Authentik outpost)
     ];
     allowedUDPPorts = [
       53 # DNS (AdGuard Home)

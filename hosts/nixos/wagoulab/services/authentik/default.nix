@@ -188,7 +188,7 @@ in
 
     authentik-redis = {
       containerConfig = {
-        image = host.valkeyImage;
+        image = "host.valkeyImage";
         noNewPrivileges = true;
         networks = [ networks.authentik-internal.ref ];
         exec = [
@@ -199,6 +199,26 @@ in
           "warning"
         ];
         volumes = [ "/var/lib/authentik-redis:/data" ];
+      };
+    };
+
+    authentik-ldap = {
+      containerConfig = {
+        image = "ghcr.io/goauthentik/ldap:latest";
+        noNewPrivileges = true;
+        networks = [
+          networks.proxy.ref
+          networks.authentik-internal.ref
+        ];
+        environments = {
+          AUTHENTIK_HOST = "http://authentik-server:9000";
+          AUTHENTIK_INSECURE = "true";
+        };
+        environmentFiles = [ config.sops.templates."authentik-ldap.env".path ];
+        ports = [
+          "389:3389"
+          "636:6636"
+        ];
       };
     };
   };

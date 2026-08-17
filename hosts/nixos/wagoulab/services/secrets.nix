@@ -39,6 +39,7 @@
       oidc-client-secret.mode = "0400";
       stalwart-admin-password.mode = "0400";
       mailgun-api-key.mode = "0400";
+      authentik-ldap-token.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -136,6 +137,10 @@
           SMTP_RELAY_USERNAME=postmaster@wagou.fr
           SMTP_RELAY_PASSWORD=${config.sops.placeholder.mailgun-api-key}
         '';
+      };
+
+      "authentik-ldap.env" = {
+        content = "AUTHENTIK_TOKEN=${config.sops.placeholder.authentik-ldap-token}\n";
       };
     };
   };
