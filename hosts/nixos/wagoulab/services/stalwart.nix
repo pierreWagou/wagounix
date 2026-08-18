@@ -21,6 +21,7 @@ in
       volumes = [
         "/var/lib/stalwart:/var/lib/stalwart"
         "/var/lib/stalwart-config:/etc/stalwart"
+        "/var/lib/stalwart-logs:/var/log/stalwart"
       ];
       environmentFiles = [ config.sops.templates."stalwart.env".path ];
       environments = {
@@ -41,5 +42,6 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/stalwart 0755 2000 2000 -"
     "d /var/lib/stalwart-config 0755 2000 2000 -"
+    "d /var/lib/stalwart-logs 0755 2000 2000 -"
   ];
 }
