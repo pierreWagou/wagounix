@@ -215,9 +215,9 @@ in
           AUTHENTIK_INSECURE = "true";
         };
         environmentFiles = [ config.sops.templates."authentik-ldap.env".path ];
-        ports = [
-          "389:3389"
-          "636:6636"
+        publishPorts = [
+          "0.0.0.0:389:3389/tcp"
+          "0.0.0.0:636:6636/tcp"
         ];
       };
     };
