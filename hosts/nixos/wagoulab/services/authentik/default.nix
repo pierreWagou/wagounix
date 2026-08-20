@@ -188,7 +188,7 @@ in
 
     authentik-redis = {
       containerConfig = {
-        image = "host.valkeyImage";
+        image = host.valkeyImage;
         noNewPrivileges = true;
         networks = [ networks.authentik-internal.ref ];
         exec = [
