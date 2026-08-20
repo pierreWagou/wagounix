@@ -18,11 +18,8 @@
     initrd = {
       availableKernelModules = [
         "xhci_pci"
-        "thunderbolt"
-        "ahci"
         "nvme"
-        "usbhid"
-        "usb_storage"
+        "uas"
         "sd_mod"
       ];
       kernelModules = [ ];
@@ -32,12 +29,12 @@
   };
 
   fileSystems."/" = {
-    device = "/dev/disk/by-uuid/570719a2-20d4-4d43-8f70-9819aa9d920f";
+    device = "/dev/disk/by-uuid/21e1724e-a91c-49e5-8433-8faf5ec81942";
     fsType = "ext4";
   };
 
   fileSystems."/boot" = {
-    device = "/dev/disk/by-uuid/ADC8-9DF0";
+    device = "/dev/disk/by-uuid/ACDD-FB83";
     fsType = "vfat";
     options = [
       "fmask=0022"
@@ -45,9 +42,7 @@
     ];
   };
 
-  swapDevices = [
-    { device = "/dev/disk/by-uuid/6acec370-7b2c-419d-a7e8-16ddc0bb561e"; }
-  ];
+  swapDevices = [ ];
 
   networking.useDHCP = lib.mkDefault true;
 

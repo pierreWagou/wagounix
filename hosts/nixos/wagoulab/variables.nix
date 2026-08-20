@@ -3,9 +3,9 @@ rec {
   homeDir = "/home/${username}";
   hostname = "wagoulab";
   domain = "wagou.fr";
-  serverIP = "192.168.68.65";
+  serverIP = "192.168.68.66";
   tailscaleIP = "100.68.157.70";
-  networkInterface = "enp170s0";
+  networkInterface = "enp1s0";
   lanSubnet = "192.168.68.0/24";
   renderGroupGid = "303";
   timezone = "Europe/Paris";
