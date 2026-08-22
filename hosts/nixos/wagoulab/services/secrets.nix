@@ -9,8 +9,8 @@
       # Cloudflare credentials file — mounted directly into the cloudflared container.
       # Mode 0444 because cloudflared runs as nonroot (UID 65532) inside the container
       # and needs to read the bind-mounted file. The secret is on tmpfs (/run/secrets/).
-      # Host-specific: wagoulab uses "cloudflare-credentials", wagou-clone uses "cloudflare-credentials-clone".
-      cloudflare-credentials.mode = "0444";
+      # Host-specific: wagoulab uses "cloudflare-credentials-prime", wagou-clone uses "cloudflare-credentials-clone".
+      cloudflare-credentials-prime.mode = "0444";
       cloudflare-credentials-clone.mode = "0444";
 
       # Compose service secrets (referenced in env templates below)

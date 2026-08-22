@@ -12,7 +12,7 @@ rec {
   acmeEmail = "pierre.romon@gmail.com";
   adminEmail = "pierre.romon@gmail.com";
   cloudflareAccountId = "65b2dca00576549f065820b1cd5c76c9";
-  cloudflareTunnelId = "77f1d05e-ce21-4a09-8229-13f173b38525";
+  cloudflareTunnelId = "ca26559c-2858-4c78-867e-41e3c19edb52";
 
   # Geographic coordinates (for weather widgets etc.)
   latitude = 48.8566;

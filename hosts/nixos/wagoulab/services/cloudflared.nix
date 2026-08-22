@@ -13,7 +13,7 @@ let
     if host.hostname == "wagou-clone" then
       config.sops.secrets.cloudflare-credentials-clone.path
     else
-      config.sops.secrets.cloudflare-credentials.path;
+      config.sops.secrets.cloudflare-credentials-prime.path;
 
   # Tunnel config — routes all subdomains to NixOS Traefik.
   # NixOS Traefik dispatches: service subdomains to Podman containers,
