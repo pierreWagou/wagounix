@@ -28,6 +28,7 @@
     sesh
     sheldon
     sops
+    sshpass
     stalwart-cli
     starship
     swaks

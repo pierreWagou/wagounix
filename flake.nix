@@ -114,6 +114,21 @@
           };
         };
 
+        wagou-clone = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            inputs.sops-nix.nixosModules.sops
+            inputs.quadlet-nix.nixosModules.quadlet
+            ./hosts/common
+            ./hosts/nixos
+            ./hosts/nixos/wagou-clone
+          ];
+          specialArgs = {
+            inherit inputs;
+            host = import ./hosts/nixos/wagou-clone/variables.nix;
+          };
+        };
+
       };
 
       # -----------------------------------------------------------------------

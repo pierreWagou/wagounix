@@ -9,3 +9,9 @@ creation_rules:
           - *admin
           - *wagoulab
           - *wagoumac
+  - path_regex: hosts/nixos/wagou-clone/secrets\.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *wagoulab
+          - *wagoumac

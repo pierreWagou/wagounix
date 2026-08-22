@@ -8,6 +8,13 @@
 let
   inherit (config.virtualisation.quadlet) networks;
 
+  # Host-specific Cloudflare credentials
+  cloudflareCredentials =
+    if host.hostname == "wagou-clone" then
+      config.sops.secrets.cloudflare-credentials-clone.path
+    else
+      config.sops.secrets.cloudflare-credentials.path;
+
   # Tunnel config — routes all subdomains to NixOS Traefik.
   # NixOS Traefik dispatches: service subdomains to Podman containers,
   # app subdomains to Dokploy Traefik (127.0.0.1:8080).
@@ -34,7 +41,7 @@ in
       networks = [ networks.proxy.ref ];
       volumes = [
         "${configFile}:/etc/cloudflared/config.yml:ro"
-        "${config.sops.secrets.cloudflare-credentials.path}:/etc/cloudflared/credentials.json:ro"
+        "${cloudflareCredentials}:/etc/cloudflared/credentials.json:ro"
       ];
       exec = [
         "tunnel"
