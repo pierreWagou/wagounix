@@ -29,8 +29,6 @@ rec {
     webhook = 9000;
     satisfactory = 7777;
     satisfactoryReliable = 8888;
-    marieland = 7778;
-    marielandReliable = 8889;
   };
 
   serviceTunnelSubdomains = [
@@ -57,7 +55,6 @@ rec {
 
   dnsOnlySubdomains = [
     "satisfactory"
-    "marieland"
     "mail"
   ];
 }
