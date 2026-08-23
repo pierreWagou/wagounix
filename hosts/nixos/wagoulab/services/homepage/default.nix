@@ -87,6 +87,20 @@ let
     {
       "Services" = [
         {
+          "Immich" = {
+            icon = "immich.svg";
+            href = "https://pixel.${host.domain}";
+            description = "Photo management";
+            siteMonitor = "http://immich-server:2283";
+            widget = {
+              type = "immich";
+              url = "http://immich-server:2283";
+              key = "{{HOMEPAGE_VAR_IMMICH_API_KEY}}";
+              version = 2;
+            };
+          };
+        }
+        {
           "Vaultwarden" = {
             icon = "vaultwarden.svg";
             href = "https://vault.${host.domain}";
@@ -100,20 +114,6 @@ let
             href = "https://disk.${host.domain}";
             description = "File sync & sharing";
             siteMonitor = "http://seafile:80";
-          };
-        }
-        {
-          "Immich" = {
-            icon = "immich.svg";
-            href = "https://pixel.${host.domain}";
-            description = "Photo management";
-            siteMonitor = "http://immich-server:2283";
-            widget = {
-              type = "immich";
-              url = "http://immich-server:2283";
-              key = "{{HOMEPAGE_VAR_IMMICH_API_KEY}}";
-              version = 2;
-            };
           };
         }
         {
@@ -171,20 +171,14 @@ let
     {
       "Infrastructure" = [
         {
-          "Authentik" = {
-            icon = "authentik.svg";
-            href = "https://auth.${host.domain}";
-            description = "Identity provider";
-            siteMonitor = "http://authentik-server:9000";
-          };
-        }
-        {
-          "Traefik" = {
-            icon = "traefik.svg";
-            description = "Reverse proxy";
+          "Cloudflare Tunnel" = {
+            icon = "cloudflare.svg";
+            description = "Secure remote access";
             widget = {
-              type = "traefik";
-              url = "http://traefik:8080";
+              type = "cloudflared";
+              accountid = host.cloudflareAccountId;
+              tunnelid = host.cloudflareTunnelId;
+              key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
             };
           };
         }
@@ -203,15 +197,21 @@ let
           };
         }
         {
-          "Cloudflare Tunnel" = {
-            icon = "cloudflare.svg";
-            description = "Secure remote access";
+          "Traefik" = {
+            icon = "traefik.svg";
+            description = "Reverse proxy";
             widget = {
-              type = "cloudflared";
-              accountid = host.cloudflareAccountId;
-              tunnelid = host.cloudflareTunnelId;
-              key = "{{HOMEPAGE_VAR_CF_API_TOKEN}}";
+              type = "traefik";
+              url = "http://traefik:8080";
             };
+          };
+        }
+        {
+          "Authentik" = {
+            icon = "authentik.svg";
+            href = "https://auth.${host.domain}";
+            description = "Identity provider";
+            siteMonitor = "http://authentik-server:9000";
           };
         }
         {
