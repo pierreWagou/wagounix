@@ -21,6 +21,7 @@
     mprocs
     neovim
     opencode
+    openldap
     openssl
     pinentry-curses
     rbw
