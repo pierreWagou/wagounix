@@ -3,7 +3,7 @@ rec {
   homeDir = "/home/${username}";
   hostname = "wagou-clone";
   domain = "wagou.fr";
-  serverIP = "192.168.68.66";
+  serverIP = "192.168.68.62";
   tailscaleIP = "100.81.107.72";
   networkInterface = "enp1s0";
   lanSubnet = "192.168.68.0/24";
