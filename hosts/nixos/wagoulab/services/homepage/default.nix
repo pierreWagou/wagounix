@@ -38,11 +38,7 @@ let
     layout = {
       Services = {
         style = "row";
-        columns = 4;
-      };
-      Media = {
-        style = "row";
-        columns = 2;
+        columns = 3;
       };
       Infrastructure = {
         style = "row";
@@ -86,6 +82,21 @@ let
   servicesFile = yamlFormat.generate "services.yaml" [
     {
       "Services" = [
+        {
+          "Jellyfin" = {
+            icon = "jellyfin.svg";
+            href = "https://tape.${host.domain}";
+            description = "Media server";
+            siteMonitor = "http://jellyfin:8096";
+            widget = {
+              type = "jellyfin";
+              url = "http://jellyfin:8096";
+              key = "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}";
+              enableBlocks = true;
+              enableNowPlaying = false;
+            };
+          };
+        }
         {
           "Immich" = {
             icon = "immich.svg";
@@ -139,31 +150,12 @@ let
             description = "PaaS app deployment";
           };
         }
-      ];
-    }
-    {
-      "Media" = [
         {
           "Home Assistant" = {
             icon = "home-assistant.svg";
             href = "https://home.${host.domain}";
             description = "Home automation";
             siteMonitor = "http://home-assistant:8123";
-          };
-        }
-        {
-          "Jellyfin" = {
-            icon = "jellyfin.svg";
-            href = "https://tape.${host.domain}";
-            description = "Media server";
-            siteMonitor = "http://jellyfin:8096";
-            widget = {
-              type = "jellyfin";
-              url = "http://jellyfin:8096";
-              key = "{{HOMEPAGE_VAR_JELLYFIN_API_KEY}}";
-              enableBlocks = true;
-              enableNowPlaying = false;
-            };
           };
         }
       ];
