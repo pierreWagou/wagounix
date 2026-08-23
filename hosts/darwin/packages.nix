@@ -7,6 +7,7 @@
     cocoapods
     darwin.trash
     git-credential-manager
+    manga-tui
     pinentry_mac
     spicetify-cli
     spotify-player
