@@ -1,29 +1,29 @@
 # Wagoulab
 
-NixOS on a Beelink EQI13 (x86_64-linux, 32 GB RAM, 512 GB NVMe) running self-hosted services with network-wide ad blocking and secure remote access.
+NixOS homeserver running self-hosted services with network-wide ad blocking, secure remote access, and warm standby failover.
 
 ## Architecture
 
 ```
-Remote (phone/laptop outside home)
-  ── https://*.wagou.fr ──▶ Cloudflare (valid TLS) ──▶ Tunnel (encrypted)
-                                                             │
-Local (home network)                                         │
-  ── https://*.wagou.fr ──▶ AdGuard Home (DNS rewrite) ──────────────┤
-                                                             ▼
-Remote via Tailscale (split DNS)                        Traefik (HTTPS :443)
-  ── https://*.wagou.fr ──▶ AdGuard Home (100.68.157.70)     │
-       ──▶ resolves to 192.168.68.65                         │
-       ──▶ subnet route via Tailscale ───────────────────────┤
-                                                             │
-                                              ┌──────────────┼──────────────┐
-                                              ▼              ▼              ▼
-                                         Vaultwarden     Seafile         Immich
-                                           (:80)          (:80)         (:2283)
-
-Remote SSH/LAN access via Tailscale
-  ── Tailscale (WireGuard) ──▶ Beelink (subnet router) ──▶ 192.168.68.0/24
+Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service/App
+Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Subnet router -> LAN
+Local access:   Browser -> AdGuard Home (*.wagou.fr -> serverIP) -> Traefik (HTTPS :443) -> Service/App
 ```
+
+## Primary/Backup Setup
+
+| Machine | Role | IP | Tunnel | Status |
+|---|---|---|---|---|
+| wagoulab | Primary | `192.168.68.66` | `wagou-prime` | Pending (new hardware arriving) |
+| wagou-clone | Backup | `192.168.68.62` | `wagou-clone` | Live |
+
+Both machines share the same NixOS config via the wagounix flake. wagou-clone imports wagoulab's services.
+
+**Backup**: Restic hourly from primary → backup machine. After each backup, backup restores snapshot to regular files. On primary failure, switch DNS CNAME to backup tunnel.
+
+**Failover** (~10-15 min): Restore DB dumps → switch DNS → switch game server A record → switch MX record → verify.
+
+**Failback** (when new primary arrives): Deploy NixOS → restore from backup → switch DNS to wagou-prime → move port forwarding.
 
 All services run as Podman containers managed by quadlet-nix. They communicate over a shared `proxy` Podman network — no ports are published to the host except Traefik (80/443), AdGuard Home (53 on LAN/Tailscale/loopback, 3000 on loopback). Traefik serves HTTPS with Let's Encrypt wildcard certificates (DNS-01 challenge via Cloudflare). The Cloudflare Tunnel connects to Traefik over HTTPS (container-to-container). On the local network, AdGuard Home rewrites `*.wagou.fr` to the Beelink's IP, bypassing Cloudflare.
 
@@ -50,6 +50,8 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **KitchenOwl** | Recipes & grocery lists | `https://cabas.wagou.fr` | 8080 |
 | **Authentik** | Identity provider / SSO (OIDC) | `https://auth.wagou.fr` | 9000 |
 | **imgproxy** | Branding assets (logos, backgrounds, favicon) | `https://assets.wagou.fr` | 8080 |
+| **Stalwart Mail** | Email server (LDAP auth via Authentik) | `https://mailbox.wagou.fr` | 8080 |
+| **Dokploy** | PaaS for user-built apps (Docker Swarm) | `https://apps.wagou.fr` | 3001, 9080 |
 
 ## Hardware
 
@@ -73,36 +75,17 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 ## Files
 
 ```
-hosts/nixos/wagoulab/
+hosts/nixos/wagoulab/                # Primary machine config
 ├── default.nix              # Imports hardware.nix and services/
-├── variables.nix            # Host variables (username, homeDir, hostname, domain, serverIP, timezone, acmeEmail, cloudflare IDs, tunnel subdomains)
-├── hardware.nix             # Auto-generated hardware config (boot, filesystems, kernel modules)
-├── secrets.yaml             # sops-encrypted secrets (age encryption)
-└── services/
-    ├── default.nix          # Imports all service modules + system packages
-    ├── podman.nix           # Podman runtime, quadlet-nix shared proxy network
-    ├── secrets.nix          # sops-nix secret declarations and templates
-    ├── traefik.nix          # Reverse proxy (Traefik container with Let's Encrypt)
-    ├── vaultwarden.nix      # Password manager
-    ├── seafile.nix          # File sync & sharing (SeaDoc + OIDC SSO)
-    ├── immich.nix           # Photo management
-    ├── home-assistant.nix   # Home automation
-    ├── jellyfin.nix         # Media server
-    ├── adguardhome.nix      # DNS server + ad blocker
-    ├── cloudflared.nix      # Cloudflare Tunnel
-    ├── tailscale.nix        # Tailscale VPN (subnet router for LAN access)
-    ├── homepage.nix         # Homepage dashboard
-    ├── authentik.nix        # Identity provider / SSO (OIDC)
-    ├── branding.nix         # Shared Catppuccin theme + imgproxy assets server
-    ├── branding-assets/     # Logos, background images, favicon (served via imgproxy)
-    ├── fail2ban.nix         # Brute force protection
-    ├── firewall.nix         # Firewall rules (ports 22, 53, 80, 443)
-    ├── ttyd.nix             # Web terminal (remote dev access via dev.wagou.fr)
-    ├── rbw.nix              # Bitwarden CLI custom pinentry (zero-touch vault unlock)
-    ├── creneau.nix          # Appointment scheduling
-    ├── webhook.nix          # GitHub webhook receiver
-    ├── renovate.nix         # Dependency update bot
-    └── kitchenowl.nix       # Recipes & grocery lists
+├── variables.nix            # Host variables (hostname, IP, tunnel ID, NIC)
+├── hardware.nix             # Auto-generated hardware config
+├── secrets.yaml             # sops-encrypted secrets
+└── services/                # All service configs (shared with wagou-clone)
+
+hosts/nixos/wagou-clone/            # Backup machine config
+├── default.nix              # Imports ../wagoulab/services/ (shared)
+├── variables.nix            # Backup-specific vars (hostname, IP, tunnel ID)
+├── hardware.nix             # Backup-specific hardware config
 ```
 
 Platform-level config at `hosts/nixos/`:
@@ -134,7 +117,8 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 
 | Secret | Used by | Runtime path |
 |---|---|---|
-| `cloudflare-credentials` | Cloudflare Tunnel (credentials file) | `/run/secrets/cloudflare-credentials` |
+| `cloudflare-credentials-prime` | Cloudflare Tunnel credentials (wagou-prime) | `/run/secrets/cloudflare-credentials-prime` |
+| `cloudflare-credentials-clone` | Cloudflare Tunnel credentials (wagou-clone) | `/run/secrets/cloudflare-credentials-clone` |
 | `vaultwarden-admin-token` | Vaultwarden (via sops template) | `/run/secrets/rendered/vaultwarden.env` |
 | `immich-db-username` | Immich + PostgreSQL (via sops template) | `/run/secrets/rendered/immich.env` |
 | `immich-db-password` | Immich + PostgreSQL (via sops template) | `/run/secrets/rendered/immich-postgres.env` |
@@ -244,7 +228,14 @@ SSH config on Mac (`~/.ssh/config`, managed by chezmoi):
 
 ```
 Host wagoulab
-    HostName 192.168.68.65
+    HostName 192.168.68.66
+    User wagou
+    IdentityFile ~/.ssh/id_ed25519_homeserver
+    AddKeysToAgent yes
+    UseKeychain yes
+
+Host wagou-clone
+    HostName 192.168.68.62
     User wagou
     IdentityFile ~/.ssh/id_ed25519_homeserver
     AddKeysToAgent yes
@@ -366,5 +357,6 @@ Ensure `~/.config/sops/age/keys.txt` exists. If lost, regenerate with `age-keyge
 | Service | Purpose | Status |
 |---|---|---|
 | Ollama | Local LLM inference | Planned |
-| Backups | borgbackup/restic to external drive or cloud | Planned |
+| Backups | Restic hourly primary → backup with restore-after-backup | **Planned (not implemented yet)** |
 | Monitoring | Uptime Kuma or similar | Planned |
+| Stalwart Mail | Email server (LDAP auth via Authentik) | Partially working (LDAP auth needs testing) |

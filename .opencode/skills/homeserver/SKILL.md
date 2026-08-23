@@ -1,22 +1,183 @@
 ---
 name: homeserver
-description: Manage the NixOS homeserver (wagoulab) — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Traefik reverse proxy, security hardening, and troubleshoot the Beelink EQI13.
+description: Manage the NixOS homeserver (wagoulab) — add services, configure secrets, DNS rewrites, Cloudflare Tunnel routes, Traefik reverse proxy, security hardening, backups, failover, and troubleshoot the primary/backup setup.
 ---
 
 ## Overview
 
-The homeserver (wagoulab) is a Beelink EQI13 running NixOS (x86_64-linux, 32 GB RAM, 512 GB NVMe) at IP `192.168.68.65`. It serves as a self-hosted service platform with network-wide ad blocking and secure remote access via Cloudflare Tunnel and Tailscale.
+The homeserver runs as a **warm standby** primary/backup pair serving self-hosted services with network-wide ad blocking and secure remote access.
+
+| Machine | Role | Hardware | LAN IP | Tailscale IP | Cloudflare Tunnel |
+|---|---|---|---|---|---|
+| **wagoulab** | Primary | New hardware (TBD) | `192.168.68.66` | TBD | `wagou-prime` |
+| **wagou-clone** | Backup | Different hardware | `192.168.68.62` | TBD | `wagou-clone` |
 
 Domain: `wagou.fr` (registered at OVH, DNS managed by Cloudflare)
 
-## Architecture
+Both machines share the same NixOS config via the wagounix flake — wagou-clone imports wagoulab's services. The only differences are in `hosts/nixos/<hostname>/variables.nix` (hostname, IP, tunnel ID, network interface).
+
+## Primary/Backup Architecture
 
 ```
-Remote access:  Browser -> Cloudflare (HTTPS) -> Tunnel (encrypted) -> Traefik (HTTPS :443) -> Service/App
-Remote access:  SSH/LAN -> Tailscale (WireGuard) -> Beelink (subnet router) -> 192.168.68.0/24
-Remote access:  Browser -> Tailscale (split DNS) -> AdGuard Home -> 192.168.68.65 -> Traefik -> Service/App
-Local access:   Browser -> AdGuard Home (*.wagou.fr -> 192.168.68.65) -> Traefik (HTTPS :443) -> Service/App
+                              Cloudflare DNS
+                          *.wagou.fr → CNAME
+                              ┌──────┴──────┐
+                              │             │
+                    wagou-prime tunnel  wagou-clone tunnel
+                    (when primary      (currently active)
+                     is live)
+                              │             │
+              ┌───────────────┤             ├───────────────┐
+              │    Tailscale  │             │    Tailscale  │
+              │   (encrypted) │             │   (encrypted) │
+              └───────┬───────┘             └───────┬───────┘
+                      │                             │
+         ┌────────────▼────────────┐   ┌────────────▼────────────┐
+         │    Primary (wagoulab)   │   │    Backup (wagou-clone) │
+         │    192.168.68.66        │   │    192.168.68.62        │
+         │    All services running │   │    All services running  │
+         │    Restic backup source │◄──┤    Restic repository     │
+         └─────────────────────────┘   │    (warm standby)        │
+                                       └─────────────────────────┘
 ```
+
+### How it works
+
+- **Primary** pushes hourly Restic backups (including database dumps) to the backup machine via SSH
+- After each backup, the backup machine **restores** the snapshot to regular files so services can read them
+- **File-based data** (Vaultwarden, Immich uploads, Seafile, HA) is always current on backup
+- **Database data** (Immich, Authentik, Seafile) is restored from dumps on each hourly cycle
+- On primary failure: switch DNS CNAME to backup tunnel → services are live on backup machine
+
+### Cloudflare Tunnel naming
+
+| Tunnel | ID | Machine | Purpose |
+|---|---|---|---|
+| `wagou-prime` | `ca26559c-2858-4c78-867e-41e3c19edb52` | Primary | Active when primary is live |
+| `wagou-clone` | `b1054c2d-9146-421d-9beb-4efe75a4b25f` | Backup | Active during failover |
+
+DNS CNAME records currently point to wagou-clone (backup is live). When primary arrives, CNAMEs switch to wagou-prime.
+
+IMPORTANT: `cloudflared tunnel route dns` creates individual CNAME records per hostname, not wildcards. A wildcard `*.wagou.fr` CNAME exists but specific records take precedence. During failover, update all individual CNAMEs:
+```bash
+for sub in dash vault pixel guard home tape dev relay cabas auth disk assets mailbox; do
+  TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"
+done
+```
+
+### Variables that differ between machines
+
+| Variable | wagoulab (primary) | wagou-clone (backup) |
+|---|---|---|
+| `hostname` | `wagoulab` | `wagou-clone` |
+| `serverIP` | `192.168.68.66` | `192.168.68.62` |
+| `cloudflareTunnelId` | `ca26559c-...` (wagou-prime) | `b1054c2d-...` (wagou-clone) |
+| `networkInterface` | TBD (new hardware) | `enp1s0` |
+
+## Backup Strategy
+
+Restic backups run **hourly** from primary to backup machine via SSH. After each backup, the backup machine **restores** the snapshot to regular files so services can run on current data.
+
+### What's backed up
+
+| Directory | Service | Priority |
+|---|---|---|
+| `/var/lib/vaultwarden` | Vaultwarden | Critical |
+| `/var/lib/immich` | Immich (photos) | High |
+| `/var/lib/immich-postgres` | Immich DB | High |
+| `/var/lib/seafile` | Seafile (files) | High |
+| `/var/lib/seafile-mysql` | Seafile DB | High |
+| `/var/lib/authentik` | Authentik | High |
+| `/var/lib/authentik-postgres` | Authentik DB | High |
+| `/var/lib/home-assistant` | Home Assistant | High |
+| `/var/lib/stalwart` | Stalwart Mail | Medium |
+| `/var/lib/stalwart-config` | Stalwart config | Medium |
+| `/var/lib/kitchenowl` | KitchenOwl | Low |
+| `/var/lib/satisfactory` | Satisfactory saves | Low |
+| `/var/lib/adguardhome/conf` | AdGuard config | Medium |
+| `/var/lib/jellyfin/config` | Jellyfin config | Medium |
+| `/var/lib/dokploy` | Dokploy | Medium |
+| `/tmp/restic-dumps/*` | Database dumps | High |
+
+**Excluded:** `/var/lib/immich-ml-cache`, `/var/lib/jellyfin/cache`, `/var/lib/traefik/letsencrypt`, `/var/lib/adguardhome/work`, `/var/lib/satisfactory/gamefiles` (2.8 GB), `/var/lib/*/redis`, `*/logs/*`, `/var/backup`
+
+### Database dumps (pre-backup)
+
+Before each Restic backup, database dumps are created:
+
+```bash
+sudo podman exec immich-postgres pg_dump -U postgres -Fc immich > /tmp/restic-dumps/immich.dump
+sudo podman exec authentik-postgres pg_dump -U authentik -Fc authentik > /tmp/restic-dumps/authentik.dump
+sudo podman exec seafile-db mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --all-databases > /tmp/restic-dumps/seafile.sql
+```
+
+### Restic repository
+
+- **Location**: `/var/backup/restic` on backup machine
+- **Access**: SSH/SFTP from primary
+- **Retention**: 7 daily, 4 weekly, 6 monthly
+- **Encryption**: Restic built-in (password via sops)
+
+### Key backup commands
+
+| Action | Command |
+|---|---|
+| List snapshots | `restic -r /var/backup/restic snapshots` |
+| Restore latest | `restic -r /var/backup/restic restore latest --target /` |
+| Restore specific | `restic -r /var/backup/restic restore <snapshot-id> --target /` |
+| Check repo integrity | `restic -r /var/backup/restic check` |
+
+## Failover Procedure
+
+### When primary dies (RTO: ~10-15 min, RPO: ~1 hour)
+
+1. **Restore database dumps** on backup machine:
+   ```bash
+   sudo podman exec immich-postgres pg_restore -U postgres immich < /tmp/restore/immich.dump
+   sudo podman exec authentik-postgres pg_restore -U authentik authentik < /tmp/restore/authentik.dump
+   sudo podman exec seafile-db mysql < /tmp/restore/seafile.sql
+   sudo systemctl restart immich authentik seafile
+   ```
+2. **Switch Cloudflare DNS**:
+   ```bash
+   for sub in dash vault pixel guard home tape dev relay cabas auth disk assets mailbox; do
+     TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-clone "$sub.wagou.fr"
+   done
+   ```
+3. **Switch game server A record**: `satisfactory.wagou.fr` → backup's public IP
+4. **Switch MX record**: `wagou.fr` → backup's public IP
+5. **Verify**: `curl -I https://dash.wagou.fr`
+
+**File-based services** (Vaultwarden, Immich photos, Seafile files, HA, etc.) are already current on backup — no restore needed. Only database-backed services (Immich, Authentik, Seafile DBs) need the dump/restore step.
+
+### When new primary arrives
+
+1. Install NixOS, deploy wagoulab config
+2. Restore data from backup via Restic
+3. Switch Cloudflare DNS to wagou-prime:
+   ```bash
+   for sub in dash vault pixel guard home tape dev relay cabas auth disk assets mailbox; do
+     TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"
+   done
+   ```
+4. Update game server A record and MX record → primary's public IP
+5. Move port forwarding on home router → primary IP
+
+### When backup moves to parents' home
+
+1. Update `wagou-clone/variables.nix`: `serverIP` → parents' LAN IP, `tailscaleIP` → new Tailscale IP, `networkInterface` → actual NIC
+2. Set up port forwarding on parents' router (same ports as primary)
+3. Backups continue over Tailscale
+
+### Port forwarding
+
+| Port | Protocol | Purpose |
+|---|---|---|
+| 7777, 8888 | TCP+UDP | Satisfactory game server |
+| 25, 465, 587 | TCP | Stalwart SMTP |
+| 143, 993, 4190 | TCP | Stalwart IMAP/Sieve |
+
+Port forwarding switches to whichever machine is active. Cloudflare Tunnel (web services) needs no port forwarding.
 
 ### Services vs Apps — two-tier deployment model
 
@@ -168,7 +329,9 @@ Secrets are encrypted with age in `hosts/nixos/wagoulab/secrets.yaml` (colocated
 
 | Secret key | Used by | Mechanism |
 |---|---|---|
-| `cloudflare-credentials` | `cloudflared.nix` | Credentials file for tunnel auth |
+| `cloudflare-credentials-prime` | `cloudflared.nix` (primary) | Credentials file for wagou-prime tunnel |
+| `cloudflare-credentials-clone` | `cloudflared.nix` (backup) | Credentials file for wagou-clone tunnel |
+| `cloudflare-credentials` | DEPRECATED — removed, use prime/clone variants | - |
 | `vaultwarden-admin-token` | `vaultwarden.nix` | Via sops template `vaultwarden.env` |
 | `immich-db-username` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
 | `immich-db-password` | `immich.nix` | Via sops templates `immich.env` and `immich-postgres.env` |
@@ -471,6 +634,8 @@ git add -A && git commit -m "feat: add newservice" && git push
 sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 ```
 
+NOTE: After deploying to primary, also rebuild backup with `#wagou-clone` to pick up the new service.
+
 ## Troubleshooting
 
 > Full troubleshooting guide: see `hosts/nixos/wagoulab/README.md` -> "Troubleshooting" section.
@@ -523,13 +688,19 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 
 | Action | Command |
 |---|---|
-| SSH into server | `ssh wagoulab` |
-| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh` |
+| SSH into primary | `ssh wagoulab` |
+| SSH into backup | `ssh wagou-clone` |
+| Rebuild primary from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh` |
+| Rebuild backup from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagou-clone --refresh` |
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
 | Edit secrets | `sops hosts/nixos/wagoulab/secrets.yaml` |
 | Test build | `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath` |
+| List restic snapshots | `restic -r /var/backup/restic snapshots` |
+| Restore from backup | `restic -r /var/backup/restic restore latest --target /` |
+| Switch DNS to backup | `for sub in dash vault pixel guard home tape dev relay cabas auth disk assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-clone "$sub.wagou.fr"; done` |
+| Switch DNS to primary | `for sub in dash vault pixel guard home tape dev relay cabas auth disk assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"; done` |
 
 ## Important rules
 
@@ -547,3 +718,6 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 - `hardware.nix` was generated by `nixos-generate-config` — only regenerate if hardware changes
 - Always test builds before pushing: `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath`
 - SSH uses a dedicated key (`id_ed25519_homeserver`), separate from work SSH key
+- Both machines share config via the flake — changes in `services/` apply to both wagoulab and wagou-clone
+- Machine-specific settings go in `hosts/nixos/<hostname>/variables.nix` (hostname, IP, tunnel ID, NIC)
+- After deploying changes, rebuild **both** machines to keep them in sync
