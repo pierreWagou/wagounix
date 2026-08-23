@@ -125,11 +125,18 @@ let
           };
         }
         {
-          "Creneau" = {
-            icon = "calendar.svg";
-            href = "https://creneau.${host.domain}";
-            description = "Appointment scheduling";
-            siteMonitor = "http://creneau:3000";
+          "Stalwart Mail" = {
+            icon = "stalwart-mail.svg";
+            href = "https://mailbox.${host.domain}";
+            description = "Email server";
+            siteMonitor = "http://stalwart:8080";
+          };
+        }
+        {
+          "Dokploy" = {
+            icon = "dokploy.svg";
+            href = "https://apps.${host.domain}";
+            description = "PaaS app deployment";
           };
         }
       ];
@@ -213,6 +220,22 @@ let
             href = "https://dev.${host.domain}";
             description = "Web terminal";
             siteMonitor = "http://127.0.0.1:${toString host.ports.ttyd}";
+          };
+        }
+        {
+          "Webhook" = {
+            icon = "webhook.svg";
+            href = "https://relay.${host.domain}";
+            description = "GitHub webhook receiver";
+            siteMonitor = "http://127.0.0.1:${toString host.ports.webhook}";
+          };
+        }
+        {
+          "Branding" = {
+            icon = "palette.svg";
+            href = "https://assets.${host.domain}";
+            description = "Image proxy & assets";
+            siteMonitor = "http://imgproxy:8080";
           };
         }
       ];
