@@ -39,7 +39,7 @@ wagounix/
 │   │   │   ├── default.nix        # Imports packages, homebrew
 │   │   │   ├── packages.nix       # Personal nix packages (android-tools, mas)
 │   │   │   ├── homebrew.nix       # Personal casks (Steam, Ankama, etc.) + masApps
-│   │   │   └── wagoumac/          # Personal Mac (aarch64-darwin)
+│   │   │   └── wagou-mac/          # Personal Mac (aarch64-darwin)
 │   │   │       ├── default.nix
 │   │   │       └── variables.nix
 │   │   └── alan/                  # Work Mac (aarch64-darwin)
@@ -350,7 +350,7 @@ nix flake check      # runs all checks + builds
 ### CI (GitHub Actions)
 
 - **lint** — nixfmt, statix, deadnix (ubuntu-latest)
-- **build-darwin** — wagoumac, alan (macos-15, parallel)
+- **build-darwin** — wagou-mac, alan-mac (macos-15, parallel)
 - **build-nixos** — wagoulab (ubuntu-latest)
 
 ## Key commands

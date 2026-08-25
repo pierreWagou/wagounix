@@ -58,7 +58,7 @@
       "docker" # Allows wagou to use Docker CLI (required for Dokploy management)
     ];
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7V9q0WZKoODnbbHsHDFXwTE4JDEqmhvmKxWG05JhBp wagou@wagoumac"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7V9q0WZKoODnbbHsHDFXwTE4JDEqmhvmKxWG05JhBp wagou@wagou-mac"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIUtk99V3fN1Q5y7RGTB9hS6c9pyhW61vJ0LYLqSmJ2s wagou-clone"
     ];
   };

@@ -33,8 +33,8 @@ Each configuration is assembled from layered modules — common packages are sha
   ├──────────────────────────────────┬────────────────────────────┤
   │         hosts/darwin/            │        hosts/nixos/        │  platform
   ├────────────────┬─────────────────┼────────────────────────────┤
-  │   personal/    │     alan/        │        wagoulab/           │  layer / host
-  │   wagoumac     │                  │                            │
+  │   personal/    │     alan-mac/        │        wagoulab/           │  layer / host
+  │   wagou-mac     │                  │                            │
   └────────────────┴─────────────────┴────────────────────────────┘
 ```
 
@@ -46,8 +46,8 @@ wagounix/
 └── hosts/
     ├── common/        # Cross-platform — packages, fonts, users
     ├── darwin/        # macOS — platform config, settings, Homebrew, icons
-    │   ├── personal/  # Personal Mac (wagoumac)
-    │   └── alan/      # Work Mac (alan)
+    │   ├── personal/  # Personal Mac (wagou-mac)
+    │   └── alan-mac/      # Work Mac (alan-mac)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
 ```
@@ -92,10 +92,10 @@ wagounix/
     │   │   ├── default.nix
     │   │   ├── packages.nix
     │   │   ├── homebrew.nix
-    │   │   └── wagoumac/
+    │   │   └── wagou-mac/
     │   │       ├── default.nix
     │   │       └── variables.nix
-    │   └── alan/
+    │   └── alan-mac/
     │       ├── default.nix
     │       ├── variables.nix
     │       ├── homebrew.nix
@@ -144,8 +144,8 @@ wagounix/
 
 | Profile | System | Layer | Description |
 |---|---|---|---|
-| `wagoumac` | aarch64-darwin | personal | Personal Mac (Apple Silicon) |
-| `alan` | aarch64-darwin | work | Work Mac |
+| `wagou-mac` | aarch64-darwin | personal | Personal Mac (Apple Silicon) |
+| `alan-mac` | aarch64-darwin | work | Work Mac |
 
 ### NixOS
 
@@ -157,7 +157,7 @@ wagounix/
 
 ### macOS
 
-Profiles: `wagoumac`, `alan`
+Profiles: `wagou-mac`, `alan-mac`
 
 ```bash
 # 1. Install Nix
@@ -220,7 +220,7 @@ GitHub Actions runs on push to `main` and on PRs:
 | Job | Runner | Profiles |
 |---|---|---|
 | Lint | ubuntu-latest | nixfmt, statix, deadnix |
-| Build darwin | macos-15 | wagoumac, alan (parallel) |
+| Build darwin | macos-15 | wagou-mac, alan-mac (parallel) |
 | Build NixOS | ubuntu-latest | wagoulab |
 
 ## Quick Reference

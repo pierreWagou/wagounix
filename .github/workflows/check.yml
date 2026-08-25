@@ -27,7 +27,7 @@ jobs:
     runs-on: macos-15
     strategy:
       matrix:
-        profile: [wagoumac, alan]
+        profile: [wagou-mac, alan-mac]
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31

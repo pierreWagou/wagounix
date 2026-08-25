@@ -65,30 +65,30 @@
       # -----------------------------------------------------------------------
       darwinConfigurations = {
 
-        wagoumac = nix-darwin.lib.darwinSystem {
+        wagou-mac = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
             ./hosts/common
             ./hosts/darwin
             ./hosts/darwin/personal
-            ./hosts/darwin/personal/wagoumac
+            ./hosts/darwin/personal/wagou-mac
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/darwin/personal/wagoumac/variables.nix;
+            host = import ./hosts/darwin/personal/wagou-mac/variables.nix;
           };
         };
 
-        alan = nix-darwin.lib.darwinSystem {
+        alan-mac = nix-darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
             ./hosts/common
             ./hosts/darwin
-            ./hosts/darwin/alan
+            ./hosts/darwin/alan-mac
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/darwin/alan/variables.nix;
+            host = import ./hosts/darwin/alan-mac/variables.nix;
           };
         };
 
