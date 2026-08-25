@@ -29,6 +29,7 @@
     sesh
     sheldon
     sops
+    sshfs
     sshpass
     stalwart-cli
     starship
