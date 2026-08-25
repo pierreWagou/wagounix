@@ -1,6 +1,7 @@
 keys:
   - &admin age1ygezr8p29dslzduyvleekzl9zf4swqjntyy4t3yp4fr590jhrfyqsjcy9s
-  - &wagou-prime age1fqkxw5ly485yz6lpqw9v84hka764sy45xyrd53vx7grs4yvjud9sa4chjc
+  - &wagou-prime age1qgd6cgu6fnm8phe86d6sq3sfq33znrnaddh6mqm889lww2afd4lqq2thfv
+  - &wagou-clone age1fqkxw5ly485yz6lpqw9v84hka764sy45xyrd53vx7grs4yvjud9sa4chjc
   - &wagoumac age1ya5p9n5p90p8jsml4lnw6jlfyu8t872khjf5vaff9gxzlkav2u4qcrsxcr
 creation_rules:
   - path_regex: hosts/nixos/wagoulab/common/secrets\.yaml$
@@ -8,10 +9,12 @@ creation_rules:
       - age:
           - *admin
           - *wagou-prime
+          - *wagou-clone
           - *wagoumac
-  - path_regex: hosts/nixos/wagou-clone/secrets\.yaml$
+  - path_regex: hosts/nixos/wagoulab/clone/secrets\.yaml$
     key_groups:
       - age:
           - *admin
           - *wagou-prime
+          - *wagou-clone
           - *wagoumac
