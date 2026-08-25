@@ -4,7 +4,7 @@ rec {
   hostname = "wagou-prime";
   domain = "wagou.fr";
   serverIP = "192.168.68.66";
-  tailscaleIP = "100.81.107.72";
+  tailscaleIP = "100.97.36.56";
   networkInterface = "enp170s0";
   lanSubnet = "192.168.68.0/24";
   renderGroupGid = "303";
