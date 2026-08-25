@@ -19,7 +19,7 @@ let
   yamlFormat = pkgs.formats.yaml { };
 
   settingsFile = yamlFormat.generate "settings.yaml" {
-    title = "wagoulab://dash";
+    title = "wagou-prime://dash";
     inherit (branding.urls) favicon;
     logo = branding.urls.favicon;
     theme = "dark";

@@ -1,7 +1,7 @@
 rec {
   username = "wagou";
   homeDir = "/home/${username}";
-  hostname = "wagoulab";
+  hostname = "wagou-prime";
   domain = "wagou.fr";
   serverIP = "192.168.68.66";
   tailscaleIP = "100.81.107.72";

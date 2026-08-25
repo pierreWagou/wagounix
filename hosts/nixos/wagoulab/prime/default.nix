@@ -1,7 +1,8 @@
-_: {
+_:
 
+{
   imports = [
     ./hardware.nix
-    ../wagoulab/services
+    ../common
   ];
 }

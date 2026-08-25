@@ -99,18 +99,19 @@
       # -----------------------------------------------------------------------
       nixosConfigurations = {
 
-        wagoulab = nixpkgs.lib.nixosSystem {
+        wagou-prime = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             inputs.sops-nix.nixosModules.sops
             inputs.quadlet-nix.nixosModules.quadlet
             ./hosts/common
             ./hosts/nixos
-            ./hosts/nixos/wagoulab
+            ./hosts/nixos/wagoulab/common
+            ./hosts/nixos/wagoulab/prime
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/nixos/wagoulab/variables.nix;
+            host = import ./hosts/nixos/wagoulab/prime/variables.nix;
           };
         };
 
@@ -121,11 +122,12 @@
             inputs.quadlet-nix.nixosModules.quadlet
             ./hosts/common
             ./hosts/nixos
-            ./hosts/nixos/wagou-clone
+            ./hosts/nixos/wagoulab/common
+            ./hosts/nixos/wagoulab/clone
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/nixos/wagou-clone/variables.nix;
+            host = import ./hosts/nixos/wagoulab/clone/variables.nix;
           };
         };
 
