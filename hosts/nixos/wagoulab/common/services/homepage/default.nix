@@ -158,6 +158,12 @@ let
             siteMonitor = "http://home-assistant:8123";
           };
         }
+        {
+          "Satisfactory" = {
+            icon = "mdi-gamepad-variant";
+            description = "Game server";
+          };
+        }
       ];
     }
     {
