@@ -13,6 +13,7 @@ _:
         PUID = "1000";
         PGID = "1000";
         STEAMBETA = "false";
+        LOAD_LATEST_SAVE = "true";
       };
     };
   };
