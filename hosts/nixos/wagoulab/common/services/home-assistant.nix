@@ -67,7 +67,7 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/plants.yaml
-            shutters:
+            shutters-panel:
               mode: yaml
               title: Shutters
               icon: mdi:blinds
