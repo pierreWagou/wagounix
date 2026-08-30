@@ -69,13 +69,6 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/plants.yaml
-            shutters:
-              mode: yaml
-              title: Shutters
-              icon: mdi:blinds
-              show_in_sidebar: true
-              require_admin: false
-              filename: dashboards/shutters.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
