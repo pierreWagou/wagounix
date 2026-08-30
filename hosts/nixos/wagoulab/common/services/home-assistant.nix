@@ -11,60 +11,54 @@ let
   lightsDashboard = ./dashboards/lights.yaml;
   mietteDashboard = ./dashboards/miette.yaml;
   plantsDashboard = ./dashboards/plants.yaml;
-  shuttersDashboard = ./dashboards/shutters.yaml;
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
-    default_config:
+        default_config:
 
-    homeassistant:
-      name: Home
-      unit_system: metric
-      time_zone: ${host.timezone}
-      external_url: https://home.${host.domain}
-      internal_url: https://home.${host.domain}
+        homeassistant:
+          name: Home
+          unit_system: metric
+          time_zone: ${host.timezone}
+          external_url: https://home.${host.domain}
+          internal_url: https://home.${host.domain}
 
-    http:
-      use_x_forwarded_for: true
-      trusted_proxies:
-    - 10.89.0.1
-    - 10.89.1.1
-    - 10.89.2.1
-    - 10.89.3.1
-    - 172.16.0.1
-    - 127.0.0.1
+        http:
+          use_x_forwarded_for: true
+          trusted_proxies:
+    ${builtins.concatStringsSep "\n" (map (cidr: "        - ${cidr}") host.podmanCIDRs)}
 
-    frontend:
-      themes: !include_dir_merge_named themes
+        frontend:
+          themes: !include_dir_merge_named themes
 
-    lovelace:
-      dashboards:
-        heatmap-weather:
-          mode: yaml
-          title: Heatmap
-          icon: mdi:home-thermometer
-          show_in_sidebar: true
-          require_admin: false
-          filename: dashboards/heatmap.yaml
-        devices-weather:
-          mode: yaml
-          title: Devices
-          icon: mdi:devices
-          show_in_sidebar: true
-          require_admin: false
-          filename: dashboards/devices.yaml
-        hue-lights:
-          mode: yaml
-          title: Lights
-          icon: mdi:lightbulb
-          show_in_sidebar: true
-          require_admin: false
-          filename: dashboards/lights.yaml
-        miette-pets:
-          mode: yaml
-          title: Miette
-          icon: mdi:cat
-          show_in_sidebar: true
-          require_admin: false
-          filename: dashboards/miette.yaml
+        lovelace:
+          dashboards:
+            heatmap-weather:
+              mode: yaml
+              title: Heatmap
+              icon: mdi:home-thermometer
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/heatmap.yaml
+            devices-weather:
+              mode: yaml
+              title: Devices
+              icon: mdi:devices
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/devices.yaml
+            hue-lights:
+              mode: yaml
+              title: Lights
+              icon: mdi:lightbulb
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/lights.yaml
+            miette-pets:
+              mode: yaml
+              title: Miette
+              icon: mdi:cat
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/miette.yaml
             plant-monitor:
               mode: yaml
               title: Plants
@@ -72,28 +66,21 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/plants.yaml
-            shutters:
-              mode: yaml
-              title: Shutters
-              icon: mdi:blinds
-              show_in_sidebar: true
-              require_admin: false
-              filename: dashboards/shutters.yaml
 
-    automation: !include automations.yaml
-    script: !include scripts.yaml
-    scene: !include scenes.yaml
+        automation: !include automations.yaml
+        script: !include scripts.yaml
+        scene: !include scenes.yaml
 
-    auth_oidc:
-      client_id: "B5xh86aOL0cHkNRHze8iA1HsDtZpwWSjmVL8j2K7"
-      client_secret: !secret oidc_client_secret
-      discovery_url: "https://auth.wagou.fr/application/o/home-assistant/.well-known/openid-configuration"
-      features:
-        automatic_user_linking: false
-        automatic_person_creation: true
-        default_redirect: true
-      roles:
-        admin: "admins"
+        auth_oidc:
+          client_id: "B5xh86aOL0cHkNRHze8iA1HsDtZpwWSjmVL8j2K7"
+          client_secret: !secret oidc_client_secret
+          discovery_url: "https://auth.wagou.fr/application/o/home-assistant/.well-known/openid-configuration"
+          features:
+            automatic_user_linking: false
+            automatic_person_creation: true
+            default_redirect: true
+          roles:
+            admin: "admins"
   '';
 in
 {
@@ -110,7 +97,6 @@ in
         "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
         "${mietteDashboard}:/config/dashboards/miette.yaml:ro"
         "${plantsDashboard}:/config/dashboards/plants.yaml:ro"
-        "${shuttersDashboard}:/config/dashboards/shutters.yaml:ro"
         "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro"
       ];
       environments = {
