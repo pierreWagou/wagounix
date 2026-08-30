@@ -1,0 +1,12 @@
+views:
+  - title: Shutters
+    type: sections
+    sections:
+      - cards:
+          - type: heading
+            heading: Office
+          - type: tile
+            entity: cover.shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
