@@ -1,7 +1,9 @@
 {
   config,
+  lib,
   pkgs,
   host,
+  clone ? null,
   ...
 }:
 
@@ -56,11 +58,19 @@ let
     filtering = {
       protection_enabled = true;
       filtering_enabled = true;
-      rewrites = map (sub: {
-        domain = "${sub}.${host.domain}";
-        answer = host.serverIP;
-        enabled = true;
-      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
+      rewrites =
+        (map (sub: {
+          domain = "${sub}.${host.domain}";
+          answer = host.serverIP;
+          enabled = true;
+        }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains))
+        ++ (lib.optionals (clone != null) (
+          map (sub: {
+            domain = "${sub}.clone.${host.domain}";
+            answer = clone.serverIP;
+            enabled = true;
+          }) (clone.serviceTunnelSubdomains ++ clone.appTunnelSubdomains ++ clone.dnsOnlySubdomains)
+        ));
     };
     filters = [
       {
