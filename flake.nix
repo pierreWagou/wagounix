@@ -129,6 +129,7 @@
           specialArgs = {
             inherit inputs;
             host = import ./hosts/nixos/wagoulab/clone/variables.nix;
+            clone = null;
           };
         };
 
