@@ -9,7 +9,6 @@ views:
             entity: cover.office_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -18,7 +17,6 @@ views:
             entity: cover.bedroom_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -27,7 +25,6 @@ views:
             entity: cover.kitchen_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -36,7 +33,6 @@ views:
             entity: cover.utility_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -45,7 +41,6 @@ views:
             entity: cover.main_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -54,7 +49,6 @@ views:
             entity: cover.couch_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
 
       - cards:
           - type: heading
@@ -63,4 +57,3 @@ views:
             entity: cover.tv_shutter
             features:
               - type: cover-open-close
-              - type: cover-stop
