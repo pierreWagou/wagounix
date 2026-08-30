@@ -12,9 +12,7 @@ let
   mietteDashboard = ./dashboards/miette.yaml;
   plantsDashboard = ./dashboards/plants.yaml;
   shuttersDashboard = ./dashboards/shutters.yaml;
-  # Home Assistant configuration — changes here recreate the container
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
-        # Home Assistant config — managed by NixOS
         default_config:
 
         homeassistant:
@@ -69,6 +67,13 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/plants.yaml
+            shutters:
+              mode: yaml
+              title: Shutters
+              icon: mdi:blinds
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/shutters.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
@@ -89,7 +94,7 @@ in
 {
   virtualisation.quadlet.containers.home-assistant = {
     containerConfig = {
-      image = "homeassistant/home-assistant:2026.5.4";
+      image = "homeassistant/home-assistant:2026.8.3";
       networks = [ "host" ];
       volumes = [
         "/var/lib/home-assistant:/config"
