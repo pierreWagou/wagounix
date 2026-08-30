@@ -11,7 +11,9 @@ let
   lightsDashboard = ./dashboards/lights.yaml;
   mietteDashboard = ./dashboards/miette.yaml;
   plantsDashboard = ./dashboards/plants.yaml;
+  # Home Assistant configuration — changes here recreate the container
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
+        # Home Assistant config — managed by NixOS
         default_config:
 
         homeassistant:
