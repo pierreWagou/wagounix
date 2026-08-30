@@ -1,0 +1,66 @@
+views:
+  - title: Shutters
+    type: sections
+    sections:
+      - cards:
+          - type: heading
+            heading: Office
+          - type: tile
+            entity: cover.shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: Bedroom
+          - type: tile
+            entity: cover.bedroom_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: Kitchen
+          - type: tile
+            entity: cover.kitchen_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: Utility
+          - type: tile
+            entity: cover.utility_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: Main
+          - type: tile
+            entity: cover.main_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: Couch
+          - type: tile
+            entity: cover.couch_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop
+
+      - cards:
+          - type: heading
+            heading: TV
+          - type: tile
+            entity: cover.tv_shutter
+            features:
+              - type: cover-open-close
+              - type: cover-stop

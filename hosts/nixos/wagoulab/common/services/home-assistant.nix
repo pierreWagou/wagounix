@@ -11,6 +11,7 @@ let
   lightsDashboard = ./dashboards/lights.yaml;
   mietteDashboard = ./dashboards/miette.yaml;
   plantsDashboard = ./dashboards/plants.yaml;
+  shuttersDashboard = ./dashboards/shutters.yaml;
   configFile = pkgs.writeText "home-assistant-configuration.yaml" ''
         default_config:
 
@@ -66,6 +67,13 @@ let
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/plants.yaml
+            shutters:
+              mode: yaml
+              title: Shutters
+              icon: mdi:blinds
+              show_in_sidebar: true
+              require_admin: false
+              filename: dashboards/shutters.yaml
 
         automation: !include automations.yaml
         script: !include scripts.yaml
@@ -97,6 +105,7 @@ in
         "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
         "${mietteDashboard}:/config/dashboards/miette.yaml:ro"
         "${plantsDashboard}:/config/dashboards/plants.yaml:ro"
+        "${shuttersDashboard}:/config/dashboards/shutters.yaml:ro"
         "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro"
       ];
       environments = {
