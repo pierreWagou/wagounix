@@ -70,7 +70,7 @@ let
             shutters-panel:
               mode: yaml
               title: Shutters
-              icon: mdi:blinds
+              icon: mdi:window-shutter-open
               show_in_sidebar: true
               require_admin: false
               filename: dashboards/shutters.yaml
