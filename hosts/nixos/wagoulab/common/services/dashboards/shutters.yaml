@@ -3,8 +3,6 @@ views:
     type: sections
     sections:
       - cards:
-          - type: heading
-            heading: Groups
           - type: tile
             entity: cover.all_shutters
             features:
