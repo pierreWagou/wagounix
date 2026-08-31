@@ -10,6 +10,12 @@ views:
             features:
               - type: cover-open-close
           - type: heading
+            heading: Living Room
+          - type: tile
+            entity: cover.living_room_shutters
+            features:
+              - type: cover-open-close
+          - type: heading
             heading: Individual Shutters
           - type: tile
             entity: cover.office_shutter
