@@ -4,55 +4,37 @@ views:
     sections:
       - cards:
           - type: heading
-            heading: Office
+            heading: All Shutters
+          - type: tile
+            entity: cover.all_shutters
+            features:
+              - type: cover-open-close
+          - type: heading
+            heading: Individual Shutters
           - type: tile
             entity: cover.office_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: Bedroom
           - type: tile
             entity: cover.bedroom_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: Kitchen
           - type: tile
             entity: cover.kitchen_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: Utility
           - type: tile
             entity: cover.utility_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: Main
           - type: tile
             entity: cover.main_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: Couch
           - type: tile
             entity: cover.couch_shutter
             features:
               - type: cover-open-close
-
-      - cards:
-          - type: heading
-            heading: TV
           - type: tile
             entity: cover.tv_shutter
             features:
