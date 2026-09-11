@@ -172,6 +172,7 @@
           "OMNIGENT_OIDC_COOKIE_SECRET=${config.sops.placeholder.omnigent-cookie-secret}"
           "OMNIGENT_OIDC_SCOPES=openid email profile"
           "OMNIGENT_OIDC_SESSION_TTL_HOURS=8"
+          "OMNIGENT_OIDC_SKIP_EMAIL_VERIFICATION=1"
           "OMNIGENT_DOMAIN=ai.${host.domain}"
         ];
       };
