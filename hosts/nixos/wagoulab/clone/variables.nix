@@ -46,6 +46,7 @@ rec {
     "disk"
     "assets"
     "mailbox"
+    "ai"
   ];
 
   appTunnelSubdomains = [

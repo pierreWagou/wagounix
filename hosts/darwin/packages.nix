@@ -18,6 +18,7 @@
     ffmpeg
     fnm
     git-lfs
+    herdr
     imagemagick
     lazygit
     maven

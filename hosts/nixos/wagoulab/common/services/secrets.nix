@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, host, ... }:
 
 {
   sops = {
@@ -42,6 +42,11 @@
       stalwart-admin-password.mode = "0400";
       mailgun-api-key.mode = "0400";
       authentik-ldap-token.mode = "0400";
+
+      # OmniGent secrets
+      omnigent-postgres-password.mode = "0444";
+      omnigent-cookie-secret.mode = "0400";
+      omnigent-oidc-client-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -143,6 +148,32 @@
 
       "authentik-ldap.env" = {
         content = "AUTHENTIK_TOKEN=${config.sops.placeholder.authentik-ldap-token}\n";
+      };
+
+      "omnigent-postgres.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "POSTGRES_DB=omnigent"
+          "POSTGRES_USER=omnigent"
+          "POSTGRES_PASSWORD=${config.sops.placeholder.omnigent-postgres-password}"
+        ];
+      };
+
+      "omnigent.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "DATABASE_URL=postgresql+psycopg://omnigent:${config.sops.placeholder.omnigent-postgres-password}@omnigent-postgres:5432/omnigent"
+          "ARTIFACT_DIR=/data/artifacts"
+          "HOST=0.0.0.0"
+          "PORT=8000"
+          "OMNIGENT_AUTH_ENABLED=1"
+          "OMNIGENT_AUTH_PROVIDER=oidc"
+          "OMNIGENT_OIDC_ISSUER=https://auth.${host.domain}/application/o/omnigent/"
+          "OMNIGENT_OIDC_CLIENT_ID=omnigent"
+          "OMNIGENT_OIDC_CLIENT_SECRET=${config.sops.placeholder.omnigent-oidc-client-secret}"
+          "OMNIGENT_OIDC_COOKIE_SECRET=${config.sops.placeholder.omnigent-cookie-secret}"
+          "OMNIGENT_OIDC_SCOPES=openid email profile"
+          "OMNIGENT_OIDC_SESSION_TTL_HOURS=8"
+          "OMNIGENT_DOMAIN=ai.${host.domain}"
+        ];
       };
     };
   };

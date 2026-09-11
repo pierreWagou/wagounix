@@ -29,5 +29,6 @@ _: {
     ./dokploy.nix
     ./stalwart.nix
     ./satisfactory.nix
+    ./omnigent.nix
   ];
 }
