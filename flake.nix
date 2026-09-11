@@ -38,6 +38,10 @@
       url = "github:Dashlane/homebrew-tap";
       flake = false;
     };
+    homebrew-alerter = {
+      url = "github:vjeantet/homebrew-tap";
+      flake = false;
+    };
   };
 
   outputs =
