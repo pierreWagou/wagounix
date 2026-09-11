@@ -23,6 +23,10 @@ in
       containerConfig = {
         image = "ghcr.io/omnigent-ai/omnigent-server:latest";
         noNewPrivileges = true;
+        # Use host DNS (AdGuard Home) so auth.wagou.fr resolves to the server IP
+        # instead of Cloudflare — the JWKS endpoint is fetched server-side and
+        # must reach Authentik directly, not through the Cloudflare tunnel.
+        dns = [ host.serverIP ];
         networks = [
           networks.proxy.ref
           networks.omnigent-internal.ref
