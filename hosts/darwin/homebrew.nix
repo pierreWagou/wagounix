@@ -51,7 +51,6 @@
       "google-chrome"
       "google-drive"
       "hiddenbar"
-      "logitune"
       "microsoft-excel"
       "microsoft-powerpoint"
       "microsoft-teams"
