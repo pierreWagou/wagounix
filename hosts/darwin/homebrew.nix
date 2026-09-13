@@ -65,6 +65,7 @@
       "raycast"
       "spotify"
       "seafile-client"
+      "steam"
       "synology-drive"
       "tailscale-app"
       "thunderbird"
