@@ -72,7 +72,7 @@ in
           "/var/lib/omnigent:/data"
           "${wagou-agent}:/agents:ro"
         ];
-        environment = {
+        environments = {
           OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou";
         };
         environmentFiles = [ config.sops.templates."omnigent.env".path ];
