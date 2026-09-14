@@ -40,7 +40,7 @@ in
           "/home/${host.username}/.omnigent/agents:/agents:ro"
         ];
         environments = {
-          OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou";
+          OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou:/agents/alan";
         };
         environmentFiles = [ config.sops.templates."omnigent.env".path ];
         labels = {
