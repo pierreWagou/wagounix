@@ -21,7 +21,7 @@ let
     executor:
       type: omnigent
       config:
-        harness: opencode-native
+        harness: opencode
       model: opencode-go/mimo-v2.5
 
     os_env:
