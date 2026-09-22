@@ -17,6 +17,7 @@
     gh
     gnupg
     go
+    mailpit
     mise
     mprocs
     neovim
