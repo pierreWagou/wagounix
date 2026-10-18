@@ -6,6 +6,7 @@
   # Packages for all machines (including wagoulab)
   environment.systemPackages = with pkgs; [
     age
+    ansible
     bat
     bottom
     chezmoi
@@ -30,6 +31,7 @@
     sesh
     sheldon
     sops
+    speedtest-cli
     sshfs
     sshpass
     stalwart-cli
