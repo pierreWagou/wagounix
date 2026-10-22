@@ -36,7 +36,6 @@
     taps = builtins.attrNames config.nix-homebrew.taps;
     brews = [
       "alerter"
-      "aoe"
       "dashlane-cli"
       "yarn"
     ];
@@ -53,6 +52,7 @@
       "google-chrome"
       "google-drive"
       "hiddenbar"
+      "linear"
       "microsoft-excel"
       "microsoft-powerpoint"
       "microsoft-teams"
