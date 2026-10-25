@@ -25,6 +25,7 @@ _: {
     ./kitchenowl.nix
     ./authentik
     ./seafile
+    ./onlyoffice.nix
     ./branding.nix
     ./dokploy.nix
     ./stalwart.nix

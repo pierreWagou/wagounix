@@ -36,6 +36,7 @@
       seafile-jwt-key.mode = "0400";
       seafile-oauth-client-secret.mode = "0400";
       seafile-secret-key.mode = "0400";
+      onlyoffice-jwt-secret.mode = "0400";
 
       dokploy-db-password.mode = "0400";
       oidc-client-secret.mode = "0400";
@@ -125,6 +126,10 @@
 
       "seafile-db.env" = {
         content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
+      };
+
+      "onlyoffice.env" = {
+        content = "JWT_SECRET=${config.sops.placeholder.onlyoffice-jwt-secret}\n";
       };
 
       "dokploy-postgres.env" = {

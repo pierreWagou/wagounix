@@ -97,6 +97,12 @@ in
       ""
       "# SeaDoc"
       "ENABLE_SEADOC = True"
+      ""
+      "# OnlyOffice Docs (https://docs.${host.domain})"
+      "ENABLE_ONLYOFFICE = True"
+      "ONLYOFFICE_APIJS_URL = 'https://docs.${host.domain}/web-apps/apps/api/documents/api.js'"
+      "ONLYOFFICE_JWT_SECRET = '${config.sops.placeholder.onlyoffice-jwt-secret}'"
+      "ONLYOFFICE_FORCE_SAVE = True"
     ];
   };
 
