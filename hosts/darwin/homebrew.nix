@@ -12,17 +12,15 @@
 
   nix-homebrew = {
     enable = true;
-    inherit (host) enableRosetta;
+    enableRosetta = true;
     user = host.username;
     mutableTaps = false;
-    trust = {
-      taps = builtins.attrNames config.nix-homebrew.taps;
-    };
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
       "Dashlane/homebrew-tap" = inputs.homebrew-dashlane;
       "vjeantet/homebrew-tap" = inputs.homebrew-alerter;
+      "crmne/homebrew-tap" = inputs.homebrew-spotifast;
     };
   };
 
@@ -33,7 +31,10 @@
       upgrade = true;
       cleanup = "uninstall";
     };
-    taps = builtins.attrNames config.nix-homebrew.taps;
+    taps = builtins.map (name: {
+      inherit name;
+      trusted = true;
+    }) (builtins.attrNames config.nix-homebrew.taps);
     brews = [
       "alerter"
       "dashlane-cli"
@@ -59,10 +60,12 @@
       "microsoft-word"
       "obsidian"
       "onedrive"
+      "onlyoffice"
       "opencode-desktop"
       "openvpn-connect"
       "philips-hue-sync"
       "raycast"
+      "spotifast"
       "spotify"
       "seafile-client"
       "steam"

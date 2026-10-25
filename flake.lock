@@ -133,6 +133,22 @@
         "type": "github"
       }
     },
+    "homebrew-spotifast": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792840025,
+        "narHash": "sha256-c22iyIZC1f2eepnpzgqpYIWcLXzwOEtnI1OsEh29gmA=",
+        "owner": "crmne",
+        "repo": "homebrew-tap",
+        "rev": "86a17f7705a11561a4b3cf9c1c69a1686250a9d3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "crmne",
+        "repo": "homebrew-tap",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -211,6 +227,7 @@
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "homebrew-dashlane": "homebrew-dashlane",
+        "homebrew-spotifast": "homebrew-spotifast",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nixpkgs": "nixpkgs",

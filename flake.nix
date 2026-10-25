@@ -42,6 +42,10 @@
       url = "github:vjeantet/homebrew-tap";
       flake = false;
     };
+    homebrew-spotifast = {
+      url = "github:crmne/homebrew-tap";
+      flake = false;
+    };
   };
 
   outputs =
@@ -70,12 +74,11 @@
           modules = [
             ./hosts/common
             ./hosts/darwin
-            ./hosts/darwin/personal
-            ./hosts/darwin/personal/wagou-mac
+            ./hosts/darwin/wagou-mac
           ];
           specialArgs = {
             inherit inputs;
-            host = import ./hosts/darwin/personal/wagou-mac/variables.nix;
+            host = import ./hosts/darwin/wagou-mac/variables.nix;
           };
         };
 
