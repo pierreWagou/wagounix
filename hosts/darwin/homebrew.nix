@@ -43,6 +43,7 @@
     casks = [
       "aerial"
       "alt-tab"
+      "audacity"
       "betterDisplay"
       "bruno"
       "claude"
@@ -66,6 +67,7 @@
       "spotify"
       "seafile-client"
       "steam"
+      "stirling-pdf"
       "tailscale-app"
       "thunderbird"
       "upscayl"

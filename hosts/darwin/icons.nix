@@ -85,6 +85,10 @@
         icon = ./icons/obsidian.icns;
       }
       {
+        path = "/Applications/ONLYOFFICE.app";
+        icon = ./icons/onlyoffice.icns;
+      }
+      {
         path = "/Applications/Tailscale.app";
         icon = ./icons/tailscale.icns;
       }
