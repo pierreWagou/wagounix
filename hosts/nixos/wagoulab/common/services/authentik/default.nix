@@ -8,7 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks;
   inherit (config.wagou) branding;
-  authentikVersion = "2026.5.1";
+  authentikVersion = "2026.5.8";
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
