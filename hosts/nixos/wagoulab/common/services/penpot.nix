@@ -60,6 +60,10 @@ in
           PENPOT_OIDC_SCOPES = "openid profile email";
           PENPOT_OIDC_NAME = "Authentik";
           PENPOT_SSRF_ALLOWED_HOSTS = "auth.wagou.fr";
+          PENPOT_OIDC_AUTH_URI = "https://auth.wagou.fr/application/o/authorize/";
+          PENPOT_OIDC_TOKEN_URI = "https://auth.wagou.fr/application/o/token/";
+          PENPOT_OIDC_USER_URI = "https://auth.wagou.fr/application/o/userinfo/";
+          PENPOT_OIDC_JWKS_URI = "https://auth.wagou.fr/application/o/penpot/jwks/";
         };
         environmentFiles = [ penpotEnv ];
       };
