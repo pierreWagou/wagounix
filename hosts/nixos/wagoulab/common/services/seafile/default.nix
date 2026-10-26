@@ -103,6 +103,7 @@ in
       "ONLYOFFICE_APIJS_URL = 'https://docs.${host.domain}/web-apps/apps/api/documents/api.js'"
       "ONLYOFFICE_JWT_SECRET = '${config.sops.placeholder.onlyoffice-jwt-secret}'"
       "ONLYOFFICE_FORCE_SAVE = True"
+      "ONLYOFFICE_FILE_EXTENSION = ('doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'odt', 'odp', 'ods', 'csv')"
     ];
   };
 
