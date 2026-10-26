@@ -39,6 +39,7 @@
       onlyoffice-jwt-secret.mode = "0400";
       penpot-secret-key.mode = "0400";
       penpot-postgres-password.mode = "0400";
+      penpot-oidc-client-secret.mode = "0400";
 
       dokploy-db-password.mode = "0400";
       oidc-client-secret.mode = "0400";
@@ -139,6 +140,7 @@
           PENPOT_SECRET_KEY=${config.sops.placeholder.penpot-secret-key}
           PENPOT_DATABASE_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
           POSTGRES_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          PENPOT_OIDC_CLIENT_SECRET=${config.sops.placeholder.penpot-oidc-client-secret}
         '';
       };
 

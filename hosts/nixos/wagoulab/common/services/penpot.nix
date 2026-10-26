@@ -2,7 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
-  flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console";
+  flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console enable-login-with-oidc enable-oidc-registration";
   publicUri = "https://pantone.${host.domain}";
   penpotEnv = config.sops.templates."penpot.env".path;
 in
@@ -55,6 +55,11 @@ in
           PENPOT_OBJECTS_STORAGE_BACKEND = "fs";
           PENPOT_OBJECTS_STORAGE_FS_DIRECTORY = "/opt/data/assets";
           PENPOT_TELEMETRY_ENABLED = "false";
+          PENPOT_OIDC_CLIENT_ID = "qM3JaYCvEWcwl2Iub0YPZFlpCWcaml0FXRR8mcyL";
+          PENPOT_OIDC_BASE_URI = "https://auth.wagou.fr";
+          PENPOT_OIDC_SCOPES = "openid profile email";
+          PENPOT_OIDC_NAME = "Authentik";
+          PENPOT_SSRF_ALLOWED_HOSTS = "auth.wagou.fr";
         };
         environmentFiles = [ penpotEnv ];
       };
