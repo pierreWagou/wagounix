@@ -55,6 +55,7 @@ rec {
     "mailbox"
     "ai"
     "docs"
+    "pantone"
   ];
 
   # Subdomains for Dokploy-deployed apps.

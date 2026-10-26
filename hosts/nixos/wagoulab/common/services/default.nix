@@ -26,6 +26,7 @@ _: {
     ./authentik
     ./seafile
     ./onlyoffice.nix
+    ./penpot.nix
     ./branding.nix
     ./dokploy.nix
     ./stalwart.nix

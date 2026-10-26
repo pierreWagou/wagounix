@@ -37,6 +37,8 @@
       seafile-oauth-client-secret.mode = "0400";
       seafile-secret-key.mode = "0400";
       onlyoffice-jwt-secret.mode = "0400";
+      penpot-secret-key.mode = "0400";
+      penpot-postgres-password.mode = "0400";
 
       dokploy-db-password.mode = "0400";
       oidc-client-secret.mode = "0400";
@@ -130,6 +132,14 @@
 
       "onlyoffice.env" = {
         content = "JWT_SECRET=${config.sops.placeholder.onlyoffice-jwt-secret}\n";
+      };
+
+      "penpot.env" = {
+        content = ''
+          PENPOT_SECRET_KEY=${config.sops.placeholder.penpot-secret-key}
+          PENPOT_DATABASE_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          POSTGRES_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+        '';
       };
 
       "dokploy-postgres.env" = {

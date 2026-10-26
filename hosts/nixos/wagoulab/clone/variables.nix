@@ -48,6 +48,7 @@ rec {
     "mailbox"
     "ai"
     "docs"
+    "pantone"
   ];
 
   appTunnelSubdomains = [

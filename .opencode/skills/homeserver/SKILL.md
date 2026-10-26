@@ -60,7 +60,7 @@ DNS CNAME records currently point to wagou-clone (backup is live). When primary 
 
 IMPORTANT: `cloudflared tunnel route dns` creates individual CNAME records per hostname, not wildcards. A wildcard `*.wagou.fr` CNAME exists but specific records take precedence. During failover, update all individual CNAMEs:
 ```bash
-for sub in dash vault pixel guard home tape dev relay cabas auth disk docs assets mailbox; do
+for sub in dash vault pixel guard home tape dev relay cabas auth disk docs pantone assets mailbox; do
   TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"
 done
 ```
@@ -140,7 +140,7 @@ sudo podman exec seafile-db mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --all-dat
    ```
 2. **Switch Cloudflare DNS**:
    ```bash
-   for sub in dash vault pixel guard home tape dev relay cabas auth disk docs assets mailbox; do
+   for sub in dash vault pixel guard home tape dev relay cabas auth disk docs pantone assets mailbox; do
      TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-clone "$sub.wagou.fr"
    done
    ```
@@ -156,7 +156,7 @@ sudo podman exec seafile-db mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" --all-dat
 2. Restore data from backup via Restic
 3. Switch Cloudflare DNS to wagou-prime:
    ```bash
-   for sub in dash vault pixel guard home tape dev relay cabas auth disk docs assets mailbox; do
+   for sub in dash vault pixel guard home tape dev relay cabas auth disk docs pantone assets mailbox; do
      TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"
    done
    ```
@@ -699,8 +699,8 @@ Ensure `~/.config/sops/age/keys.txt` exists and contains your age private key. I
 | Test build | `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath` |
 | List restic snapshots | `restic -r /var/backup/restic snapshots` |
 | Restore from backup | `restic -r /var/backup/restic restore latest --target /` |
-| Switch DNS to backup | `for sub in dash vault pixel guard home tape dev relay cabas auth disk docs assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-clone "$sub.wagou.fr"; done` |
-| Switch DNS to primary | `for sub in dash vault pixel guard home tape dev relay cabas auth disk docs assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"; done` |
+| Switch DNS to backup | `for sub in dash vault pixel guard home tape dev relay cabas auth disk docs pantone assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-clone "$sub.wagou.fr"; done` |
+| Switch DNS to primary | `for sub in dash vault pixel guard home tape dev relay cabas auth disk docs pantone assets mailbox; do TUNNEL_FORCE_PROVISIONING_DNS=true cloudflared tunnel route dns wagou-prime "$sub.wagou.fr"; done` |
 
 ## Important rules
 
