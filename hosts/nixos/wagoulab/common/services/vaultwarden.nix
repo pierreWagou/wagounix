@@ -1,36 +1,28 @@
 { config, host, ... }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
+  ws = import ./lib/web-service.nix { inherit config host; };
+  svc = ws.mkWebService {
+    name = "vaultwarden";
+    subdomain = "vault";
+    image = "vaultwarden/server:1.37.2";
+    port = 80;
+    env = {
+      DOMAIN = "https://vault.${host.domain}";
+      SIGNUPS_ALLOWED = "false";
+      IP_HEADER = "X-Real-IP";
+    };
+    volumes = [
+      "/var/lib/vaultwarden:/data"
+    ];
+    environmentFiles = [ config.sops.templates."vaultwarden.env".path ];
+    dataDirs = [ "/var/lib/vaultwarden" ];
+  };
 in
 {
-  virtualisation.quadlet.containers.vaultwarden = {
-    containerConfig = {
-      image = "vaultwarden/server:1.37.2";
-      noNewPrivileges = true;
-      networks = [ networks.proxy.ref ];
-      volumes = [
-        "/var/lib/vaultwarden:/data"
-      ];
-      environments = {
-        DOMAIN = "https://vault.${host.domain}";
-        SIGNUPS_ALLOWED = "false";
-        IP_HEADER = "X-Real-IP";
-      };
-      environmentFiles = [ config.sops.templates."vaultwarden.env".path ];
-      labels = {
-        "traefik.enable" = "true";
-        "traefik.http.routers.vaultwarden.rule" = "Host(`vault.${host.domain}`)";
-        "traefik.http.routers.vaultwarden.entrypoints" = "websecure";
-        "traefik.http.routers.vaultwarden.tls" = "true";
-        "traefik.http.routers.vaultwarden.middlewares" = "secure-headers@file";
-        "traefik.http.services.vaultwarden.loadbalancer.server.port" = "80";
-      };
-    };
-  };
+  virtualisation.quadlet.containers.vaultwarden.containerConfig = svc.containerConfig;
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/vaultwarden 0755 root root -"
+  systemd.tmpfiles.rules = svc.tmpfilesRules ++ [
     "d /var/backup/vaultwarden 0755 root root -" # for planned borgbackup/restic service
   ];
 }
