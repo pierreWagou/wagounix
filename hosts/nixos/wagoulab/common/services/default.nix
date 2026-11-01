@@ -11,7 +11,7 @@ _: {
     ./cloudflared.nix
     ./vaultwarden.nix
     ./jellyfin.nix
-    ./home-assistant.nix
+    ./home-assistant
     ./homepage
     ./adguardhome.nix
     ./immich.nix

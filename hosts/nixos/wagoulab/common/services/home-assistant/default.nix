@@ -6,7 +6,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
 
   # Single source of truth for Lovelace dashboards: drives the
   # `lovelace.dashboards` section of configuration.yaml AND the volume mounts.
