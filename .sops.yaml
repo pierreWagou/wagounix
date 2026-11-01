@@ -18,3 +18,12 @@ creation_rules:
           - *wagou-prime
           - *wagou-clone
           - *wagou-mac
+  # Per-service secrets, colocated with their service module.
+  # Covers services/<name>/secrets.yaml at any depth.
+  - path_regex: hosts/nixos/wagoulab/common/services/.*/secrets\.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *wagou-prime
+          - *wagou-clone
+          - *wagou-mac

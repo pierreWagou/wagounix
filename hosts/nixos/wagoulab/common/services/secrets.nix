@@ -21,8 +21,6 @@
       immich-api-key.mode = "0400";
       immich-db-username.mode = "0400";
       immich-db-password.mode = "0400";
-      adguard-password.mode = "0400";
-      adguard-password-hash.mode = "0400";
       jellyfin-api-key.mode = "0400";
       github-webhook-secret.mode = "0400";
       renovate-github-app-id.mode = "0400";

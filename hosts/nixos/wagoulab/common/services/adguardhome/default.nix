@@ -6,7 +6,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   yamlFormat = pkgs.formats.yaml { };
 
   # AdGuard config — generated as proper YAML from a Nix attrset.
@@ -128,9 +128,22 @@ let
   };
 in
 {
-  sops.templates."AdGuardHome.yaml" = {
-    file = seedTemplate;
-    restartUnits = [ "adguard.service" ];
+  # Service secrets, colocated with the service. Values live in
+  # services/adguardhome/secrets.yaml (moved verbatim, not rotated).
+  sops = {
+    secrets.adguard-password = {
+      sopsFile = ./secrets.yaml;
+      mode = "0400";
+    };
+    secrets.adguard-password-hash = {
+      sopsFile = ./secrets.yaml;
+      mode = "0400";
+    };
+
+    templates."AdGuardHome.yaml" = {
+      file = seedTemplate;
+      restartUnits = [ "adguard.service" ];
+    };
   };
 
   # Use the image's default entrypoint and CMD.

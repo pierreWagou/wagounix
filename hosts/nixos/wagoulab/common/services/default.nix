@@ -13,7 +13,7 @@ _: {
     ./jellyfin.nix
     ./home-assistant
     ./homepage
-    ./adguardhome.nix
+    ./adguardhome
     ./immich.nix
     ./fail2ban.nix
     ./firewall.nix
