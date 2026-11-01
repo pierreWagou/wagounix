@@ -13,16 +13,16 @@ let
   # schema_version: 34 prevents the broken migration.
   # bootstrap_dns uses :53 port suffix per the v34 schema.
   # trusted_proxies includes the Podman network ranges so Traefik requests aren't rejected.
-  adguardConfig = yamlFormat.generate "AdGuardHome.yaml" {
+  # The admin bcrypt hash is injected at activation via the sops template below
+  # (secrets don't exist at build time, so the generated YAML carries a sentinel).
+  adguardSeed = yamlFormat.generate "AdGuardHome.yaml" {
     schema_version = 34;
     users = [
       {
         name = "admin";
-        # WARNING: This bcrypt hash is in version control. While bcrypt is irreversible,
-        # anyone with repo access can attempt to crack it. Regenerate after deployment
-        # with: htpasswd -nbBC 10 "" 'newpassword' | cut -d: -f2
-        # Stored here because sops-nix can't inject at build time for YAML generation.
-        password = "$2b$10$2RWpdsOdYLc0ba5B/4lEoOvdAytSW5ERQs013M8b2E/TtjwLyqto6";
+        # Sentinel swapped for the real bcrypt hash from sops at activation
+        # (see seedTemplate below). Never a real secret in the store.
+        password = "@ADGUARD_PASSWORD_HASH@";
       }
     ];
     http.address = "0.0.0.0:3000";
@@ -118,8 +118,21 @@ let
       "/var/lib/adguardhome/conf"
     ];
   };
+  # Rendered seed: generated YAML with the admin hash injected from sops.
+  # Colocated here (not in centralized secrets.nix) next to its consumer.
+  # replaceVars runs at build time (no content read at eval, so darwin-side
+  # `nix eval` keeps working); sops-nix substitutes the placeholder marker
+  # at activation. restartUnits picks up rotations automatically.
+  seedTemplate = pkgs.replaceVars adguardSeed {
+    ADGUARD_PASSWORD_HASH = config.sops.placeholder.adguard-password-hash;
+  };
 in
 {
+  sops.templates."AdGuardHome.yaml" = {
+    file = seedTemplate;
+    restartUnits = [ "adguard.service" ];
+  };
+
   # Use the image's default entrypoint and CMD.
   # The seed config is copied by ExecStartPre below.
   virtualisation.quadlet.containers.adguard.containerConfig = svc.containerConfig;
@@ -128,7 +141,9 @@ in
   # This ensures our declarative config is always the starting point while
   # allowing AdGuard to write runtime changes to the file.
   systemd.services.adguard.serviceConfig.ExecStartPre = [
-    "${pkgs.coreutils}/bin/cp ${adguardConfig} /var/lib/adguardhome/conf/AdGuardHome.yaml"
+    "${pkgs.coreutils}/bin/cp ${
+      config.sops.templates."AdGuardHome.yaml".path
+    } /var/lib/adguardhome/conf/AdGuardHome.yaml"
   ];
 
   systemd.tmpfiles.rules = svc.tmpfilesRules;
