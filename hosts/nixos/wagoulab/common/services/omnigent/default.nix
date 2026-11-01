@@ -30,6 +30,13 @@ let
       After = [ containers.omnigent-postgres.ref ];
     };
   };
+  pg = ws.mkPostgres {
+    name = "omnigent-postgres";
+    image = "postgres:16-alpine";
+    passwordEnvFile = config.sops.templates."omnigent-postgres.env".path;
+    networks = [ networks.omnigent-internal.ref ];
+    shmSize = "256m";
+  };
 in
 {
   sops = {
@@ -86,20 +93,8 @@ in
   virtualisation.quadlet.containers = {
     omnigent-server.containerConfig = server.containerConfig;
     omnigent-server.unitConfig = server.unitConfig;
-    omnigent-postgres = {
-      containerConfig = {
-        image = "postgres:16-alpine";
-        noNewPrivileges = true;
-        networks = [ networks.omnigent-internal.ref ];
-        volumes = [ "/var/lib/omnigent-postgres:/var/lib/postgresql/data" ];
-        environmentFiles = [ config.sops.templates."omnigent-postgres.env".path ];
-        shmSize = "256m";
-      };
-    };
+    omnigent-postgres.containerConfig = pg.containerConfig;
   };
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/omnigent 0755 root root -"
-    "d /var/lib/omnigent-postgres 0755 root root -"
-  ];
+  systemd.tmpfiles.rules = [ "d /var/lib/omnigent 0755 root root -" ] ++ pg.tmpfilesRules;
 }

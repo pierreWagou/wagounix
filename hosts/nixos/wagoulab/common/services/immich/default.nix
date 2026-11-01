@@ -34,6 +34,20 @@ let
       ];
     };
   };
+  pg = ws.mkPostgres {
+    name = "immich-postgres";
+    image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
+    db = "immich";
+    passwordEnvFile = config.sops.templates."immich-postgres.env".path;
+    networks = [ networks.immich-internal.ref ];
+    shmSize = "128m";
+    initdbArgs = "--data-checksums";
+  };
+  cache = ws.mkValkey {
+    name = "immich-redis";
+    networks = [ networks.immich-internal.ref ];
+    dataDirMode = "0755 999 999";
+  };
 in
 {
   sops = {
@@ -89,36 +103,9 @@ in
       };
     };
 
-    immich-postgres = {
-      containerConfig = {
-        image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0";
-        noNewPrivileges = true;
-        networks = [ networks.immich-internal.ref ];
-        volumes = [ "/var/lib/immich-postgres:/var/lib/postgresql/data" ];
-        environments = {
-          POSTGRES_DB = "immich";
-          POSTGRES_INITDB_ARGS = "--data-checksums";
-        };
-        environmentFiles = [ config.sops.templates."immich-postgres.env".path ];
-        shmSize = "128m";
-      };
-    };
+    immich-postgres.containerConfig = pg.containerConfig;
 
-    immich-redis = {
-      containerConfig = {
-        image = host.valkeyImage;
-        noNewPrivileges = true;
-        networks = [ networks.immich-internal.ref ];
-        exec = [
-          "--save"
-          "60"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
-        volumes = [ "/var/lib/immich-redis:/data" ];
-      };
-    };
+    immich-redis.containerConfig = cache.containerConfig;
   };
 
   # GPU drivers shared with Jellyfin — primary declaration is in jellyfin.nix
@@ -127,7 +114,7 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/immich 0755 root root -"
     "d /var/lib/immich-ml-cache 0755 root root -"
-    "d /var/lib/immich-postgres 0755 root root -"
-    "d /var/lib/immich-redis 0755 999 999 -"
-  ];
+  ]
+  ++ pg.tmpfilesRules
+  ++ cache.tmpfilesRules;
 }

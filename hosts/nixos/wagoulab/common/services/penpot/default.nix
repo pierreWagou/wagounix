@@ -6,6 +6,37 @@ let
   flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console enable-login-with-oidc enable-oidc-registration";
   publicUri = "https://pantone.${host.domain}";
   penpotEnv = config.sops.templates."penpot.env".path;
+  pgUnit = {
+    unitConfig = {
+      After = [ "network-online.target" ];
+    };
+    serviceConfig = {
+      Restart = "always";
+      TimeoutStartSec = 300;
+    };
+  };
+  pg = ws.mkPostgres {
+    name = "penpot-postgres";
+    image = "docker.io/library/postgres:15";
+    db = "penpot";
+    user = "penpot";
+    passwordEnvFile = penpotEnv;
+    dataDir = "/var/lib/penpot/postgres";
+    networks = [ networks.proxy.ref ];
+    initdbArgs = "--data-checksums";
+    inherit (pgUnit) unitConfig serviceConfig;
+  };
+  cache = ws.mkValkey {
+    name = "penpot-valkey";
+    image = "docker.io/valkey/valkey:8.1";
+    dataDir = null;
+    persist = false;
+    extraEnv = {
+      VALKEY_EXTRA_FLAGS = "--maxmemory 128mb --maxmemory-policy volatile-lfu";
+    };
+    networks = [ networks.proxy.ref ];
+    inherit (pgUnit) unitConfig serviceConfig;
+  };
   frontend = ws.mkWebService {
     name = "penpot";
     subdomain = "pantone";
@@ -181,49 +212,18 @@ in
     };
 
     penpot-postgres = {
-      containerConfig = {
-        image = "docker.io/library/postgres:15";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [ "/var/lib/penpot/postgres:/var/lib/postgresql/data" ];
-        environments = {
-          POSTGRES_INITDB_ARGS = "--data-checksums";
-          POSTGRES_DB = "penpot";
-          POSTGRES_USER = "penpot";
-        };
-        environmentFiles = [ penpotEnv ];
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (pg) containerConfig unitConfig serviceConfig;
     };
 
     penpot-valkey = {
-      containerConfig = {
-        image = "docker.io/valkey/valkey:8.1";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        environments = {
-          VALKEY_EXTRA_FLAGS = "--maxmemory 128mb --maxmemory-policy volatile-lfu";
-        };
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (cache) containerConfig unitConfig serviceConfig;
     };
   };
 
   systemd.tmpfiles.rules = [
     "d /var/lib/penpot 0755 root root -"
-    "d /var/lib/penpot/postgres 0755 root root -"
     "d /var/lib/penpot/assets 0755 root root -"
-  ];
+  ]
+  ++ pg.tmpfilesRules
+  ++ cache.tmpfilesRules;
 }

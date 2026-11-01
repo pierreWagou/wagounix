@@ -134,6 +134,18 @@ let
     extraNetworks = [ networks.authentik-internal.ref ];
     exec = [ "server" ];
   };
+  pg = ws.mkPostgres {
+    name = "authentik-postgres";
+    image = "docker.io/library/postgres:16-alpine";
+    db = "authentik";
+    user = "authentik";
+    passwordEnvFile = config.sops.templates."authentik-postgres.env".path;
+    networks = [ networks.authentik-internal.ref ];
+  };
+  cache = ws.mkValkey {
+    name = "authentik-redis";
+    networks = [ networks.authentik-internal.ref ];
+  };
 in
 {
   sops = {
@@ -199,35 +211,9 @@ in
       };
     };
 
-    authentik-postgres = {
-      containerConfig = {
-        image = "docker.io/library/postgres:16-alpine";
-        noNewPrivileges = true;
-        networks = [ networks.authentik-internal.ref ];
-        volumes = [ "/var/lib/authentik-postgres:/var/lib/postgresql/data" ];
-        environments = {
-          POSTGRES_DB = "authentik";
-          POSTGRES_USER = "authentik";
-        };
-        environmentFiles = [ config.sops.templates."authentik-postgres.env".path ];
-      };
-    };
+    authentik-postgres.containerConfig = pg.containerConfig;
 
-    authentik-redis = {
-      containerConfig = {
-        image = host.valkeyImage;
-        noNewPrivileges = true;
-        networks = [ networks.authentik-internal.ref ];
-        exec = [
-          "--save"
-          "60"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
-        volumes = [ "/var/lib/authentik-redis:/data" ];
-      };
-    };
+    authentik-redis.containerConfig = cache.containerConfig;
 
     authentik-ldap = {
       containerConfig = {
@@ -254,7 +240,7 @@ in
     "d /var/lib/authentik 0755 root root -"
     "d /var/lib/authentik/media 0755 root root -"
     "d /var/lib/authentik/templates 0755 root root -"
-    "d /var/lib/authentik-postgres 0755 root root -"
-    "d /var/lib/authentik-redis 0755 root root -"
-  ];
+  ]
+  ++ pg.tmpfilesRules
+  ++ cache.tmpfilesRules;
 }

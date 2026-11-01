@@ -9,6 +9,12 @@ let
   inherit (config.virtualisation.quadlet) networks containers;
   inherit (config.wagou) branding;
   ws = import ../lib/web-service.nix { inherit config host; };
+  cache = ws.mkValkey {
+    name = "seafile-redis";
+    networks = [ networks.seafile-internal.ref ];
+    dataDirMode = "0750 999 999";
+    extraTmpfilesRules = [ "Z /var/lib/seafile-redis 0750 999 999 -" ];
+  };
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
@@ -207,21 +213,7 @@ in
       };
     };
 
-    seafile-redis = {
-      containerConfig = {
-        image = host.valkeyImage;
-        noNewPrivileges = true;
-        networks = [ networks.seafile-internal.ref ];
-        exec = [
-          "--save"
-          "60"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
-        volumes = [ "/var/lib/seafile-redis:/data" ];
-      };
-    };
+    seafile-redis.containerConfig = cache.containerConfig;
 
     seadoc = {
       containerConfig = {
@@ -245,12 +237,11 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/seafile 0755 root root -"
     "d /var/lib/seafile-mysql 0755 root root -"
-    "d /var/lib/seafile-redis 0750 999 999 -"
-    "Z /var/lib/seafile-redis 0750 999 999 -"
     "d /var/lib/seadoc 0755 root root -"
     # Branding assets directory
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
-  ];
+  ]
+  ++ cache.tmpfilesRules;
 
   # Seed declarative config + branding assets into the stateful volume before
   # every start. Seafile only reads these files from inside its self-initialized

@@ -98,4 +98,90 @@ in
 
       inherit unitConfig serviceConfig;
     };
+
+  # Dedicated PostgreSQL on an internal network. Versions differ per app
+  # on purpose (e.g. Immich needs its vectorchord fork) — image is required.
+  # Returns the same shape as mkWebService (containerConfig/unitConfig/...).
+  mkPostgres =
+    {
+      name,
+      image,
+      db ? null,
+      user ? null,
+      passwordEnvFile ? null,
+      dataDir ? "/var/lib/${name}",
+      dataDirMode ? "0755 root root",
+      networks,
+      shmSize ? null,
+      initdbArgs ? null,
+      extraEnv ? { },
+      extraTmpfilesRules ? [ ],
+      unitConfig ? { },
+      serviceConfig ? { },
+    }:
+    {
+      containerConfig = {
+        inherit image;
+        noNewPrivileges = true;
+        inherit networks;
+        volumes = [ "${dataDir}:/var/lib/postgresql/data" ];
+        environments =
+          { }
+          // (if db == null then { } else { POSTGRES_DB = db; })
+          // (if user == null then { } else { POSTGRES_USER = user; })
+          // (if initdbArgs == null then { } else { POSTGRES_INITDB_ARGS = initdbArgs; })
+          // extraEnv;
+        environmentFiles = if passwordEnvFile == null then [ ] else [ passwordEnvFile ];
+      }
+      // (if shmSize == null then { } else { inherit shmSize; });
+
+      tmpfilesRules = [ "d ${dataDir} ${dataDirMode} -" ] ++ extraTmpfilesRules;
+
+      inherit unitConfig serviceConfig;
+    };
+
+  # Valkey/Redis cache on an internal network. persist=true appends the
+  # standard RDB snapshot flags; penpot runs ephemeral (persist=false).
+  mkValkey =
+    {
+      name,
+      image ? host.valkeyImage,
+      dataDir ? "/var/lib/${name}",
+      dataDirMode ? "0755 root root",
+      networks,
+      persist ? true,
+      extraEnv ? { },
+      environmentFiles ? [ ],
+      extraTmpfilesRules ? [ ],
+      unitConfig ? { },
+      serviceConfig ? { },
+    }:
+    {
+      containerConfig = {
+        inherit image environmentFiles;
+        noNewPrivileges = true;
+        inherit networks;
+        volumes = if dataDir == null then [ ] else [ "${dataDir}:/data" ];
+        environments = extraEnv;
+      }
+      // (
+        if persist then
+          {
+            exec = [
+              "--save"
+              "60"
+              "1"
+              "--loglevel"
+              "warning"
+            ];
+          }
+        else
+          { }
+      );
+
+      tmpfilesRules =
+        (if dataDir == null then [ ] else [ "d ${dataDir} ${dataDirMode} -" ]) ++ extraTmpfilesRules;
+
+      inherit unitConfig serviceConfig;
+    };
 }
