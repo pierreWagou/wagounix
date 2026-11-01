@@ -182,6 +182,17 @@ in
       readOnly = true;
       description = "Pre-built URLs for common branding assets";
     };
+    files = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = {
+        logoDisk = "${brandingDir}/logo-disk.svg";
+        logoAuth = "${brandingDir}/logo-auth.svg";
+        favicon = "${brandingDir}/favicon.svg";
+        bgCity = "${brandingDir}/city.jpg";
+      };
+      readOnly = true;
+      description = "Store paths for common branding assets (for seeding into stateful app data dirs that can't use URLs)";
+    };
   };
 
   config = {

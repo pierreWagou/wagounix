@@ -98,14 +98,14 @@ in
       ""
       "CSRF_TRUSTED_ORIGINS = ['https://disk.${host.domain}']"
       ""
-      "# Branding"
+      "# Branding (media-relative: Seahub prepends /media/ to these paths)"
       "SITE_NAME = 'Wagou Disk'"
       "SITE_TITLE = 'Wagou Disk'"
-      "LOGO_PATH = '${branding.urls.logoDisk}'"
+      "LOGO_PATH = 'custom/logo-disk.svg'"
       "LOGO_WIDTH = 250"
       "LOGO_HEIGHT = 40"
-      "FAVICON_PATH = '${branding.urls.favicon}'"
-      "LOGIN_BG_IMAGE_PATH = '${branding.urls.bgCity}'"
+      "FAVICON_PATH = 'custom/favicon.svg'"
+      "LOGIN_BG_IMAGE_PATH = 'custom/city.jpg'"
       "BRANDING_CSS = 'custom/custom.css'"
       "ENABLE_SETTINGS_VIA_WEB = False"
       ""
@@ -209,9 +209,12 @@ in
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
   ];
 
-  # Seed declarative config + branding into the stateful volume before every start.
-  # Seafile only reads these files from inside its self-initialized data dir,
-  # so a plain :ro mount can't work (the paths don't exist until first init).
+  # Seed declarative config + branding assets into the stateful volume before
+  # every start. Seafile only reads these files from inside its self-initialized
+  # data dir, so plain :ro mounts can't work (the paths don't exist until first
+  # init). LOGO_PATH etc. are media-relative (Seahub prepends /media/), so the
+  # asset files must live in seahub-data/custom/ — absolute imgproxy URLs get
+  # mangled into /media/https://... and 404.
   # The guard preserves first-init: if conf/ is missing, Seafile hasn't
   # initialized yet — skip seeding and let it run. Never mkdir the conf dir
   # ourselves: its absence is the first-init signal.
@@ -228,7 +231,10 @@ in
       chmod 644 "$CONF_DIR/seahub_settings.py"
       mkdir -p "$CUSTOM_DIR"
       cp ${customCss} "$CUSTOM_DIR/custom.css"
-      chmod 644 "$CUSTOM_DIR/custom.css"
+      cp ${branding.files.logoDisk} "$CUSTOM_DIR/logo-disk.svg"
+      cp ${branding.files.favicon} "$CUSTOM_DIR/favicon.svg"
+      cp ${branding.files.bgCity} "$CUSTOM_DIR/city.jpg"
+      chmod 644 "$CUSTOM_DIR"/*
     '')
   ];
 }
