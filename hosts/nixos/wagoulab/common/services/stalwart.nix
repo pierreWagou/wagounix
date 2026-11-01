@@ -1,7 +1,16 @@
-{ config, host, ... }:
+{
+  config,
+  pkgs,
+  host,
+  ...
+}:
 
 let
   ws = import ./lib/web-service.nix { inherit config host; };
+  # Store pointer: the only file Stalwart keeps in /etc/stalwart.
+  # Everything else (domains, accounts, DKIM keys, settings) lives in
+  # RocksDB at /var/lib/stalwart. Kept byte-equivalent to the wizard output.
+  configJson = pkgs.writeText "stalwart-config.json" ''{"@type":"RocksDb","path":"/var/lib/stalwart/","blobSize":16834,"bufferSize":134217728,"poolWorkers":null}'';
   svc = ws.mkWebService {
     name = "stalwart";
     subdomain = "mailbox";
@@ -14,7 +23,7 @@ let
     };
     volumes = [
       "/var/lib/stalwart:/var/lib/stalwart"
-      "/var/lib/stalwart-config:/etc/stalwart"
+      "${configJson}:/etc/stalwart/config.json:ro"
       "/var/lib/stalwart-logs:/var/log/stalwart"
     ];
     environmentFiles = [ config.sops.templates."stalwart.env".path ];
@@ -28,7 +37,6 @@ let
     ];
     dataDirs = [
       "/var/lib/stalwart"
-      "/var/lib/stalwart-config"
       "/var/lib/stalwart-logs"
     ];
     dataDirsMode = "0755 2000 2000";
