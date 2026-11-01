@@ -8,6 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   inherit (config.wagou) branding;
+  ws = import ../lib/web-service.nix { inherit config host; };
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
@@ -44,6 +45,43 @@ let
     (pkgs.writeText "seafile-vars.css" seafileCssVars)
     ./seafile.css
   ];
+  frontend = ws.mkWebService {
+    name = "seafile";
+    subdomain = "disk";
+    image = "docker.io/seafileltd/seafile-mc:13.0.21";
+    port = 80;
+    env = {
+      SEAFILE_MYSQL_DB_HOST = "seafile-db";
+      SEAFILE_MYSQL_DB_PORT = "3306";
+      SEAFILE_MYSQL_DB_USER = "seafile";
+      SEAFILE_MYSQL_DB_CCNET_DB_NAME = "ccnet_db";
+      SEAFILE_MYSQL_DB_SEAFILE_DB_NAME = "seafile_db";
+      SEAFILE_MYSQL_DB_SEAHUB_DB_NAME = "seahub_db";
+      TIME_ZONE = host.timezone;
+      SEAFILE_SERVER_HOSTNAME = "disk.${host.domain}";
+      SEAFILE_SERVER_PROTOCOL = "https";
+      CACHE_PROVIDER = "redis";
+      REDIS_HOST = "seafile-redis";
+      REDIS_PORT = "6379";
+      ENABLE_SEADOC = "true";
+      INIT_SEAFILE_ADMIN_EMAIL = host.adminEmail;
+    };
+    volumes = [
+      "/var/lib/seafile:/shared"
+    ];
+    environmentFiles = [ config.sops.templates."seafile.env".path ];
+    extraNetworks = [ networks.seafile-internal.ref ];
+    unitConfig = {
+      Requires = [
+        containers.seafile-db.ref
+        containers.seafile-redis.ref
+      ];
+      After = [
+        containers.seafile-db.ref
+        containers.seafile-redis.ref
+      ];
+    };
+  };
 in
 {
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
@@ -109,54 +147,8 @@ in
   };
 
   virtualisation.quadlet.containers = {
-    seafile = {
-      containerConfig = {
-        image = "docker.io/seafileltd/seafile-mc:13.0.21";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.seafile-internal.ref
-        ];
-        volumes = [
-          "/var/lib/seafile:/shared"
-        ];
-        environments = {
-          SEAFILE_MYSQL_DB_HOST = "seafile-db";
-          SEAFILE_MYSQL_DB_PORT = "3306";
-          SEAFILE_MYSQL_DB_USER = "seafile";
-          SEAFILE_MYSQL_DB_CCNET_DB_NAME = "ccnet_db";
-          SEAFILE_MYSQL_DB_SEAFILE_DB_NAME = "seafile_db";
-          SEAFILE_MYSQL_DB_SEAHUB_DB_NAME = "seahub_db";
-          TIME_ZONE = host.timezone;
-          SEAFILE_SERVER_HOSTNAME = "disk.${host.domain}";
-          SEAFILE_SERVER_PROTOCOL = "https";
-          CACHE_PROVIDER = "redis";
-          REDIS_HOST = "seafile-redis";
-          REDIS_PORT = "6379";
-          ENABLE_SEADOC = "true";
-          INIT_SEAFILE_ADMIN_EMAIL = host.adminEmail;
-        };
-        environmentFiles = [ config.sops.templates."seafile.env".path ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.seafile.rule" = "Host(`disk.${host.domain}`)";
-          "traefik.http.routers.seafile.entrypoints" = "websecure";
-          "traefik.http.routers.seafile.tls" = "true";
-          "traefik.http.routers.seafile.middlewares" = "secure-headers@file";
-          "traefik.http.services.seafile.loadbalancer.server.port" = "80";
-        };
-      };
-      unitConfig = {
-        Requires = [
-          containers.seafile-db.ref
-          containers.seafile-redis.ref
-        ];
-        After = [
-          containers.seafile-db.ref
-          containers.seafile-redis.ref
-        ];
-      };
-    };
+    seafile.containerConfig = frontend.containerConfig;
+    seafile.unitConfig = frontend.unitConfig;
 
     seafile-db = {
       containerConfig = {

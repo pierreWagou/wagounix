@@ -6,6 +6,7 @@
 }:
 
 let
+  ws = import ./lib/web-service.nix { inherit config host; };
   heatmapDashboard = ./dashboards/heatmap.yaml;
   devicesDashboard = ./dashboards/devices.yaml;
   lightsDashboard = ./dashboards/lights.yaml;
@@ -90,36 +91,38 @@ let
           roles:
             admin: "admins"
   '';
+  ha = ws.mkWebService {
+    name = "home-assistant";
+    exposeViaTraefik = false; # routed via Traefik file provider (host network has no container discovery)
+    networks = [ "host" ];
+    image = "homeassistant/home-assistant:2026.8.3";
+    env = {
+      TZ = host.timezone;
+    };
+    volumes = [
+      "/var/lib/home-assistant:/config"
+      "${configFile}:/config/configuration.yaml:ro"
+      "${config.sops.templates."ha-secrets.yaml".path}:/config/secrets.yaml:ro"
+      "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
+      "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
+      "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
+      "${mietteDashboard}:/config/dashboards/miette.yaml:ro"
+      "${plantsDashboard}:/config/dashboards/plants.yaml:ro"
+      "${shuttersDashboard}:/config/dashboards/shutters.yaml:ro"
+      "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro"
+    ];
+    dataDirs = [
+      "/var/lib/home-assistant"
+      "/var/lib/home-assistant/custom_components"
+      "/var/lib/home-assistant/dashboards"
+    ];
+  };
 in
 {
-  virtualisation.quadlet.containers.home-assistant = {
-    containerConfig = {
-      image = "homeassistant/home-assistant:2026.8.3";
-      networks = [ "host" ];
-      volumes = [
-        "/var/lib/home-assistant:/config"
-        "${configFile}:/config/configuration.yaml:ro"
-        "${config.sops.templates."ha-secrets.yaml".path}:/config/secrets.yaml:ro"
-        "${heatmapDashboard}:/config/dashboards/heatmap.yaml:ro"
-        "${devicesDashboard}:/config/dashboards/devices.yaml:ro"
-        "${lightsDashboard}:/config/dashboards/lights.yaml:ro"
-        "${mietteDashboard}:/config/dashboards/miette.yaml:ro"
-        "${plantsDashboard}:/config/dashboards/plants.yaml:ro"
-        "${shuttersDashboard}:/config/dashboards/shutters.yaml:ro"
-        "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro"
-      ];
-      environments = {
-        TZ = host.timezone;
-      };
-    };
-  };
+  virtualisation.quadlet.containers.home-assistant.containerConfig = ha.containerConfig;
 
   systemd = {
-    tmpfiles.rules = [
-      "d /var/lib/home-assistant 0755 root root -"
-      "d /var/lib/home-assistant/custom_components 0755 root root -"
-      "d /var/lib/home-assistant/dashboards 0755 root root -"
-    ];
+    tmpfiles.rules = ha.tmpfilesRules;
 
     services.hacs-install = {
       description = "Install HACS into Home Assistant";

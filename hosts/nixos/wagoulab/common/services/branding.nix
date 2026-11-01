@@ -7,7 +7,7 @@
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
+  ws = import ./lib/web-service.nix { inherit config host; };
 
   # === Catppuccin Palettes ===
   mocha = {
@@ -111,6 +111,25 @@ let
     bgCity = "${assetsBaseUrl}/plain/local:///city.jpg";
   };
 
+  imgproxy = ws.mkWebService {
+    name = "imgproxy";
+    subdomain = "assets";
+    image = "docker.io/darthsim/imgproxy:v4.0.3";
+    port = 8080;
+    env = {
+      IMGPROXY_LOCAL_FILESYSTEM_ROOT = "/images";
+      IMGPROXY_ALLOWED_SOURCES = "local://";
+      IMGPROXY_WORKERS = "2";
+      IMGPROXY_MALLOC = "jemalloc";
+      IMGPROXY_TTL = "86400";
+      IMGPROXY_USE_ETAG = "true";
+      IMGPROXY_SKIP_PROCESSING_FORMATS = "svg";
+      IMGPROXY_SANITIZE_SVG = "true";
+      IMGPROXY_MAX_SRC_RESOLUTION = "50";
+      IMGPROXY_QUALITY = "80";
+    };
+    volumes = [ "${brandingDir}:/images:ro" ];
+  };
 in
 {
   options.wagou.branding = {
@@ -167,33 +186,6 @@ in
 
   config = {
     # === imgproxy container for serving branding assets ===
-    virtualisation.quadlet.containers.imgproxy = {
-      containerConfig = {
-        image = "docker.io/darthsim/imgproxy:v4.0.3";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [ "${brandingDir}:/images:ro" ];
-        environments = {
-          IMGPROXY_LOCAL_FILESYSTEM_ROOT = "/images";
-          IMGPROXY_ALLOWED_SOURCES = "local://";
-          IMGPROXY_WORKERS = "2";
-          IMGPROXY_MALLOC = "jemalloc";
-          IMGPROXY_TTL = "86400";
-          IMGPROXY_USE_ETAG = "true";
-          IMGPROXY_SKIP_PROCESSING_FORMATS = "svg";
-          IMGPROXY_SANITIZE_SVG = "true";
-          IMGPROXY_MAX_SRC_RESOLUTION = "50";
-          IMGPROXY_QUALITY = "80";
-        };
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.imgproxy.rule" = "Host(`assets.${host.domain}`)";
-          "traefik.http.routers.imgproxy.entrypoints" = "websecure";
-          "traefik.http.routers.imgproxy.tls" = "true";
-          "traefik.http.routers.imgproxy.middlewares" = "secure-headers@file";
-          "traefik.http.services.imgproxy.loadbalancer.server.port" = "8080";
-        };
-      };
-    };
+    virtualisation.quadlet.containers.imgproxy.containerConfig = imgproxy.containerConfig;
   };
 }

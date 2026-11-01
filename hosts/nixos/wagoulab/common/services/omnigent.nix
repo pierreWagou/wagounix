@@ -6,12 +6,38 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
+  ws = import ./lib/web-service.nix { inherit config host; };
+  server = ws.mkWebService {
+    name = "omnigent";
+    subdomain = "ai";
+    image = "ghcr.io/omnigent-ai/omnigent-server:latest";
+    port = 8000;
+    # Use host DNS (AdGuard Home) so auth.wagou.fr resolves to the server IP
+    # instead of Cloudflare — the JWKS endpoint is fetched server-side and
+    # must reach Authentik directly, not through the Cloudflare tunnel.
+    dns = [ host.serverIP ];
+    env = {
+      OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou:/agents/alan";
+    };
+    volumes = [
+      "/var/lib/omnigent:/data"
+      "/home/${host.username}/.omnigent/agents:/agents:ro"
+    ];
+    environmentFiles = [ config.sops.templates."omnigent.env".path ];
+    extraNetworks = [ networks.omnigent-internal.ref ];
+    unitConfig = {
+      Requires = [ containers.omnigent-postgres.ref ];
+      After = [ containers.omnigent-postgres.ref ];
+    };
+  };
 in
 {
   # OmniGent-internal network for Postgres ↔ Server traffic (not exposed to Traefik)
   virtualisation.quadlet.networks.omnigent-internal = { };
 
   virtualisation.quadlet.containers = {
+    omnigent-server.containerConfig = server.containerConfig;
+    omnigent-server.unitConfig = server.unitConfig;
     omnigent-postgres = {
       containerConfig = {
         image = "postgres:16-alpine";
@@ -20,41 +46,6 @@ in
         volumes = [ "/var/lib/omnigent-postgres:/var/lib/postgresql/data" ];
         environmentFiles = [ config.sops.templates."omnigent-postgres.env".path ];
         shmSize = "256m";
-      };
-    };
-
-    omnigent-server = {
-      containerConfig = {
-        image = "ghcr.io/omnigent-ai/omnigent-server:latest";
-        noNewPrivileges = true;
-        # Use host DNS (AdGuard Home) so auth.wagou.fr resolves to the server IP
-        # instead of Cloudflare — the JWKS endpoint is fetched server-side and
-        # must reach Authentik directly, not through the Cloudflare tunnel.
-        dns = [ host.serverIP ];
-        networks = [
-          networks.proxy.ref
-          networks.omnigent-internal.ref
-        ];
-        volumes = [
-          "/var/lib/omnigent:/data"
-          "/home/${host.username}/.omnigent/agents:/agents:ro"
-        ];
-        environments = {
-          OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou:/agents/alan";
-        };
-        environmentFiles = [ config.sops.templates."omnigent.env".path ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.omnigent.rule" = "Host(`ai.${host.domain}`)";
-          "traefik.http.routers.omnigent.entrypoints" = "websecure";
-          "traefik.http.routers.omnigent.tls" = "true";
-          "traefik.http.routers.omnigent.middlewares" = "secure-headers@file";
-          "traefik.http.services.omnigent.loadbalancer.server.port" = "8000";
-        };
-      };
-      unitConfig = {
-        Requires = [ containers.omnigent-postgres.ref ];
-        After = [ containers.omnigent-postgres.ref ];
       };
     };
   };

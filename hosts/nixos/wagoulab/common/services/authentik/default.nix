@@ -8,6 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks;
   inherit (config.wagou) branding;
+  ws = import ../lib/web-service.nix { inherit config host; };
   authentikVersion = "2026.5.8";
   l = branding.palette.latte;
   m = branding.palette.mocha;
@@ -113,43 +114,33 @@ let
     bgUrl = branding.urls.bgCity;
     customCss = escapedCss;
   };
+  server = ws.mkWebService {
+    name = "authentik";
+    subdomain = "auth";
+    image = "ghcr.io/goauthentik/server:${authentikVersion}";
+    port = 9000;
+    env = {
+      AUTHENTIK_REDIS__HOST = "authentik-redis";
+      AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
+      AUTHENTIK_POSTGRESQL__USER = "authentik";
+      AUTHENTIK_POSTGRESQL__NAME = "authentik";
+    };
+    environmentFiles = [ config.sops.templates."authentik.env".path ];
+    volumes = [
+      "/var/lib/authentik/media:/media"
+      "/var/lib/authentik/templates:/templates"
+      "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
+    ];
+    extraNetworks = [ networks.authentik-internal.ref ];
+    exec = [ "server" ];
+  };
 in
 {
   # Authentik-internal network for DB and Redis (not exposed to Traefik)
   virtualisation.quadlet.networks.authentik-internal = { };
 
   virtualisation.quadlet.containers = {
-    authentik-server = {
-      containerConfig = {
-        image = "ghcr.io/goauthentik/server:${authentikVersion}";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.authentik-internal.ref
-        ];
-        environments = {
-          AUTHENTIK_REDIS__HOST = "authentik-redis";
-          AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
-          AUTHENTIK_POSTGRESQL__USER = "authentik";
-          AUTHENTIK_POSTGRESQL__NAME = "authentik";
-        };
-        environmentFiles = [ config.sops.templates."authentik.env".path ];
-        volumes = [
-          "/var/lib/authentik/media:/media"
-          "/var/lib/authentik/templates:/templates"
-          "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
-        ];
-        exec = [ "server" ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.authentik.rule" = "Host(`auth.${host.domain}`)";
-          "traefik.http.routers.authentik.entrypoints" = "websecure";
-          "traefik.http.routers.authentik.tls" = "true";
-          "traefik.http.routers.authentik.middlewares" = "secure-headers@file";
-          "traefik.http.services.authentik.loadbalancer.server.port" = "9000";
-        };
-      };
-    };
+    authentik-server.containerConfig = server.containerConfig;
 
     authentik-worker = {
       containerConfig = {

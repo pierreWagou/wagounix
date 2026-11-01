@@ -6,8 +6,8 @@
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
   inherit (config.wagou) branding;
+  ws = import ../lib/web-service.nix { inherit config host; };
   brandingAssetsDir = ../branding-assets;
   imageFiles = builtins.filter (f: builtins.match ".*\\.(jpg|jpeg|png)" f != null) (
     builtins.attrNames (builtins.readDir brandingAssetsDir)
@@ -255,41 +255,32 @@ let
       bgEl.style.backgroundImage = "url('" + pick + "')";
     }
   '';
+  homepage = ws.mkWebService {
+    name = "homepage";
+    subdomain = "dash";
+    image = "ghcr.io/gethomepage/homepage:v1.13.1";
+    port = 3000;
+    healthCmd = "none";
+    env = {
+      HOMEPAGE_ALLOWED_HOSTS = "${host.domain},dash.${host.domain}";
+    };
+    volumes = [
+      "${settingsFile}:/app/config/settings.yaml:ro"
+      "${widgetsFile}:/app/config/widgets.yaml:ro"
+      "${servicesFile}:/app/config/services.yaml:ro"
+      "${bookmarksFile}:/app/config/bookmarks.yaml:ro"
+      "${customCSS}:/app/config/custom.css:ro"
+      "${customJS}:/app/config/custom.js:ro"
+      "/var/lib/${host.hostname}/homepage-logs:/app/config/logs"
+    ];
+    environmentFiles = [ config.sops.templates."homepage.env".path ];
+    dataDirs = [ "/var/lib/${host.hostname}/homepage-logs" ];
+  };
 in
 {
   virtualisation.quadlet.containers = {
-    homepage = {
-      containerConfig = {
-        image = "ghcr.io/gethomepage/homepage:v1.13.1";
-        noNewPrivileges = true;
-        healthCmd = "none";
-        networks = [ networks.proxy.ref ];
-        volumes = [
-          "${settingsFile}:/app/config/settings.yaml:ro"
-          "${widgetsFile}:/app/config/widgets.yaml:ro"
-          "${servicesFile}:/app/config/services.yaml:ro"
-          "${bookmarksFile}:/app/config/bookmarks.yaml:ro"
-          "${customCSS}:/app/config/custom.css:ro"
-          "${customJS}:/app/config/custom.js:ro"
-          "/var/lib/${host.hostname}/homepage-logs:/app/config/logs"
-        ];
-        environments = {
-          HOMEPAGE_ALLOWED_HOSTS = "${host.domain},dash.${host.domain}";
-        };
-        environmentFiles = [ config.sops.templates."homepage.env".path ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.homepage.rule" = "Host(`dash.${host.domain}`)";
-          "traefik.http.routers.homepage.entrypoints" = "websecure";
-          "traefik.http.routers.homepage.tls" = "true";
-          "traefik.http.routers.homepage.middlewares" = "secure-headers@file";
-          "traefik.http.services.homepage.loadbalancer.server.port" = "3000";
-        };
-      };
-    };
+    homepage.containerConfig = homepage.containerConfig;
   };
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/${host.hostname}/homepage-logs 0755 root root -"
-  ];
+  systemd.tmpfiles.rules = homepage.tmpfilesRules;
 }

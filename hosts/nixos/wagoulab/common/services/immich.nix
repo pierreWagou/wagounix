@@ -2,54 +2,46 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
+  ws = import ./lib/web-service.nix { inherit config host; };
   immichVersion = "v2.7.5";
+  server = ws.mkWebService {
+    name = "immich";
+    subdomain = "pixel";
+    image = "ghcr.io/immich-app/immich-server:${immichVersion}";
+    port = 2283;
+    env = {
+      DB_HOSTNAME = "immich-postgres";
+      DB_PORT = "5432";
+      DB_DATABASE_NAME = "immich";
+      REDIS_HOSTNAME = "immich-redis";
+      REDIS_PORT = "6379";
+      IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
+    };
+    volumes = [
+      "/var/lib/immich:/usr/src/app/upload"
+      "/etc/localtime:/etc/localtime:ro"
+    ];
+    environmentFiles = [ config.sops.templates."immich.env".path ];
+    extraNetworks = [ networks.immich-internal.ref ];
+    unitConfig = {
+      Requires = [
+        containers.immich-postgres.ref
+        containers.immich-redis.ref
+      ];
+      After = [
+        containers.immich-postgres.ref
+        containers.immich-redis.ref
+      ];
+    };
+  };
 in
 {
   # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
   virtualisation.quadlet.networks.immich-internal = { };
 
   virtualisation.quadlet.containers = {
-    immich-server = {
-      containerConfig = {
-        image = "ghcr.io/immich-app/immich-server:${immichVersion}";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.immich-internal.ref
-        ];
-        volumes = [
-          "/var/lib/immich:/usr/src/app/upload"
-          "/etc/localtime:/etc/localtime:ro"
-        ];
-        environments = {
-          DB_HOSTNAME = "immich-postgres";
-          DB_PORT = "5432";
-          DB_DATABASE_NAME = "immich";
-          REDIS_HOSTNAME = "immich-redis";
-          REDIS_PORT = "6379";
-          IMMICH_MACHINE_LEARNING_URL = "http://immich-ml:3003";
-        };
-        environmentFiles = [ config.sops.templates."immich.env".path ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.immich.rule" = "Host(`pixel.${host.domain}`)";
-          "traefik.http.routers.immich.entrypoints" = "websecure";
-          "traefik.http.routers.immich.tls" = "true";
-          "traefik.http.routers.immich.middlewares" = "secure-headers@file";
-          "traefik.http.services.immich.loadbalancer.server.port" = "2283";
-        };
-      };
-      unitConfig = {
-        Requires = [
-          containers.immich-postgres.ref
-          containers.immich-redis.ref
-        ];
-        After = [
-          containers.immich-postgres.ref
-          containers.immich-redis.ref
-        ];
-      };
-    };
+    immich-server.containerConfig = server.containerConfig;
+    immich-server.unitConfig = server.unitConfig;
 
     immich-ml = {
       containerConfig = {

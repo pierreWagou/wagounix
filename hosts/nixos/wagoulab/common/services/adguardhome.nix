@@ -6,7 +6,7 @@
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
+  ws = import ./lib/web-service.nix { inherit config host; };
   yamlFormat = pkgs.formats.yaml { };
 
   # AdGuard config — generated as proper YAML from a Nix attrset.
@@ -89,43 +89,40 @@ let
       }
     ];
   };
+  svc = ws.mkWebService {
+    name = "adguard";
+    subdomain = "guard";
+    image = "adguard/adguardhome:v0.107.76";
+    port = 3000;
+    # Override Podman's DNS injection — without this, Podman injects the
+    # network gateway (10.89.x.1:53) into the container's resolv.conf,
+    # and AdGuard tries to use it for reverse DNS lookups, causing 2s
+    # timeouts on every PTR query and massive latency.
+    dns = [ "127.0.0.1" ];
+    volumes = [
+      "/var/lib/adguardhome/work:/opt/adguardhome/work"
+      "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
+    ];
+    publishPorts = [
+      "${host.serverIP}:53:5353/tcp"
+      "${host.serverIP}:53:5353/udp"
+      "${host.tailscaleIP}:53:5353/tcp"
+      "${host.tailscaleIP}:53:5353/udp"
+      "127.0.0.1:53:5353/tcp"
+      "127.0.0.1:53:5353/udp"
+      "127.0.0.1:3000:3000/tcp"
+    ];
+    dataDirs = [
+      "/var/lib/adguardhome"
+      "/var/lib/adguardhome/work"
+      "/var/lib/adguardhome/conf"
+    ];
+  };
 in
 {
-  virtualisation.quadlet.containers.adguard = {
-    containerConfig = {
-      image = "adguard/adguardhome:v0.107.76";
-      noNewPrivileges = true;
-      # Override Podman's DNS injection — without this, Podman injects the
-      # network gateway (10.89.x.1:53) into the container's resolv.conf,
-      # and AdGuard tries to use it for reverse DNS lookups, causing 2s
-      # timeouts on every PTR query and massive latency.
-      dns = [ "127.0.0.1" ];
-      networks = [ networks.proxy.ref ];
-      publishPorts = [
-        "${host.serverIP}:53:5353/tcp"
-        "${host.serverIP}:53:5353/udp"
-        "${host.tailscaleIP}:53:5353/tcp"
-        "${host.tailscaleIP}:53:5353/udp"
-        "127.0.0.1:53:5353/tcp"
-        "127.0.0.1:53:5353/udp"
-        "127.0.0.1:3000:3000/tcp"
-      ];
-      volumes = [
-        "/var/lib/adguardhome/work:/opt/adguardhome/work"
-        "/var/lib/adguardhome/conf:/opt/adguardhome/conf"
-      ];
-      # Use the image's default entrypoint and CMD.
-      # The seed config is copied by ExecStartPre below.
-      labels = {
-        "traefik.enable" = "true";
-        "traefik.http.routers.adguard.rule" = "Host(`guard.${host.domain}`)";
-        "traefik.http.routers.adguard.entrypoints" = "websecure";
-        "traefik.http.routers.adguard.tls" = "true";
-        "traefik.http.routers.adguard.middlewares" = "secure-headers@file";
-        "traefik.http.services.adguard.loadbalancer.server.port" = "3000";
-      };
-    };
-  };
+  # Use the image's default entrypoint and CMD.
+  # The seed config is copied by ExecStartPre below.
+  virtualisation.quadlet.containers.adguard.containerConfig = svc.containerConfig;
 
   # Copy the Nix-generated seed config before the container starts.
   # This ensures our declarative config is always the starting point while
@@ -134,9 +131,5 @@ in
     "${pkgs.coreutils}/bin/cp ${adguardConfig} /var/lib/adguardhome/conf/AdGuardHome.yaml"
   ];
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/adguardhome 0755 root root -"
-    "d /var/lib/adguardhome/work 0755 root root -"
-    "d /var/lib/adguardhome/conf 0755 root root -"
-  ];
+  systemd.tmpfiles.rules = svc.tmpfilesRules;
 }

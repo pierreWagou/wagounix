@@ -2,40 +2,35 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
+  ws = import ./lib/web-service.nix { inherit config host; };
   flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console enable-login-with-oidc enable-oidc-registration";
   publicUri = "https://pantone.${host.domain}";
   penpotEnv = config.sops.templates."penpot.env".path;
+  frontend = ws.mkWebService {
+    name = "penpot";
+    subdomain = "pantone";
+    image = "docker.io/penpotapp/frontend:2.18";
+    port = 8080;
+    env = {
+      PENPOT_FLAGS = flags;
+      PENPOT_HTTP_SERVER_MAX_BODY_SIZE = "367001600";
+      PENPOT_PUBLIC_URI = publicUri;
+      PENPOT_ADMIN_CONSOLE_URI = "http://penpot-admin-console:3000";
+    };
+    volumes = [ "/var/lib/penpot/assets:/opt/data/assets" ];
+    unitConfig = {
+      After = [ "network-online.target" ];
+    };
+    serviceConfig = {
+      Restart = "always";
+      TimeoutStartSec = 300;
+    };
+  };
 in
 {
   virtualisation.quadlet.containers = {
     penpot-frontend = {
-      containerConfig = {
-        image = "docker.io/penpotapp/frontend:2.18";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [ "/var/lib/penpot/assets:/opt/data/assets" ];
-        environments = {
-          PENPOT_FLAGS = flags;
-          PENPOT_HTTP_SERVER_MAX_BODY_SIZE = "367001600";
-          PENPOT_PUBLIC_URI = publicUri;
-          PENPOT_ADMIN_CONSOLE_URI = "http://penpot-admin-console:3000";
-        };
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.penpot.rule" = "Host(`pantone.${host.domain}`)";
-          "traefik.http.routers.penpot.entrypoints" = "websecure";
-          "traefik.http.routers.penpot.tls" = "true";
-          "traefik.http.routers.penpot.middlewares" = "secure-headers@file";
-          "traefik.http.services.penpot.loadbalancer.server.port" = "8080";
-        };
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (frontend) containerConfig unitConfig serviceConfig;
     };
 
     penpot-backend = {

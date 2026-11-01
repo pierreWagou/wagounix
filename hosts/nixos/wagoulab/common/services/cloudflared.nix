@@ -6,7 +6,7 @@
 }:
 
 let
-  inherit (config.virtualisation.quadlet) networks;
+  ws = import ./lib/web-service.nix { inherit config host; };
 
   # Host-specific Cloudflare credentials
   cloudflareCredentials =
@@ -32,24 +32,23 @@ let
         ++ [ { service = "http_status:404"; } ];
     }
   );
+  tunnel = ws.mkWebService {
+    name = "cloudflared";
+    exposeViaTraefik = false; # the tunnel feeds Traefik, not the other way around
+    image = "cloudflare/cloudflared:2026.5.1";
+    volumes = [
+      "${configFile}:/etc/cloudflared/config.yml:ro"
+      "${cloudflareCredentials}:/etc/cloudflared/credentials.json:ro"
+    ];
+    exec = [
+      "tunnel"
+      "--config"
+      "/etc/cloudflared/config.yml"
+      "--no-autoupdate"
+      "run"
+    ];
+  };
 in
 {
-  virtualisation.quadlet.containers.cloudflared = {
-    containerConfig = {
-      image = "cloudflare/cloudflared:2026.5.1";
-      noNewPrivileges = true;
-      networks = [ networks.proxy.ref ];
-      volumes = [
-        "${configFile}:/etc/cloudflared/config.yml:ro"
-        "${cloudflareCredentials}:/etc/cloudflared/credentials.json:ro"
-      ];
-      exec = [
-        "tunnel"
-        "--config"
-        "/etc/cloudflared/config.yml"
-        "--no-autoupdate"
-        "run"
-      ];
-    };
-  };
+  virtualisation.quadlet.containers.cloudflared.containerConfig = tunnel.containerConfig;
 }
