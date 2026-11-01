@@ -5,6 +5,21 @@
 }:
 
 {
+  sops = {
+    secrets = {
+      github-webhook-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "webhook.env" = {
+        content = "WEBHOOK_SECRET=${config.sops.placeholder.github-webhook-secret}\n";
+      };
+    };
+  };
+
   services.webhook = {
     enable = true;
     port = host.ports.webhook;

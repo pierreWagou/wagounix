@@ -131,18 +131,23 @@ in
   # Service secrets, colocated with the service. Values live in
   # services/adguardhome/secrets.yaml (moved verbatim, not rotated).
   sops = {
-    secrets.adguard-password = {
-      sopsFile = ./secrets.yaml;
-      mode = "0400";
-    };
-    secrets.adguard-password-hash = {
-      sopsFile = ./secrets.yaml;
-      mode = "0400";
+    secrets = {
+      adguard-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      adguard-password-hash = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
     };
 
-    templates."AdGuardHome.yaml" = {
-      file = seedTemplate;
-      restartUnits = [ "adguard.service" ];
+    templates = {
+      "AdGuardHome.yaml" = {
+        file = seedTemplate;
+        restartUnits = [ "adguard.service" ];
+      };
     };
   };
 

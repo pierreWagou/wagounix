@@ -129,6 +129,21 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      oidc-client-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "ha-secrets.yaml" = {
+        content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\n";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.home-assistant.containerConfig = ha.containerConfig;
 
   systemd = {

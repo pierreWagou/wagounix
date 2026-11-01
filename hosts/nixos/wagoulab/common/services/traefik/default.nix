@@ -7,7 +7,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   yamlFormat = pkgs.formats.yaml { };
 
   # Helper to build a standard Traefik router attrset.
@@ -130,6 +130,14 @@ let
   };
 in
 {
+  sops = {
+    templates = {
+      "traefik.env" = {
+        content = "CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.traefik.containerConfig = traefikSvc.containerConfig;
   virtualisation.quadlet.containers.traefik.serviceConfig = traefikSvc.serviceConfig // {
     TimeoutStartSec = "120";

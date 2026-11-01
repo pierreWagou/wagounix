@@ -84,6 +84,49 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      seafile-mysql-root-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-mysql-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-jwt-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-oauth-client-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "seafile.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
+          "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
+          "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
+        ];
+      };
+
+      "seafile-db.env" = {
+        content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
+      };
+    };
+  };
+
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 

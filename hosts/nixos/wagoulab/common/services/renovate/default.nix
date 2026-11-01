@@ -64,6 +64,25 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      renovate-github-app-id = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      renovate-github-app-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      renovate-installation-id = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+  };
+
   # Oneshot service — generates token then runs Renovate CLI
   systemd.services.renovate = {
     description = "Renovate dependency update bot";

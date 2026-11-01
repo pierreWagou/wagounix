@@ -6,7 +6,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   # Store pointer: the only file Stalwart keeps in /etc/stalwart.
   # Everything else (domains, accounts, DKIM keys, settings) lives in
   # RocksDB at /var/lib/stalwart. Kept byte-equivalent to the wizard output.
@@ -43,6 +43,33 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      stalwart-admin-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      mailgun-api-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "stalwart.env" = {
+        content = ''
+          STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}
+          CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}
+          SMTP_RELAY_HOST=smtp.eu.mailgun.org
+          SMTP_RELAY_PORT=587
+          SMTP_RELAY_USERNAME=postmaster@wagou.fr
+          SMTP_RELAY_PASSWORD=${config.sops.placeholder.mailgun-api-key}
+        '';
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.stalwart.containerConfig = svc.containerConfig;
 
   systemd.tmpfiles.rules = svc.tmpfilesRules;

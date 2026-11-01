@@ -278,6 +278,27 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      cloudflare-tunnel-token = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "homepage.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
+          "HOMEPAGE_VAR_ADGUARD_USER=admin"
+          "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
+          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
+          "HOMEPAGE_VAR_JELLYFIN_API_KEY=${config.sops.placeholder.jellyfin-api-key}"
+        ];
+      };
+    };
+  };
+
   virtualisation.quadlet.containers = {
     homepage.containerConfig = homepage.containerConfig;
   };

@@ -136,6 +136,42 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      authentik-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      authentik-postgres-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      authentik-ldap-token = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "authentik.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "AUTHENTIK_SECRET_KEY=${config.sops.placeholder.authentik-secret-key}"
+          "AUTHENTIK_POSTGRESQL__PASSWORD=${config.sops.placeholder.authentik-postgres-password}"
+        ];
+      };
+
+      "authentik-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
+      };
+
+      "authentik-ldap.env" = {
+        content = "AUTHENTIK_TOKEN=${config.sops.placeholder.authentik-ldap-token}\n";
+      };
+    };
+  };
+
   # Authentik-internal network for DB and Redis (not exposed to Traefik)
   virtualisation.quadlet.networks.authentik-internal = { };
 

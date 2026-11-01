@@ -26,29 +26,43 @@ let
       insecure: false
   '';
 in
-
-# Dokploy: self-hosted PaaS for deploying apps via a web UI.
-# It requires Docker Swarm (not Podman) — this file enables Docker alongside Podman
-# and deploys Dokploy as a Docker Swarm service managed by a NixOS systemd unit.
-#
-# Architecture:
-#   - NixOS Traefik (Podman/quadlet): single external entry point, handles *.wagou.fr.
-#     Forwards Dokploy app traffic to Dokploy Traefik via 127.0.0.1:8080.
-#   - Dokploy Traefik (Docker Swarm): internal router for Dokploy-deployed apps.
-#     Published to 127.0.0.1:8080 only (not externally accessible).
-#     Reads routing config from /etc/dokploy/traefik/dynamic/ (file provider).
-#   - Two Docker networks:
-#     - dokploy-network: Dokploy infra (UI, postgres, redis, traefik) — internal only.
-#     - apps: Deployed app containers — isolated from Dokploy infra.
-#   - Cloudflare tunnel: forwards all traffic to NixOS Traefik on 443.
-#
-# Dokploy UI: https://apps.wagou.fr
-# Apps deployed by Dokploy: add domain in Dokploy UI + add a NixOS Traefik forward rule.
-#
-# First-time setup (run once after nixos-rebuild switch):
-#   docker swarm init --advertise-addr <server-ip>
-#   Then the systemd service below will auto-deploy Dokploy on next run.
 {
+  # Dokploy: self-hosted PaaS for deploying apps via a web UI.
+  # It requires Docker Swarm (not Podman) — this file enables Docker alongside Podman
+  # and deploys Dokploy as a Docker Swarm service managed by a NixOS systemd unit.
+  #
+  # Architecture:
+  #   - NixOS Traefik (Podman/quadlet): single external entry point, handles *.wagou.fr.
+  #     Forwards Dokploy app traffic to Dokploy Traefik via 127.0.0.1:8080.
+  #   - Dokploy Traefik (Docker Swarm): internal router for Dokploy-deployed apps.
+  #     Published to 127.0.0.1:8080 only (not externally accessible).
+  #     Reads routing config from /etc/dokploy/traefik/dynamic/ (file provider).
+  #   - Two Docker networks:
+  #     - dokploy-network: Dokploy infra (UI, postgres, redis, traefik) — internal only.
+  #     - apps: Deployed app containers — isolated from Dokploy infra.
+  #   - Cloudflare tunnel: forwards all traffic to NixOS Traefik on 443.
+  #
+  # Dokploy UI: https://apps.wagou.fr
+  # Apps deployed by Dokploy: add domain in Dokploy UI + add a NixOS Traefik forward rule.
+  #
+  # First-time setup (run once after nixos-rebuild switch):
+  #   docker swarm init --advertise-addr <server-ip>
+  #   Then the systemd service below will auto-deploy Dokploy on next run.
+  sops = {
+    secrets = {
+      dokploy-db-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "dokploy-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.dokploy-db-password}\n";
+      };
+    };
+  };
+
   # Data directory for Dokploy config and Traefik configuration
   systemd.tmpfiles.rules = [
     "d /etc/dokploy 0777 root root -"

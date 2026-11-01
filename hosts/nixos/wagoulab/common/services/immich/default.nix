@@ -2,7 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks containers;
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   immichVersion = "v2.7.5";
   server = ws.mkWebService {
     name = "immich";
@@ -36,6 +36,41 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      immich-db-username = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      immich-db-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      immich-api-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "immich.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "DB_USERNAME=${config.sops.placeholder.immich-db-username}"
+          "DB_PASSWORD=${config.sops.placeholder.immich-db-password}"
+        ];
+      };
+
+      "immich-postgres.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "POSTGRES_USER=${config.sops.placeholder.immich-db-username}"
+          "POSTGRES_PASSWORD=${config.sops.placeholder.immich-db-password}"
+        ];
+      };
+    };
+  };
+
   # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
   virtualisation.quadlet.networks.immich-internal = { };
 

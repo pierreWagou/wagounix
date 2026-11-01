@@ -1,7 +1,7 @@
 { config, host, ... }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   svc = ws.mkWebService {
     name = "onlyoffice";
     subdomain = "docs";
@@ -27,6 +27,21 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      onlyoffice-jwt-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "onlyoffice.env" = {
+        content = "JWT_SECRET=${config.sops.placeholder.onlyoffice-jwt-secret}\n";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.onlyoffice.containerConfig = svc.containerConfig;
 
   systemd.tmpfiles.rules = svc.tmpfilesRules;

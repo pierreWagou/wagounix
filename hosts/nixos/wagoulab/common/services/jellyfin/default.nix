@@ -6,7 +6,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   svc = ws.mkWebService {
     name = "jellyfin";
     subdomain = "tape";
@@ -30,6 +30,15 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      jellyfin-api-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.jellyfin.containerConfig = svc.containerConfig;
 
   systemd.tmpfiles.rules = svc.tmpfilesRules;

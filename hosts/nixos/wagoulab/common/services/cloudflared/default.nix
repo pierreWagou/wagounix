@@ -6,7 +6,7 @@
 }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
 
   # Host-specific Cloudflare credentials
   cloudflareCredentials =
@@ -50,5 +50,23 @@ let
   };
 in
 {
+  # Cloudflare credentials file — mounted directly into the cloudflared container.
+  # Mode 0444 because cloudflared runs as nonroot (UID 65532) inside the container
+  # and needs to read the bind-mounted file. The secret is on tmpfs (/run/secrets/).
+  # Host-specific: wagou-prime uses "cloudflare-credentials-prime", wagou-clone uses "cloudflare-credentials-clone".
+  sops = {
+    secrets = {
+      cloudflare-credentials-prime = {
+        sopsFile = ./secrets.yaml;
+        mode = "0444";
+      };
+
+      cloudflare-credentials-clone = {
+        sopsFile = ./secrets.yaml;
+        mode = "0444";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.cloudflared.containerConfig = tunnel.containerConfig;
 }

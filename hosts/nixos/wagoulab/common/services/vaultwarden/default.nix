@@ -1,7 +1,7 @@
 { config, host, ... }:
 
 let
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   svc = ws.mkWebService {
     name = "vaultwarden";
     subdomain = "vault";
@@ -20,6 +20,21 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      vaultwarden-admin-token = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "vaultwarden.env" = {
+        content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
+      };
+    };
+  };
+
   virtualisation.quadlet.containers.vaultwarden.containerConfig = svc.containerConfig;
 
   systemd.tmpfiles.rules = svc.tmpfilesRules ++ [

@@ -2,7 +2,7 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
-  ws = import ./lib/web-service.nix { inherit config host; };
+  ws = import ../lib/web-service.nix { inherit config host; };
   flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console enable-login-with-oidc enable-oidc-registration";
   publicUri = "https://pantone.${host.domain}";
   penpotEnv = config.sops.templates."penpot.env".path;
@@ -28,6 +28,36 @@ let
   };
 in
 {
+  sops = {
+    secrets = {
+      penpot-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      penpot-postgres-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      penpot-oidc-client-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "penpot.env" = {
+        content = ''
+          PENPOT_SECRET_KEY=${config.sops.placeholder.penpot-secret-key}
+          PENPOT_DATABASE_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          POSTGRES_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          PENPOT_OIDC_CLIENT_SECRET=${config.sops.placeholder.penpot-oidc-client-secret}
+        '';
+      };
+    };
+  };
+
   virtualisation.quadlet.containers = {
     penpot-frontend = {
       inherit (frontend) containerConfig unitConfig serviceConfig;
