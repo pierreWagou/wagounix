@@ -8,6 +8,13 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   inherit (config.wagou) branding;
+  ws = import ../lib/web-service.nix { inherit config host; };
+  cache = ws.mkValkey {
+    name = "seafile-redis";
+    networks = [ networks.seafile-internal.ref ];
+    dataDirMode = "0750 999 999";
+    extraTmpfilesRules = [ "Z /var/lib/seafile-redis 0750 999 999 -" ];
+  };
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
@@ -44,13 +51,93 @@ let
     (pkgs.writeText "seafile-vars.css" seafileCssVars)
     ./seafile.css
   ];
+  frontend = ws.mkWebService {
+    name = "seafile";
+    subdomain = "disk";
+    image = "docker.io/seafileltd/seafile-mc:13.0.21";
+    port = 80;
+    env = {
+      SEAFILE_MYSQL_DB_HOST = "seafile-db";
+      SEAFILE_MYSQL_DB_PORT = "3306";
+      SEAFILE_MYSQL_DB_USER = "seafile";
+      SEAFILE_MYSQL_DB_CCNET_DB_NAME = "ccnet_db";
+      SEAFILE_MYSQL_DB_SEAFILE_DB_NAME = "seafile_db";
+      SEAFILE_MYSQL_DB_SEAHUB_DB_NAME = "seahub_db";
+      TIME_ZONE = host.timezone;
+      SEAFILE_SERVER_HOSTNAME = "disk.${host.domain}";
+      SEAFILE_SERVER_PROTOCOL = "https";
+      CACHE_PROVIDER = "redis";
+      REDIS_HOST = "seafile-redis";
+      REDIS_PORT = "6379";
+      ENABLE_SEADOC = "true";
+      INIT_SEAFILE_ADMIN_EMAIL = host.adminEmail;
+    };
+    volumes = [
+      "/var/lib/seafile:/shared"
+    ];
+    environmentFiles = [ config.sops.templates."seafile.env".path ];
+    extraNetworks = [ networks.seafile-internal.ref ];
+    unitConfig = {
+      Requires = [
+        containers.seafile-db.ref
+        containers.seafile-redis.ref
+      ];
+      After = [
+        containers.seafile-db.ref
+        containers.seafile-redis.ref
+      ];
+    };
+  };
 in
 {
+  sops = {
+    secrets = {
+      seafile-mysql-root-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-mysql-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-jwt-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-oauth-client-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      seafile-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "seafile.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
+          "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
+          "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
+        ];
+      };
+
+      "seafile-db.env" = {
+        content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
+      };
+    };
+  };
+
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 
-  # Complete seahub_settings.py rendered by sops-nix
-  # Deploy with: sudo seafile-deploy
+  # Complete seahub_settings.py rendered by sops-nix.
+  # Applied automatically by ExecStartPre below (no manual step).
   sops.templates."seahub_settings.py" = {
     content = builtins.concatStringsSep "\n" [
       "SECRET_KEY = '${config.sops.placeholder.seafile-secret-key}'"
@@ -60,14 +147,14 @@ in
       ""
       "CSRF_TRUSTED_ORIGINS = ['https://disk.${host.domain}']"
       ""
-      "# Branding"
+      "# Branding (media-relative: Seahub prepends /media/ to these paths)"
       "SITE_NAME = 'Wagou Disk'"
       "SITE_TITLE = 'Wagou Disk'"
-      "LOGO_PATH = '${branding.urls.logoDisk}'"
+      "LOGO_PATH = 'custom/logo-disk.svg'"
       "LOGO_WIDTH = 250"
       "LOGO_HEIGHT = 40"
-      "FAVICON_PATH = '${branding.urls.favicon}'"
-      "LOGIN_BG_IMAGE_PATH = '${branding.urls.bgCity}'"
+      "FAVICON_PATH = 'custom/favicon.svg'"
+      "LOGIN_BG_IMAGE_PATH = 'custom/city.jpg'"
       "BRANDING_CSS = 'custom/custom.css'"
       "ENABLE_SETTINGS_VIA_WEB = False"
       ""
@@ -109,54 +196,8 @@ in
   };
 
   virtualisation.quadlet.containers = {
-    seafile = {
-      containerConfig = {
-        image = "docker.io/seafileltd/seafile-mc:13.0.21";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.seafile-internal.ref
-        ];
-        volumes = [
-          "/var/lib/seafile:/shared"
-        ];
-        environments = {
-          SEAFILE_MYSQL_DB_HOST = "seafile-db";
-          SEAFILE_MYSQL_DB_PORT = "3306";
-          SEAFILE_MYSQL_DB_USER = "seafile";
-          SEAFILE_MYSQL_DB_CCNET_DB_NAME = "ccnet_db";
-          SEAFILE_MYSQL_DB_SEAFILE_DB_NAME = "seafile_db";
-          SEAFILE_MYSQL_DB_SEAHUB_DB_NAME = "seahub_db";
-          TIME_ZONE = host.timezone;
-          SEAFILE_SERVER_HOSTNAME = "disk.${host.domain}";
-          SEAFILE_SERVER_PROTOCOL = "https";
-          CACHE_PROVIDER = "redis";
-          REDIS_HOST = "seafile-redis";
-          REDIS_PORT = "6379";
-          ENABLE_SEADOC = "true";
-          INIT_SEAFILE_ADMIN_EMAIL = host.adminEmail;
-        };
-        environmentFiles = [ config.sops.templates."seafile.env".path ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.seafile.rule" = "Host(`disk.${host.domain}`)";
-          "traefik.http.routers.seafile.entrypoints" = "websecure";
-          "traefik.http.routers.seafile.tls" = "true";
-          "traefik.http.routers.seafile.middlewares" = "secure-headers@file";
-          "traefik.http.services.seafile.loadbalancer.server.port" = "80";
-        };
-      };
-      unitConfig = {
-        Requires = [
-          containers.seafile-db.ref
-          containers.seafile-redis.ref
-        ];
-        After = [
-          containers.seafile-db.ref
-          containers.seafile-redis.ref
-        ];
-      };
-    };
+    seafile.containerConfig = frontend.containerConfig;
+    seafile.unitConfig = frontend.unitConfig;
 
     seafile-db = {
       containerConfig = {
@@ -172,21 +213,7 @@ in
       };
     };
 
-    seafile-redis = {
-      containerConfig = {
-        image = host.valkeyImage;
-        noNewPrivileges = true;
-        networks = [ networks.seafile-internal.ref ];
-        exec = [
-          "--save"
-          "60"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
-        volumes = [ "/var/lib/seafile-redis:/data" ];
-      };
-    };
+    seafile-redis.containerConfig = cache.containerConfig;
 
     seadoc = {
       containerConfig = {
@@ -210,35 +237,38 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/seafile 0755 root root -"
     "d /var/lib/seafile-mysql 0755 root root -"
-    "d /var/lib/seafile-redis 0750 999 999 -"
-    "Z /var/lib/seafile-redis 0750 999 999 -"
     "d /var/lib/seadoc 0755 root root -"
     # Branding assets directory
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
-  ];
+  ]
+  ++ cache.tmpfilesRules;
 
-  # Idempotent script to deploy seahub config + branding CSS
-  # Run: sudo seafile-deploy
-  environment.systemPackages = [
-    (pkgs.writeShellScriptBin "seafile-deploy" ''
+  # Seed declarative config + branding assets into the stateful volume before
+  # every start. Seafile only reads these files from inside its self-initialized
+  # data dir, so plain :ro mounts can't work (the paths don't exist until first
+  # init). LOGO_PATH etc. are media-relative (Seahub prepends /media/), so the
+  # asset files must live in seahub-data/custom/ — absolute imgproxy URLs get
+  # mangled into /media/https://... and 404.
+  # The guard preserves first-init: if conf/ is missing, Seafile hasn't
+  # initialized yet — skip seeding and let it run. Never mkdir the conf dir
+  # ourselves: its absence is the first-init signal.
+  systemd.services.seafile.serviceConfig.ExecStartPre = [
+    (pkgs.writeShellScript "seafile-seed" ''
       set -euo pipefail
-      SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
-      CUSTOM="/var/lib/seafile/seafile/seahub-data/custom"
-      if [ ! -d "/var/lib/seafile/seafile/conf" ]; then
-        echo "Error: Seafile conf directory not found. Has Seafile been initialized?"
-        exit 1
+      CONF_DIR="/var/lib/seafile/seafile/conf"
+      CUSTOM_DIR="/var/lib/seafile/seafile/seahub-data/custom"
+      if [ ! -d "$CONF_DIR" ]; then
+        echo "seafile-seed: conf dir missing, skipping (first init not done)"
+        exit 0
       fi
-      # Deploy seahub config
-      cp ${config.sops.templates."seahub_settings.py".path} "$SETTINGS"
-      chmod 644 "$SETTINGS"
-      # Deploy custom CSS (logo/favicon/bg served by imgproxy at assets.wagou.fr)
-      mkdir -p "$CUSTOM"
-      cp ${customCss} "$CUSTOM/custom.css"
-      chmod 644 "$CUSTOM"/*
-      # Restart seahub
-      ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
-        ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
-      echo "Done. Seahub config + branding deployed."
+      cp ${config.sops.templates."seahub_settings.py".path} "$CONF_DIR/seahub_settings.py"
+      chmod 644 "$CONF_DIR/seahub_settings.py"
+      mkdir -p "$CUSTOM_DIR"
+      cp ${customCss} "$CUSTOM_DIR/custom.css"
+      cp ${branding.files.logoDisk} "$CUSTOM_DIR/logo-disk.svg"
+      cp ${branding.files.favicon} "$CUSTOM_DIR/favicon.svg"
+      cp ${branding.files.bgCity} "$CUSTOM_DIR/city.jpg"
+      chmod 644 "$CUSTOM_DIR"/*
     '')
   ];
 }

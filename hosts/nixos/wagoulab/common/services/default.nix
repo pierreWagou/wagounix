@@ -7,30 +7,30 @@ _: {
   imports = [
     ./podman.nix
     ./secrets.nix
-    ./traefik.nix
-    ./cloudflared.nix
-    ./vaultwarden.nix
-    ./jellyfin.nix
-    ./home-assistant.nix
+    ./traefik
+    ./cloudflared
+    ./vaultwarden
+    ./jellyfin
+    ./home-assistant
     ./homepage
-    ./adguardhome.nix
-    ./immich.nix
+    ./adguardhome
+    ./immich
     ./fail2ban.nix
     ./firewall.nix
     ./tailscale.nix
     ./ttyd.nix
     ./rbw.nix
-    ./webhook.nix
-    ./renovate.nix
-    ./kitchenowl.nix
+    ./webhook
+    ./renovate
+    ./kitchenowl
     ./authentik
     ./seafile
-    ./onlyoffice.nix
-    ./penpot.nix
+    ./onlyoffice
+    ./penpot
     ./branding.nix
-    ./dokploy.nix
-    ./stalwart.nix
+    ./dokploy
+    ./stalwart
     ./satisfactory.nix
-    ./omnigent.nix
+    ./omnigent
   ];
 }

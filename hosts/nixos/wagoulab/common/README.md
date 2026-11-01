@@ -311,7 +311,7 @@ The homeserver uses a dedicated SSH key (`id_ed25519_homeserver`), separate from
 
 ### Seafile branding/config not applied
 
-`seahub_settings.py` and the Catppuccin `custom.css` are deployed by a manual idempotent script (not auto-applied, since Seafile generates its config on first run). After the first start, run `sudo seafile-deploy` to copy the rendered config + CSS into the container and restart seahub.
+`seahub_settings.py` and the Catppuccin `custom.css` are seeded automatically by an `ExecStartPre` step on every container start (Seafile only reads them from inside its self-initialized data dir, so they can't be plain mounts). The seed is skipped until first init has created the conf dir. No manual step.
 
 ### Seafile fails to start ("Failed to load environment files")
 

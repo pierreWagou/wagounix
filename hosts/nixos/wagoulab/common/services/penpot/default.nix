@@ -2,40 +2,96 @@
 
 let
   inherit (config.virtualisation.quadlet) networks;
+  ws = import ../lib/web-service.nix { inherit config host; };
   flags = "disable-registration enable-prepl-server disable-secure-session-cookies enable-mcp enable-admin-console enable-login-with-oidc enable-oidc-registration";
   publicUri = "https://pantone.${host.domain}";
   penpotEnv = config.sops.templates."penpot.env".path;
+  pgUnit = {
+    unitConfig = {
+      After = [ "network-online.target" ];
+    };
+    serviceConfig = {
+      Restart = "always";
+      TimeoutStartSec = 300;
+    };
+  };
+  pg = ws.mkPostgres {
+    name = "penpot-postgres";
+    image = "docker.io/library/postgres:15";
+    db = "penpot";
+    user = "penpot";
+    passwordEnvFile = penpotEnv;
+    dataDir = "/var/lib/penpot/postgres";
+    networks = [ networks.proxy.ref ];
+    initdbArgs = "--data-checksums";
+    inherit (pgUnit) unitConfig serviceConfig;
+  };
+  cache = ws.mkValkey {
+    name = "penpot-valkey";
+    image = "docker.io/valkey/valkey:8.1";
+    dataDir = null;
+    persist = false;
+    extraEnv = {
+      VALKEY_EXTRA_FLAGS = "--maxmemory 128mb --maxmemory-policy volatile-lfu";
+    };
+    networks = [ networks.proxy.ref ];
+    inherit (pgUnit) unitConfig serviceConfig;
+  };
+  frontend = ws.mkWebService {
+    name = "penpot";
+    subdomain = "pantone";
+    image = "docker.io/penpotapp/frontend:2.18";
+    port = 8080;
+    env = {
+      PENPOT_FLAGS = flags;
+      PENPOT_HTTP_SERVER_MAX_BODY_SIZE = "367001600";
+      PENPOT_PUBLIC_URI = publicUri;
+      PENPOT_ADMIN_CONSOLE_URI = "http://penpot-admin-console:3000";
+    };
+    volumes = [ "/var/lib/penpot/assets:/opt/data/assets" ];
+    unitConfig = {
+      After = [ "network-online.target" ];
+    };
+    serviceConfig = {
+      Restart = "always";
+      TimeoutStartSec = 300;
+    };
+  };
 in
 {
+  sops = {
+    secrets = {
+      penpot-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      penpot-postgres-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      penpot-oidc-client-secret = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "penpot.env" = {
+        content = ''
+          PENPOT_SECRET_KEY=${config.sops.placeholder.penpot-secret-key}
+          PENPOT_DATABASE_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          POSTGRES_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
+          PENPOT_OIDC_CLIENT_SECRET=${config.sops.placeholder.penpot-oidc-client-secret}
+        '';
+      };
+    };
+  };
+
   virtualisation.quadlet.containers = {
     penpot-frontend = {
-      containerConfig = {
-        image = "docker.io/penpotapp/frontend:2.18";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [ "/var/lib/penpot/assets:/opt/data/assets" ];
-        environments = {
-          PENPOT_FLAGS = flags;
-          PENPOT_HTTP_SERVER_MAX_BODY_SIZE = "367001600";
-          PENPOT_PUBLIC_URI = publicUri;
-          PENPOT_ADMIN_CONSOLE_URI = "http://penpot-admin-console:3000";
-        };
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.penpot.rule" = "Host(`pantone.${host.domain}`)";
-          "traefik.http.routers.penpot.entrypoints" = "websecure";
-          "traefik.http.routers.penpot.tls" = "true";
-          "traefik.http.routers.penpot.middlewares" = "secure-headers@file";
-          "traefik.http.services.penpot.loadbalancer.server.port" = "8080";
-        };
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (frontend) containerConfig unitConfig serviceConfig;
     };
 
     penpot-backend = {
@@ -156,49 +212,18 @@ in
     };
 
     penpot-postgres = {
-      containerConfig = {
-        image = "docker.io/library/postgres:15";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        volumes = [ "/var/lib/penpot/postgres:/var/lib/postgresql/data" ];
-        environments = {
-          POSTGRES_INITDB_ARGS = "--data-checksums";
-          POSTGRES_DB = "penpot";
-          POSTGRES_USER = "penpot";
-        };
-        environmentFiles = [ penpotEnv ];
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (pg) containerConfig unitConfig serviceConfig;
     };
 
     penpot-valkey = {
-      containerConfig = {
-        image = "docker.io/valkey/valkey:8.1";
-        noNewPrivileges = true;
-        networks = [ networks.proxy.ref ];
-        environments = {
-          VALKEY_EXTRA_FLAGS = "--maxmemory 128mb --maxmemory-policy volatile-lfu";
-        };
-      };
-      unitConfig = {
-        After = [ "network-online.target" ];
-      };
-      serviceConfig = {
-        Restart = "always";
-        TimeoutStartSec = 300;
-      };
+      inherit (cache) containerConfig unitConfig serviceConfig;
     };
   };
 
   systemd.tmpfiles.rules = [
     "d /var/lib/penpot 0755 root root -"
-    "d /var/lib/penpot/postgres 0755 root root -"
     "d /var/lib/penpot/assets 0755 root root -"
-  ];
+  ]
+  ++ pg.tmpfilesRules
+  ++ cache.tmpfilesRules;
 }

@@ -8,6 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks;
   inherit (config.wagou) branding;
+  ws = import ../lib/web-service.nix { inherit config host; };
   authentikVersion = "2026.5.8";
   l = branding.palette.latte;
   m = branding.palette.mocha;
@@ -113,43 +114,81 @@ let
     bgUrl = branding.urls.bgCity;
     customCss = escapedCss;
   };
+  server = ws.mkWebService {
+    name = "authentik";
+    subdomain = "auth";
+    image = "ghcr.io/goauthentik/server:${authentikVersion}";
+    port = 9000;
+    env = {
+      AUTHENTIK_REDIS__HOST = "authentik-redis";
+      AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
+      AUTHENTIK_POSTGRESQL__USER = "authentik";
+      AUTHENTIK_POSTGRESQL__NAME = "authentik";
+    };
+    environmentFiles = [ config.sops.templates."authentik.env".path ];
+    volumes = [
+      "/var/lib/authentik/media:/media"
+      "/var/lib/authentik/templates:/templates"
+      "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
+    ];
+    extraNetworks = [ networks.authentik-internal.ref ];
+    exec = [ "server" ];
+  };
+  pg = ws.mkPostgres {
+    name = "authentik-postgres";
+    image = "docker.io/library/postgres:16-alpine";
+    db = "authentik";
+    user = "authentik";
+    passwordEnvFile = config.sops.templates."authentik-postgres.env".path;
+    networks = [ networks.authentik-internal.ref ];
+  };
+  cache = ws.mkValkey {
+    name = "authentik-redis";
+    networks = [ networks.authentik-internal.ref ];
+  };
 in
 {
+  sops = {
+    secrets = {
+      authentik-secret-key = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      authentik-postgres-password = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+
+      authentik-ldap-token = {
+        sopsFile = ./secrets.yaml;
+        mode = "0400";
+      };
+    };
+
+    templates = {
+      "authentik.env" = {
+        content = builtins.concatStringsSep "\n" [
+          "AUTHENTIK_SECRET_KEY=${config.sops.placeholder.authentik-secret-key}"
+          "AUTHENTIK_POSTGRESQL__PASSWORD=${config.sops.placeholder.authentik-postgres-password}"
+        ];
+      };
+
+      "authentik-postgres.env" = {
+        content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
+      };
+
+      "authentik-ldap.env" = {
+        content = "AUTHENTIK_TOKEN=${config.sops.placeholder.authentik-ldap-token}\n";
+      };
+    };
+  };
+
   # Authentik-internal network for DB and Redis (not exposed to Traefik)
   virtualisation.quadlet.networks.authentik-internal = { };
 
   virtualisation.quadlet.containers = {
-    authentik-server = {
-      containerConfig = {
-        image = "ghcr.io/goauthentik/server:${authentikVersion}";
-        noNewPrivileges = true;
-        networks = [
-          networks.proxy.ref
-          networks.authentik-internal.ref
-        ];
-        environments = {
-          AUTHENTIK_REDIS__HOST = "authentik-redis";
-          AUTHENTIK_POSTGRESQL__HOST = "authentik-postgres";
-          AUTHENTIK_POSTGRESQL__USER = "authentik";
-          AUTHENTIK_POSTGRESQL__NAME = "authentik";
-        };
-        environmentFiles = [ config.sops.templates."authentik.env".path ];
-        volumes = [
-          "/var/lib/authentik/media:/media"
-          "/var/lib/authentik/templates:/templates"
-          "${brandBlueprint}:/blueprints/custom/wagou-brand.yaml:ro"
-        ];
-        exec = [ "server" ];
-        labels = {
-          "traefik.enable" = "true";
-          "traefik.http.routers.authentik.rule" = "Host(`auth.${host.domain}`)";
-          "traefik.http.routers.authentik.entrypoints" = "websecure";
-          "traefik.http.routers.authentik.tls" = "true";
-          "traefik.http.routers.authentik.middlewares" = "secure-headers@file";
-          "traefik.http.services.authentik.loadbalancer.server.port" = "9000";
-        };
-      };
-    };
+    authentik-server.containerConfig = server.containerConfig;
 
     authentik-worker = {
       containerConfig = {
@@ -172,35 +211,9 @@ in
       };
     };
 
-    authentik-postgres = {
-      containerConfig = {
-        image = "docker.io/library/postgres:16-alpine";
-        noNewPrivileges = true;
-        networks = [ networks.authentik-internal.ref ];
-        volumes = [ "/var/lib/authentik-postgres:/var/lib/postgresql/data" ];
-        environments = {
-          POSTGRES_DB = "authentik";
-          POSTGRES_USER = "authentik";
-        };
-        environmentFiles = [ config.sops.templates."authentik-postgres.env".path ];
-      };
-    };
+    authentik-postgres.containerConfig = pg.containerConfig;
 
-    authentik-redis = {
-      containerConfig = {
-        image = host.valkeyImage;
-        noNewPrivileges = true;
-        networks = [ networks.authentik-internal.ref ];
-        exec = [
-          "--save"
-          "60"
-          "1"
-          "--loglevel"
-          "warning"
-        ];
-        volumes = [ "/var/lib/authentik-redis:/data" ];
-      };
-    };
+    authentik-redis.containerConfig = cache.containerConfig;
 
     authentik-ldap = {
       containerConfig = {
@@ -227,7 +240,7 @@ in
     "d /var/lib/authentik 0755 root root -"
     "d /var/lib/authentik/media 0755 root root -"
     "d /var/lib/authentik/templates 0755 root root -"
-    "d /var/lib/authentik-postgres 0755 root root -"
-    "d /var/lib/authentik-redis 0755 root root -"
-  ];
+  ]
+  ++ pg.tmpfilesRules
+  ++ cache.tmpfilesRules;
 }

@@ -65,8 +65,8 @@
         icon = ./icons/raycast.icns;
       }
       {
-        path = "/Applications/Spotify.app";
-        icon = ./icons/spotify.icns;
+        path = "/Applications/Spotifast.app";
+        icon = ./icons/spotifast.icns;
       }
       {
         path = "/Applications/Slack.app";

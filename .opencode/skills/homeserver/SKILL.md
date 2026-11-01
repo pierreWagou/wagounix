@@ -642,7 +642,7 @@ NOTE: After deploying to primary, also rebuild backup with `#wagou-clone` to pic
 
 ### Seafile branding/config not applied
 
-`seahub_settings.py` and the Catppuccin `custom.css` are deployed by the manual idempotent `seafile-deploy` script (Seafile generates its config on first run, so it can't be fully declarative). After the first start, run `sudo seafile-deploy` to copy the rendered config + CSS into the container and restart seahub.
+`seahub_settings.py` and the Catppuccin `custom.css` are seeded automatically by an `ExecStartPre` step on every container start (Seafile only reads them from inside its self-initialized data dir, so they can't be plain mounts). The seed is skipped until first init has created the conf dir. No manual step.
 
 ### Seafile fails to start ("Failed to load environment files")
 

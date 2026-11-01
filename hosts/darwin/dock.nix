@@ -32,7 +32,7 @@ in
 
     others = lib.mkOption {
       type = lib.types.listOf lib.types.str;
-      default = [ "/Applications/Spotify.app/" ];
+      default = [ "/Applications/Spotifast.app/" ];
       description = "Other apps in the dock.";
     };
   };

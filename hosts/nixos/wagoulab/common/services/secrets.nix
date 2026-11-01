@@ -1,4 +1,4 @@
-{ config, host, ... }:
+_:
 
 {
   sops = {
@@ -6,51 +6,8 @@
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
 
     secrets = {
-      # Cloudflare credentials file — mounted directly into the cloudflared container.
-      # Mode 0444 because cloudflared runs as nonroot (UID 65532) inside the container
-      # and needs to read the bind-mounted file. The secret is on tmpfs (/run/secrets/).
-      # Host-specific: wagou-prime uses "cloudflare-credentials-prime", wagou-clone uses "cloudflare-credentials-clone".
-      cloudflare-credentials-prime.mode = "0444";
-      cloudflare-credentials-clone.mode = "0444";
-
-      # Compose service secrets (referenced in env templates below)
+      # Shared Cloudflare DNS token (Traefik ACME + Stalwart ACME).
       cloudflare-dns-token.mode = "0400";
-      cloudflare-tunnel-token.mode = "0400";
-
-      vaultwarden-admin-token.mode = "0400";
-      immich-api-key.mode = "0400";
-      immich-db-username.mode = "0400";
-      immich-db-password.mode = "0400";
-      adguard-password.mode = "0400";
-      jellyfin-api-key.mode = "0400";
-      github-webhook-secret.mode = "0400";
-      renovate-github-app-id.mode = "0400";
-      renovate-github-app-key.mode = "0400";
-      renovate-installation-id.mode = "0400";
-      kitchenowl-jwt-secret.mode = "0400";
-      authentik-secret-key.mode = "0400";
-      authentik-postgres-password.mode = "0400";
-      kitchenowl-oidc-client-secret.mode = "0400";
-      seafile-mysql-root-password.mode = "0400";
-      seafile-mysql-password.mode = "0400";
-      seafile-jwt-key.mode = "0400";
-      seafile-oauth-client-secret.mode = "0400";
-      seafile-secret-key.mode = "0400";
-      onlyoffice-jwt-secret.mode = "0400";
-      penpot-secret-key.mode = "0400";
-      penpot-postgres-password.mode = "0400";
-      penpot-oidc-client-secret.mode = "0400";
-
-      dokploy-db-password.mode = "0400";
-      oidc-client-secret.mode = "0400";
-      stalwart-admin-password.mode = "0400";
-      mailgun-api-key.mode = "0400";
-      authentik-ldap-token.mode = "0400";
-
-      # OmniGent secrets
-      omnigent-postgres-password.mode = "0444";
-      omnigent-cookie-secret.mode = "0400";
-      omnigent-oidc-client-secret.mode = "0400";
 
       # Host-level secrets
       wagou-password-hash.neededForUsers = true;
@@ -60,138 +17,6 @@
       rbw-master-password = {
         mode = "0400";
         owner = "wagou";
-      };
-    };
-
-    # Rendered env files consumed by containers via environmentFiles
-    templates = {
-      "traefik.env" = {
-        content = "CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}\n";
-      };
-
-      "vaultwarden.env" = {
-        content = "ADMIN_TOKEN=${config.sops.placeholder.vaultwarden-admin-token}\n";
-      };
-
-      "immich.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "DB_USERNAME=${config.sops.placeholder.immich-db-username}"
-          "DB_PASSWORD=${config.sops.placeholder.immich-db-password}"
-        ];
-      };
-
-      "immich-postgres.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "POSTGRES_USER=${config.sops.placeholder.immich-db-username}"
-          "POSTGRES_PASSWORD=${config.sops.placeholder.immich-db-password}"
-        ];
-      };
-
-      "homepage.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "HOMEPAGE_VAR_IMMICH_API_KEY=${config.sops.placeholder.immich-api-key}"
-          "HOMEPAGE_VAR_ADGUARD_USER=admin"
-          "HOMEPAGE_VAR_ADGUARD_PASS=${config.sops.placeholder.adguard-password}"
-          "HOMEPAGE_VAR_CF_API_TOKEN=${config.sops.placeholder.cloudflare-tunnel-token}"
-          "HOMEPAGE_VAR_JELLYFIN_API_KEY=${config.sops.placeholder.jellyfin-api-key}"
-        ];
-      };
-
-      "webhook.env" = {
-        content = "WEBHOOK_SECRET=${config.sops.placeholder.github-webhook-secret}\n";
-      };
-
-      "kitchenowl.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "JWT_SECRET_KEY=${config.sops.placeholder.kitchenowl-jwt-secret}"
-          "OIDC_CLIENT_SECRET=${config.sops.placeholder.kitchenowl-oidc-client-secret}"
-        ];
-      };
-
-      "authentik.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "AUTHENTIK_SECRET_KEY=${config.sops.placeholder.authentik-secret-key}"
-          "AUTHENTIK_POSTGRESQL__PASSWORD=${config.sops.placeholder.authentik-postgres-password}"
-        ];
-      };
-
-      "authentik-postgres.env" = {
-        content = "POSTGRES_PASSWORD=${config.sops.placeholder.authentik-postgres-password}\n";
-      };
-
-      "seafile.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "SEAFILE_MYSQL_DB_PASSWORD=${config.sops.placeholder.seafile-mysql-password}"
-          "INIT_SEAFILE_MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}"
-          "JWT_PRIVATE_KEY=${config.sops.placeholder.seafile-jwt-key}"
-        ];
-      };
-
-      "seafile-db.env" = {
-        content = "MYSQL_ROOT_PASSWORD=${config.sops.placeholder.seafile-mysql-root-password}\n";
-      };
-
-      "onlyoffice.env" = {
-        content = "JWT_SECRET=${config.sops.placeholder.onlyoffice-jwt-secret}\n";
-      };
-
-      "penpot.env" = {
-        content = ''
-          PENPOT_SECRET_KEY=${config.sops.placeholder.penpot-secret-key}
-          PENPOT_DATABASE_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
-          POSTGRES_PASSWORD=${config.sops.placeholder.penpot-postgres-password}
-          PENPOT_OIDC_CLIENT_SECRET=${config.sops.placeholder.penpot-oidc-client-secret}
-        '';
-      };
-
-      "dokploy-postgres.env" = {
-        content = "POSTGRES_PASSWORD=${config.sops.placeholder.dokploy-db-password}\n";
-      };
-
-      "ha-secrets.yaml" = {
-        content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\n";
-      };
-
-      "stalwart.env" = {
-        content = ''
-          STALWART_RECOVERY_ADMIN=admin:${config.sops.placeholder.stalwart-admin-password}
-          CF_DNS_API_TOKEN=${config.sops.placeholder.cloudflare-dns-token}
-          SMTP_RELAY_HOST=smtp.eu.mailgun.org
-          SMTP_RELAY_PORT=587
-          SMTP_RELAY_USERNAME=postmaster@wagou.fr
-          SMTP_RELAY_PASSWORD=${config.sops.placeholder.mailgun-api-key}
-        '';
-      };
-
-      "authentik-ldap.env" = {
-        content = "AUTHENTIK_TOKEN=${config.sops.placeholder.authentik-ldap-token}\n";
-      };
-
-      "omnigent-postgres.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "POSTGRES_DB=omnigent"
-          "POSTGRES_USER=omnigent"
-          "POSTGRES_PASSWORD=${config.sops.placeholder.omnigent-postgres-password}"
-        ];
-      };
-
-      "omnigent.env" = {
-        content = builtins.concatStringsSep "\n" [
-          "DATABASE_URL=postgresql+psycopg://omnigent:${config.sops.placeholder.omnigent-postgres-password}@omnigent-postgres:5432/omnigent"
-          "ARTIFACT_DIR=/data/artifacts"
-          "HOST=0.0.0.0"
-          "PORT=8000"
-          "OMNIGENT_AUTH_ENABLED=1"
-          "OMNIGENT_AUTH_PROVIDER=oidc"
-          "OMNIGENT_OIDC_ISSUER=https://auth.${host.domain}/application/o/omnigent/"
-          "OMNIGENT_OIDC_CLIENT_ID=omnigent"
-          "OMNIGENT_OIDC_CLIENT_SECRET=${config.sops.placeholder.omnigent-oidc-client-secret}"
-          "OMNIGENT_OIDC_COOKIE_SECRET=${config.sops.placeholder.omnigent-cookie-secret}"
-          "OMNIGENT_OIDC_SCOPES=openid email profile"
-          "OMNIGENT_OIDC_SESSION_TTL_HOURS=8"
-          "OMNIGENT_OIDC_SKIP_EMAIL_VERIFICATION=1"
-          "OMNIGENT_DOMAIN=ai.${host.domain}"
-        ];
       };
     };
   };
