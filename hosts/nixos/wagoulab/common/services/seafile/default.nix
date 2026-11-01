@@ -87,8 +87,8 @@ in
   # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 
-  # Complete seahub_settings.py rendered by sops-nix
-  # Deploy with: sudo seafile-deploy
+  # Complete seahub_settings.py rendered by sops-nix.
+  # Applied automatically by ExecStartPre below (no manual step).
   sops.templates."seahub_settings.py" = {
     content = builtins.concatStringsSep "\n" [
       "SECRET_KEY = '${config.sops.placeholder.seafile-secret-key}'"
@@ -209,28 +209,26 @@ in
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
   ];
 
-  # Idempotent script to deploy seahub config + branding CSS
-  # Run: sudo seafile-deploy
-  environment.systemPackages = [
-    (pkgs.writeShellScriptBin "seafile-deploy" ''
+  # Seed declarative config + branding into the stateful volume before every start.
+  # Seafile only reads these files from inside its self-initialized data dir,
+  # so a plain :ro mount can't work (the paths don't exist until first init).
+  # The guard preserves first-init: if conf/ is missing, Seafile hasn't
+  # initialized yet — skip seeding and let it run. Never mkdir the conf dir
+  # ourselves: its absence is the first-init signal.
+  systemd.services.seafile.serviceConfig.ExecStartPre = [
+    (pkgs.writeShellScript "seafile-seed" ''
       set -euo pipefail
-      SETTINGS="/var/lib/seafile/seafile/conf/seahub_settings.py"
-      CUSTOM="/var/lib/seafile/seafile/seahub-data/custom"
-      if [ ! -d "/var/lib/seafile/seafile/conf" ]; then
-        echo "Error: Seafile conf directory not found. Has Seafile been initialized?"
-        exit 1
+      CONF_DIR="/var/lib/seafile/seafile/conf"
+      CUSTOM_DIR="/var/lib/seafile/seafile/seahub-data/custom"
+      if [ ! -d "$CONF_DIR" ]; then
+        echo "seafile-seed: conf dir missing, skipping (first init not done)"
+        exit 0
       fi
-      # Deploy seahub config
-      cp ${config.sops.templates."seahub_settings.py".path} "$SETTINGS"
-      chmod 644 "$SETTINGS"
-      # Deploy custom CSS (logo/favicon/bg served by imgproxy at assets.wagou.fr)
-      mkdir -p "$CUSTOM"
-      cp ${customCss} "$CUSTOM/custom.css"
-      chmod 644 "$CUSTOM"/*
-      # Restart seahub
-      ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh restart || \
-        ${pkgs.podman}/bin/podman exec seafile /opt/seafile/seafile-server-latest/seahub.sh start
-      echo "Done. Seahub config + branding deployed."
+      cp ${config.sops.templates."seahub_settings.py".path} "$CONF_DIR/seahub_settings.py"
+      chmod 644 "$CONF_DIR/seahub_settings.py"
+      mkdir -p "$CUSTOM_DIR"
+      cp ${customCss} "$CUSTOM_DIR/custom.css"
+      chmod 644 "$CUSTOM_DIR/custom.css"
     '')
   ];
 }
