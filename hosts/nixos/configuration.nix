@@ -60,6 +60,7 @@
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7V9q0WZKoODnbbHsHDFXwTE4JDEqmhvmKxWG05JhBp wagou@wagou-mac"
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIUtk99V3fN1Q5y7RGTB9hS6c9pyhW61vJ0LYLqSmJ2s wagou-clone"
+      "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEE+s+ZzqKxYwF5fioU+x1Jp2EadsZzVrNjiL+GPP+5Amu1nbihxl2y44HKedOlURBjZYb3FLpW9sse2W4UrbWk= termius-phone"
     ];
   };
 }

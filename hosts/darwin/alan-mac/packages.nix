@@ -4,6 +4,7 @@
     _1password-cli
     awscli2
     gitleaks
+    maestro
     slack-cli
   ];
 }

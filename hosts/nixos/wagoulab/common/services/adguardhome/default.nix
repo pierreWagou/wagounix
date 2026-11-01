@@ -56,6 +56,10 @@ let
     filtering = {
       protection_enabled = true;
       filtering_enabled = true;
+      # NOTE: prime.wagou.fr intentionally has NO rewrite here. It carries two
+      # public A records (LAN 192.168.68.66 + Tailscale 100.97.36.56) so one
+      # name works home and away. Adding "prime" to any subdomain list in
+      # variables.nix would shadow it with a single-IP rewrite. Don't.
       rewrites = map (sub: {
         domain = "${sub}.${host.domain}";
         answer = host.serverIP;
