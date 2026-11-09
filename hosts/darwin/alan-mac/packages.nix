@@ -5,6 +5,7 @@
     awscli2
     gitleaks
     maestro
+    nodejs
     slack-cli
   ];
 }

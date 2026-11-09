@@ -14,11 +14,10 @@
     fd
     fzf
     gcc
-    git
     gh
+    git
     gnupg
     go
-    mailpit
     mise
     mprocs
     neovim
@@ -28,7 +27,6 @@
     pinentry-curses
     rbw
     ripgrep
-    sesh
     sheldon
     sops
     speedtest-cli
@@ -38,8 +36,6 @@
     starship
     swaks
     television
-    tmux
-    tmuxinator
     unzip
     wget
     zip

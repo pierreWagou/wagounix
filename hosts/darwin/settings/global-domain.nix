@@ -8,7 +8,7 @@ _: {
     "com.apple.springing.delay" = 2.0;
     "com.apple.springing.enabled" = true;
     "com.apple.swipescrolldirection" = true;
-    _HIHideMenuBar = false;
+    _HIHideMenuBar = true;
     AppleEnableMouseSwipeNavigateWithScrolls = true;
     AppleEnableSwipeNavigateWithScrolls = true;
     AppleFontSmoothing = 2;

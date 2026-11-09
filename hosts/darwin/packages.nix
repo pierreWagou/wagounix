@@ -2,39 +2,29 @@
 
 {
   environment.systemPackages = with pkgs; [
-    # Darwin-specific
     cloudflared
     cocoapods
     darwin.trash
-    git-credential-manager
-    manga-tui
-    pinentry_mac
-    spicetify-cli
-    spotify-player
-
-    # Workstation tools (not needed on the homeserver)
-    copier
-    delta
     ffmpeg
     fnm
+    git-credential-manager
     git-lfs
     imagemagick
     lazygit
+    manga-tui
     maven
-    mutt-wizard
     nix-index
-    openapi-generator-cli
-    openvpn
     pay-respects
+    pinentry_mac
     poetry
     qrencode
     R
     scala
     sketchybar
+    spotify-player
     terraform
     tree-sitter
     uv
-
     vivid
     worktrunk
     yt-dlp
