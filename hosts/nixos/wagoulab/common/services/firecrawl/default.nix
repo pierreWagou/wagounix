@@ -34,7 +34,7 @@ let
       PLAYWRIGHT_MICROSERVICE_URL = "http://firecrawl-playwright:3000/scrape";
       POSTGRES_HOST = "firecrawl-postgres";
       POSTGRES_PORT = "5432";
-      POSTGRES_DB = "firecrawl";
+      POSTGRES_DB = "postgres";
       POSTGRES_USER = "firecrawl";
       SEARXNG_ENDPOINT = "http://firecrawl-searxng:8080";
     };
@@ -93,9 +93,12 @@ let
     dataDirsMode = "0755 999 999";
   };
   pg = ws.mkPostgres {
+    # NOTE: the database must be `postgres` — the nuq-postgres image hardcodes
+    # cron.database_name = 'postgres', and its init script aborts in any other DB.
+    # The half-initialized volume must be wiped if this ever changes.
     name = "firecrawl-postgres";
     image = "ghcr.io/firecrawl/nuq-postgres:latest";
-    db = "firecrawl";
+    db = "postgres";
     user = "firecrawl";
     passwordEnvFile = config.sops.templates."firecrawl-postgres.env".path;
     networks = [ networks.firecrawl-internal.ref ];
