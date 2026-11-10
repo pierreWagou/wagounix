@@ -110,7 +110,7 @@ let
     name = "home-assistant";
     exposeViaTraefik = false; # routed via Traefik file provider (host network has no container discovery)
     networks = [ "host" ];
-    image = "homeassistant/home-assistant:2026.8.3";
+    image = "docker.io/homeassistant/home-assistant:2026.8.3";
     env = {
       TZ = host.timezone;
     };

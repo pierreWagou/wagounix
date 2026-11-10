@@ -14,7 +14,7 @@ let
   svc = ws.mkWebService {
     name = "stalwart";
     subdomain = "mailbox";
-    image = "stalwartlabs/stalwart:v0.16";
+    image = "docker.io/stalwartlabs/stalwart:v0.16";
     port = 8080;
     addCapabilities = [ "NET_BIND_SERVICE" ];
     env = {

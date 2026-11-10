@@ -32,7 +32,7 @@ let
   };
   pg = ws.mkPostgres {
     name = "omnigent-postgres";
-    image = "postgres:16-alpine";
+    image = "docker.io/library/postgres:16-alpine";
     passwordEnvFile = config.sops.templates."omnigent-postgres.env".path;
     networks = [ networks.omnigent-internal.ref ];
     shmSize = "256m";

@@ -13,7 +13,7 @@ in
   #   svc = ws.mkWebService {
   #     name = "vaultwarden";
   #     subdomain = "vault";
-  #     image = "vaultwarden/server:1.37.2";
+  #     image = "docker.io/vaultwarden/server:1.37.2";
   #     port = 80;
   #     env = { SIGNUPS_ALLOWED = "false"; };
   #     volumes = [ "/var/lib/vaultwarden:/data" ];

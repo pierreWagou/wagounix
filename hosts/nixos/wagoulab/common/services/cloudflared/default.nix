@@ -35,7 +35,7 @@ let
   tunnel = ws.mkWebService {
     name = "cloudflared";
     exposeViaTraefik = false; # the tunnel feeds Traefik, not the other way around
-    image = "cloudflare/cloudflared:2026.5.1";
+    image = "docker.io/cloudflare/cloudflared:2026.5.1";
     volumes = [
       "${configFile}:/etc/cloudflared/config.yml:ro"
       "${cloudflareCredentials}:/etc/cloudflared/credentials.json:ro"

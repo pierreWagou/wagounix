@@ -5,7 +5,7 @@ let
   svc = ws.mkWebService {
     name = "kitchenowl";
     subdomain = "cabas";
-    image = "tombursch/kitchenowl:v0.7.8";
+    image = "docker.io/tombursch/kitchenowl:v0.7.8";
     port = 8080;
     env = {
       OPEN_REGISTRATION = "false";

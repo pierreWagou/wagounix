@@ -96,7 +96,7 @@ let
   svc = ws.mkWebService {
     name = "adguard";
     subdomain = "guard";
-    image = "adguard/adguardhome:v0.107.76";
+    image = "docker.io/adguard/adguardhome:v0.107.76";
     port = 3000;
     # Override Podman's DNS injection — without this, Podman injects the
     # network gateway (10.89.x.1:53) into the container's resolv.conf,

@@ -10,7 +10,7 @@ let
   svc = ws.mkWebService {
     name = "jellyfin";
     subdomain = "tape";
-    image = "jellyfin/jellyfin:10.11.10";
+    image = "docker.io/jellyfin/jellyfin:10.11.10";
     port = 8096;
     healthCmd = "none";
     env = {
