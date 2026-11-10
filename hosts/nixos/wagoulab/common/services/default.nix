@@ -25,6 +25,7 @@ _: {
     ./kitchenowl
     ./authentik
     ./seafile
+    ./firecrawl
     ./onlyoffice
     ./penpot
     ./branding.nix

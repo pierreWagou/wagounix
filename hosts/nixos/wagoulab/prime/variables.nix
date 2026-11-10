@@ -56,6 +56,7 @@ rec {
     "ai"
     "docs"
     "pantone"
+    "crawl"
   ];
 
   # Subdomains for Dokploy-deployed apps.

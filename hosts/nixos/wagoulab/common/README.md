@@ -55,6 +55,7 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Penpot** | Design & prototyping | `https://pantone.wagou.fr` | 9001 |
 | **Stalwart Mail** | Email server (LDAP auth via Authentik) | `https://mailbox.wagou.fr` | 8080 |
 | **OmniGent** | AI agent gateway (OIDC via Authentik) | `https://ai.wagou.fr` | 8000 |
+| **Firecrawl** | Web scraping API (self-hosted, + SearXNG for search) | `https://crawl.wagou.fr` | 3002 |
 | **Satisfactory** | Game server (raw UDP/TCP, DNS-only subdomain) | `satisfactory.wagou.fr` | 7777, 8888 |
 
 ## Hardware

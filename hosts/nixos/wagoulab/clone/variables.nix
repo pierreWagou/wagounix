@@ -49,6 +49,7 @@ rec {
     "ai"
     "docs"
     "pantone"
+    "crawl"
   ];
 
   appTunnelSubdomains = [
