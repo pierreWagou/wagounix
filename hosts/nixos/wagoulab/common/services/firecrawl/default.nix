@@ -70,7 +70,7 @@ let
   };
   redis = ws.mkWebService {
     name = "firecrawl-redis";
-    image = "redis:alpine";
+    image = "docker.io/library/redis:alpine";
     exposeViaTraefik = false;
     networks = [ networks.firecrawl-internal.ref ];
     # Upstream explicitly marks Valkey as untested with Firecrawl — stay on Redis.
