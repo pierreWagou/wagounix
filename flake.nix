@@ -34,14 +34,6 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    homebrew-dashlane = {
-      url = "github:Dashlane/homebrew-tap";
-      flake = false;
-    };
-    homebrew-alerter = {
-      url = "github:vjeantet/homebrew-tap";
-      flake = false;
-    };
     homebrew-spotifast = {
       url = "github:crmne/homebrew-tap";
       flake = false;

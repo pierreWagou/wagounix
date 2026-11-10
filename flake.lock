@@ -69,22 +69,6 @@
         "type": "github"
       }
     },
-    "homebrew-alerter": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1794134818,
-        "narHash": "sha256-6ojsMdUvcq/8nFNerpBF4qgExYu0Rt+86HDVHmQmWoA=",
-        "owner": "vjeantet",
-        "repo": "homebrew-tap",
-        "rev": "8535d3a11396aa4d27697d44f202f607170aa727",
-        "type": "github"
-      },
-      "original": {
-        "owner": "vjeantet",
-        "repo": "homebrew-tap",
-        "type": "github"
-      }
-    },
     "homebrew-cask": {
       "flake": false,
       "locked": {
@@ -114,22 +98,6 @@
       "original": {
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "type": "github"
-      }
-    },
-    "homebrew-dashlane": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1791908917,
-        "narHash": "sha256-Vixp6VzQiDj7TsZFIjJfM2VtKBf+QhgBT7VOFmfxQcM=",
-        "owner": "Dashlane",
-        "repo": "homebrew-tap",
-        "rev": "3fdc65e32fcfd9662f4fc3ff191ba84b821ab544",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Dashlane",
-        "repo": "homebrew-tap",
         "type": "github"
       }
     },
@@ -223,10 +191,8 @@
       "inputs": {
         "darwin-custom-icons": "darwin-custom-icons",
         "git-hooks": "git-hooks",
-        "homebrew-alerter": "homebrew-alerter",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
-        "homebrew-dashlane": "homebrew-dashlane",
         "homebrew-spotifast": "homebrew-spotifast",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",

@@ -25,7 +25,7 @@ in
     development = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [
-        "/Applications/Ghostty.app/"
+        "/Applications/Rex Beta.app/"
       ];
       description = "Development apps in the dock.";
     };

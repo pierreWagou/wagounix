@@ -18,8 +18,6 @@
     taps = {
       "homebrew/homebrew-core" = inputs.homebrew-core;
       "homebrew/homebrew-cask" = inputs.homebrew-cask;
-      "Dashlane/homebrew-tap" = inputs.homebrew-dashlane;
-      "vjeantet/homebrew-tap" = inputs.homebrew-alerter;
       "crmne/homebrew-tap" = inputs.homebrew-spotifast;
     };
   };
@@ -36,13 +34,10 @@
       trusted = true;
     }) (builtins.attrNames config.nix-homebrew.taps);
     brews = [
-      "alerter"
-      "dashlane-cli"
       "yarn"
     ];
     casks = [
       "aerial"
-      "alt-tab"
       "audacity"
       "betterDisplay"
       "bitwarden"
@@ -52,9 +47,9 @@
       "docker-desktop"
       "finicky"
       "flutter"
-      "ghostty"
       "google-chrome"
       "google-drive"
+      "ledger-wallet"
       "microsoft-teams"
       "obsidian"
       "onedrive"
@@ -69,6 +64,8 @@
       "stirling-pdf"
       "tailscale-app"
       "thunderbird"
+      "twine-app"
+      "ultimaker-cura"
       "upscayl"
       "visual-studio-code"
       "vlc"
@@ -77,5 +74,10 @@
       "zen"
       "zoom"
     ];
+    masApps = {
+      "Amazon Prime Video" = 545519333;
+      "Canal+" = 694580816;
+      Xcode = 497799835;
+    };
   };
 }

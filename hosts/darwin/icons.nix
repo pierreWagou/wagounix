@@ -33,10 +33,6 @@
         icon = ./icons/docker.icns;
       }
       {
-        path = "/Applications/Ghostty.app";
-        icon = ./icons/ghostty.icns;
-      }
-      {
         path = "/Applications/Microsoft Excel.app";
         icon = ./icons/microsoft_excel.icns;
       }
@@ -63,6 +59,10 @@
       {
         path = "/Applications/Raycast.app";
         icon = ./icons/raycast.icns;
+      }
+      {
+        path = "/Applications/Rex Beta.app";
+        icon = ./icons/rex.icns;
       }
       {
         path = "/Applications/Spotifast.app";
