@@ -51,36 +51,24 @@ wagounix/
 │       ├── default.nix            # Imports configuration, packages
 │       ├── configuration.nix      # NixOS system config (SSH, auto-updates, users)
 │       ├── packages.nix           # NixOS-only packages (ghostty.terminfo, ventoy)
-│       └── wagoulab/              # Home server (x86_64-linux)
-│           ├── default.nix
-│           ├── variables.nix
-│           ├── hardware.nix       # Auto-generated hardware config (nixos-generate-config)
-│           ├── secrets.yaml       # sops-encrypted secrets (age)
-│           └── services/          # Service modules (one file per service)
-│               ├── default.nix
-│               ├── podman.nix
-│               ├── secrets.nix
-│               ├── traefik.nix
-│               ├── vaultwarden.nix
-│               ├── seafile/
-│               ├── immich.nix
-│               ├── adguardhome.nix
-│               ├── cloudflared.nix
-│               ├── tailscale.nix
-│               ├── homepage/
-│               ├── branding.nix
-│               ├── branding-assets/
-│               ├── authentik/
-│               ├── home-assistant.nix
-│               ├── jellyfin.nix
-│               ├── kitchenowl.nix
-│               ├── dokploy.nix
-│               ├── renovate.nix
-│               ├── webhook.nix
-│               ├── fail2ban.nix
-│               ├── firewall.nix
-│               ├── ttyd.nix
-│               └── rbw.nix
+│       └── wagoulab/              # Home server (x86_64-linux, prime + clone share common/)
+│           ├── common/            # Shared config — services, shared secrets
+│           │   ├── default.nix    # Imports services/
+│           │   ├── secrets.yaml   # Shared sops-encrypted secrets
+│           │   └── services/      # One dir per service: <name>/default.nix + secrets.yaml
+│           │       ├── default.nix
+│           │       ├── lib/web-service.nix  # mkWebService / mkPostgres / mkValkey helpers
+│           │       ├── secrets.nix          # Shared-only secrets
+│           │       └── <service>/           # vaultwarden, immich, seafile, authentik, ...
+│           ├── prime/             # wagou-prime (primary)
+│           │   ├── default.nix    # Imports hardware.nix + ../common
+│           │   ├── variables.nix
+│           │   └── hardware.nix   # Auto-generated hardware config (nixos-generate-config)
+│           └── clone/             # wagou-clone (warm standby)
+│               ├── default.nix    # Imports hardware.nix + ../common + services-disabled.nix
+│               ├── variables.nix
+│               ├── hardware.nix
+│               └── services-disabled.nix  # Disables all quadlet containers by default
 │
 └── .github/workflows/check.yml   # CI: lint + build darwin + build NixOS
 ```
@@ -109,16 +97,29 @@ alan = nix-darwin.lib.darwinSystem {
   specialArgs = { inherit inputs; host = import ./hosts/darwin/alan/variables.nix; };
 };
 
-# NixOS host
-wagoulab = nixpkgs.lib.nixosSystem {
+# NixOS hosts (prime + clone share common/)
+wagou-prime = nixpkgs.lib.nixosSystem {
   modules = [
     inputs.sops-nix.nixosModules.sops      # secrets management
     inputs.quadlet-nix.nixosModules.quadlet # declarative Podman containers
     ./hosts/common              # common
     ./hosts/nixos               # platform
-    ./hosts/nixos/wagoulab      # host
+    ./hosts/nixos/wagoulab/common  # shared services + shared secrets
+    ./hosts/nixos/wagoulab/prime   # primary: hardware.nix + variables
   ];
-  specialArgs = { inherit inputs; host = import ./hosts/nixos/wagoulab/variables.nix; };
+  specialArgs = { inherit inputs; host = import ./hosts/nixos/wagoulab/prime/variables.nix; };
+};
+
+wagou-clone = nixpkgs.lib.nixosSystem {
+  modules = [
+    inputs.sops-nix.nixosModules.sops
+    inputs.quadlet-nix.nixosModules.quadlet
+    ./hosts/common
+    ./hosts/nixos
+    ./hosts/nixos/wagoulab/common  # same shared services
+    ./hosts/nixos/wagoulab/clone   # backup: hardware.nix + variables + services-disabled.nix
+  ];
+  specialArgs = { inherit inputs; host = import ./hosts/nixos/wagoulab/clone/variables.nix; };
 };
 ```
 
@@ -133,20 +134,21 @@ rec {
   username = "wagou";
   homeDir = "/Users/${username}";     # /home/${username} for NixOS
   enableRosetta = false;                # darwin only
-  hostname = "wagoulab";              # NixOS only
+  hostname = "wagou-prime";      # NixOS only (wagou-prime / wagou-clone)
   domain = "wagou.fr";                  # NixOS only
-  serverIP = "192.168.68.65";           # NixOS only
-  tailscaleIP = "100.68.157.70";        # NixOS only
-  networkInterface = "enp170s0";        # NixOS only
+  serverIP = "192.168.68.66";           # NixOS only (prime .66, clone .62)
+  tailscaleIP = "100.97.36.56";         # NixOS only (per machine)
+  networkInterface = "enp170s0";        # NixOS only (per machine)
   lanSubnet = "192.168.68.0/24";        # NixOS only
   renderGroupGid = "303";               # NixOS only (Jellyfin/Immich HW transcode)
   timezone = "Europe/Paris";            # NixOS only
   acmeEmail = "pierre.romon@gmail.com"; # NixOS only
   adminEmail = "pierre.romon@gmail.com"; # NixOS only
   cloudflareAccountId = "...";          # NixOS only
-  cloudflareTunnelId = "...";           # NixOS only
-  serviceTunnelSubdomains = [ "vault" "pixel" "dash" "guard" "home" "tape" "dev" "apps" "relay" "cabas" "auth" "disk" "docs" "pantone" "assets" ]; # NixOS only — services managed by Podman/quadlet-nix
+  cloudflareTunnelId = "...";           # NixOS only (per machine: prime vs clone tunnel)
+  serviceTunnelSubdomains = [ "vault" "pixel" "dash" "guard" "home" "tape" "dev" "apps" "relay" "cabas" "auth" "disk" "assets" "mailbox" "ai" "docs" "pantone" ]; # NixOS only — services managed by Podman/quadlet-nix (mirrored in prime/ and clone/variables.nix)
   appTunnelSubdomains = [ "creneau" "creneau-preview" ]; # NixOS only — apps managed by Dokploy
+  dnsOnlySubdomains = [ "satisfactory" "mail" ]; # NixOS only — AdGuard rewrite only, no Traefik/tunnel (raw TCP/UDP)
   valkeyImage = "docker.io/valkey/valkey:9.1.0"; # NixOS only (shared by immich, authentik, seafile Redis)
   podmanCIDRs = [ "10.89.0.0/16" "172.16.0.0/12" ]; # NixOS only
   ports = { ttyd = 7681; webhook = 9000; }; # NixOS only
@@ -223,18 +225,23 @@ masApps = { "App Name" = 123456789; };
 
 ## Adding a new NixOS host
 
-1. Create `hosts/nixos/<hostname>/variables.nix`:
-   ```nix
-   rec {
-     username = "myuser";
-     homeDir = "/home/${username}";
-     hostname = "<hostname>";
-   }
-   ```
-2. Create `hosts/nixos/<hostname>/default.nix` with imports for hardware and services
-3. Create `hosts/nixos/<hostname>/hardware.nix` (from `nixos-generate-config` on the target machine)
-4. Create `hosts/nixos/<hostname>/services/` directory for host-specific services (one file per service)
-5. Add a `nixosConfigurations.<hostname>` entry in `flake.nix`
+Wagoulab hosts share `hosts/nixos/wagoulab/common/` (services + shared secrets). A new machine in the pair is a thin layer:
+
+1. Create `hosts/nixos/wagoulab/<name>/variables.nix` (hostname, IPs, tunnel ID — mirror `serviceTunnelSubdomains` / `appTunnelSubdomains` / `dnsOnlySubdomains` from its sibling)
+2. Create `hosts/nixos/wagoulab/<name>/default.nix` importing `hardware.nix` and `../common` (plus `services-disabled.nix` if it should idle like the clone)
+3. Create `hosts/nixos/wagoulab/<name>/hardware.nix` (from `nixos-generate-config` on the target machine)
+4. Add a `nixosConfigurations.<hostname>` entry in `flake.nix` following the prime/clone pattern above
+
+For a brand-new unrelated NixOS host (not part of wagoulab): create `hosts/nixos/<hostname>/{default.nix,variables.nix,hardware.nix}` and add a `nixosConfigurations.<hostname>` entry.
+
+## Adding a new NixOS service (wagoulab)
+
+Services live in `hosts/nixos/wagoulab/common/services/<name>/` — one dir per service with `default.nix` (+ `secrets.yaml` if it needs secrets), built with the `lib/web-service.nix` helpers (`mkWebService`, `mkPostgres`, `mkValkey`). See the `homeserver` skill (canonical reference) for the full walkthrough. Summary:
+
+1. Create `common/services/<name>/default.nix` using `ws.mkWebService { name, subdomain, image, port, ... }`
+2. Import `./<name>` in `common/services/default.nix`
+3. Add the subdomain to `serviceTunnelSubdomains` in **both** `prime/variables.nix` and `clone/variables.nix`
+4. If secrets are needed: create `<name>/secrets.yaml` (via `sops`), declare with `sopsFile = ./secrets.yaml` in the service module (`.sops.yaml` already covers `services/*/secrets.yaml`)
 
 ## Adding macOS settings
 
@@ -351,7 +358,7 @@ nix flake check      # runs all checks + builds
 
 - **lint** — nixfmt, statix, deadnix (ubuntu-latest)
 - **build-darwin** — wagou-mac, alan-mac (macos-15, parallel)
-- **build-nixos** — wagoulab (ubuntu-latest)
+- **build-nixos** — wagou-prime, wagou-clone (ubuntu-latest)
 
 ## Key commands
 
@@ -377,5 +384,6 @@ nix flake check      # runs all checks + builds
 - No home-manager — user dotfiles are managed by chezmoi separately
 - macOS: Nix daemon is managed by the standard Nix installer (`nix.enable = false` in darwin config)
 - NixOS: `system.stateVersion` must match the version at install time — never change it
-- NixOS: `hardware.nix` is auto-generated — replace placeholder with real one from the server
+- NixOS: `hardware.nix` is auto-generated per machine (`prime/`, `clone/`) — replace with real one from the server
+- NixOS services: one dir per service in `common/services/<name>/`, built with `lib/web-service.nix` — don't hand-write Traefik labels; secrets colocated (`sopsFile = ./secrets.yaml`); see `homeserver` skill for the canonical walkthrough
 - Commit and push after successful rebuilds

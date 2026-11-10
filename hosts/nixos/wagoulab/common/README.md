@@ -17,7 +17,7 @@ Local access:   Browser -> AdGuard Home (*.wagou.fr -> serverIP) -> Traefik (HTT
 | wagoulab | Primary | `192.168.68.66` | `wagou-prime` | Pending (new hardware arriving) |
 | wagou-clone | Backup | `192.168.68.62` | `wagou-clone` | Live |
 
-Both machines share the same NixOS config via the wagounix flake. wagou-clone imports wagoulab's services.
+Both machines share `wagoulab/common/` (services + shared secrets) — prime and clone differ only in their `prime/` vs `clone/` layer (`variables.nix`, `hardware.nix`). The clone disables all quadlet containers by default (`clone/services-disabled.nix`) and sits idle until failover.
 
 **Backup**: Restic hourly from primary → backup machine. After each backup, backup restores snapshot to regular files. On primary failure, switch DNS CNAME to backup tunnel.
 
@@ -44,14 +44,18 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | **Fail2ban** | Brute force protection | - | - |
 | **ttyd** | Web-based terminal (remote dev access) | `https://dev.wagou.fr` | 7681 (native service) |
 | **rbw** | Bitwarden CLI (custom pinentry for zero-touch unlock) | - | - |
-| **Creneau** | Appointment scheduling | `https://creneau.wagou.fr` | 3000 |
+| **Creneau** | Appointment scheduling (Dokploy-managed app, see below) | `https://creneau.wagou.fr` | 3000 |
 | **Webhook** | GitHub webhook receiver | `https://relay.wagou.fr` | 9000 (native systemd service) |
 | **Renovate** | Dependency update bot | - | Podman oneshot (timer + webhook trigger) |
 | **KitchenOwl** | Recipes & grocery lists | `https://cabas.wagou.fr` | 8080 |
 | **Authentik** | Identity provider / SSO (OIDC) | `https://auth.wagou.fr` | 9000 |
 | **imgproxy** | Branding assets (logos, backgrounds, favicon) | `https://assets.wagou.fr` | 8080 |
-| **Stalwart Mail** | Email server (LDAP auth via Authentik) | `https://mailbox.wagou.fr` | 8080 |
 | **Dokploy** | PaaS for user-built apps (Docker Swarm) | `https://apps.wagou.fr` | 3001, 9080 |
+| **OnlyOffice** | Document server (Seafile integration) | internal | 80 |
+| **Penpot** | Design & prototyping | `https://pantone.wagou.fr` | 9001 |
+| **Stalwart Mail** | Email server (LDAP auth via Authentik) | `https://mailbox.wagou.fr` | 8080 |
+| **OmniGent** | AI agent gateway (OIDC via Authentik) | `https://ai.wagou.fr` | 8000 |
+| **Satisfactory** | Game server (raw UDP/TCP, DNS-only subdomain) | `satisfactory.wagou.fr` | 7777, 8888 |
 
 ## Hardware
 
@@ -62,7 +66,7 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 | RAM | 32 GB |
 | Storage | 512 GB NVMe |
 | OS | NixOS 25.05 |
-| IP | 192.168.68.65 |
+| IP | 192.168.68.66 |
 
 ### Disk partitions
 
@@ -75,17 +79,23 @@ All services run as Podman containers managed by quadlet-nix. They communicate o
 ## Files
 
 ```
-hosts/nixos/wagoulab/                # Primary machine config
-├── default.nix              # Imports hardware.nix and services/
-├── variables.nix            # Host variables (hostname, IP, tunnel ID, NIC)
-├── hardware.nix             # Auto-generated hardware config
-├── secrets.yaml             # sops-encrypted secrets
-└── services/                # All service configs (shared with wagou-clone)
-
-hosts/nixos/wagou-clone/            # Backup machine config
-├── default.nix              # Imports ../wagoulab/services/ (shared)
-├── variables.nix            # Backup-specific vars (hostname, IP, tunnel ID)
-├── hardware.nix             # Backup-specific hardware config
+hosts/nixos/wagoulab/                # Home server (prime + clone share common/)
+├── common/                  # Shared config — services + shared secrets
+│   ├── default.nix          # Imports services/
+│   ├── secrets.yaml         # Shared sops-encrypted secrets
+│   └── services/            # One dir per service: <name>/default.nix + secrets.yaml
+│       ├── default.nix      # Imports all service dirs
+│       ├── lib/web-service.nix  # mkWebService / mkPostgres / mkValkey helpers
+│       └── <service>/       # vaultwarden, immich, seafile, authentik, ...
+├── prime/                   # wagou-prime (primary)
+│   ├── default.nix          # Imports hardware.nix + ../common
+│   ├── variables.nix        # Primary-specific vars (hostname, IP, tunnel ID)
+│   └── hardware.nix         # Primary hardware config
+└── clone/                   # wagou-clone (warm standby)
+    ├── default.nix          # Imports hardware.nix + ../common + services-disabled.nix
+    ├── variables.nix        # Backup-specific vars (hostname, IP, tunnel ID)
+    ├── hardware.nix         # Backup-specific hardware config
+    └── services-disabled.nix  # Disables all quadlet containers by default (idle until failover)
 ```
 
 Platform-level config at `hosts/nixos/`:
@@ -113,7 +123,7 @@ Platform-level config at `hosts/nixos/`:
 
 ## Secrets (sops-nix)
 
-Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) and decrypted at activation time on the Beelink.
+Secrets are encrypted with age in `common/secrets.yaml` (shared) and `common/services/<name>/secrets.yaml` (per service) and decrypted at activation time on the server.
 
 | Secret | Used by | Runtime path |
 |---|---|---|
@@ -147,19 +157,20 @@ Secrets are encrypted with age in `secrets.yaml` (at the homeserver host level) 
 ### Editing secrets
 
 ```bash
-sops hosts/nixos/wagoulab/secrets.yaml
+sops hosts/nixos/wagoulab/common/secrets.yaml        # shared secrets
+sops hosts/nixos/wagoulab/common/services/<name>/secrets.yaml  # per-service secrets
 ```
 
 Or in Neovim (sops.nvim auto-decrypts):
 
 ```bash
-nvim hosts/nixos/wagoulab/secrets.yaml
+nvim hosts/nixos/wagoulab/common/services/<name>/secrets.yaml
 ```
 
 ### Adding a new secret
 
-1. Edit `secrets.yaml` with `sops` — add a new key-value pair
-2. Declare it in `services/secrets.nix` under `sops.secrets`
+1. Edit the right file with `sops` — shared secret → `common/secrets.yaml`, service secret → `common/services/<name>/secrets.yaml`
+2. Declare it: shared in `services/secrets.nix`, per-service in `<name>/default.nix` with `sopsFile = ./secrets.yaml`
 3. If it needs `KEY=VALUE` format, create a `sops.templates` entry
 4. Reference `config.sops.secrets.<name>.path` or `config.sops.templates.<name>.path` in the service config
 
@@ -177,33 +188,33 @@ nvim hosts/nixos/wagoulab/secrets.yaml
 
 | Setting | Value |
 |---|---|
-| DHCP DNS server (IPv4) | `192.168.68.65` (Beelink) |
-| Internet Connection DNS (IPv4) | `192.168.68.65` (primary), `1.1.1.1` (fallback) |
+| DHCP DNS server (IPv4) | `192.168.68.66` (Beelink) |
+| Internet Connection DNS (IPv4) | `192.168.68.66` (primary), `1.1.1.1` (fallback) |
 | Internet Connection DNS (IPv6) | Beelink's IPv6 (primary), `2606:4700:4700::1111` (fallback) |
 | IPv6 | Enabled |
-| DHCP reservation | Beelink MAC -> `192.168.68.65` |
+| DHCP reservation | Beelink MAC -> `192.168.68.66` |
 
 ### DNS resolution flow
 
 | Query | Resolution |
 |---|---|
 | `*.wagou.fr` (remote, no Tailscale) | Cloudflare DNS -> Cloudflare Tunnel -> Beelink |
-| `*.wagou.fr` (remote, Tailscale) | Split DNS -> AdGuard Home (`100.68.157.70:53`) -> `192.168.68.65` -> Tailscale subnet -> Traefik |
-| `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.65` (direct HTTPS, bypasses Cloudflare) |
+| `*.wagou.fr` (remote, Tailscale) | Split DNS -> AdGuard Home (`100.97.36.56:53`) -> `192.168.68.66` -> Tailscale subnet -> Traefik |
+| `*.wagou.fr` (local devices) | AdGuard Home rewrite -> `192.168.68.66` (direct HTTPS, bypasses Cloudflare) |
 | Ad/tracker domains | AdGuard Home -> blocked (`0.0.0.0`) |
 | Everything else | AdGuard Home -> Cloudflare/Google DoH -> Internet |
 
 ### Tailscale (remote access)
 
-Tailscale runs as a native NixOS service (subnet router) with IP `100.68.157.70`. It advertises `192.168.68.0/24`, giving remote devices access to the entire home LAN via WireGuard.
+Tailscale runs as a native NixOS service (subnet router) with IP `100.97.36.56`. It advertises `192.168.68.0/24`, giving remote devices access to the entire home LAN via WireGuard.
 
 **Split DNS** is configured in the Tailscale admin console (admin.tailscale.com -> DNS):
-- Domain `wagou.fr` -> custom nameserver `100.68.157.70`
+- Domain `wagou.fr` -> custom nameserver `100.97.36.56`
 - "Override local DNS" is **disabled** (preserves work/corporate DNS resolution)
 
 This means when connected to Tailscale from outside:
-- `*.wagou.fr` resolves via AdGuard Home -> `192.168.68.65` -> routed through Tailscale subnet -> Traefik (bypasses Cloudflare, direct path)
-- SSH to `192.168.68.65` works from anywhere
+- `*.wagou.fr` resolves via AdGuard Home -> `192.168.68.66` -> routed through Tailscale subnet -> Traefik (bypasses Cloudflare, direct path)
+- SSH to `192.168.68.66` works from anywhere
 - All other DNS uses the local network's resolver (no conflict with corporate VPN)
 - Ad blocking applies only to `wagou.fr` domains when remote
 
@@ -246,45 +257,40 @@ The homeserver uses a dedicated SSH key (`id_ed25519_homeserver`), separate from
 
 ## Adding a new service
 
-1. **Create** `services/<newservice>.nix` with a Podman container definition:
+Services live in `common/services/<name>/` — one dir per service with `default.nix` (+ `secrets.yaml` if needed), built with the `lib/web-service.nix` helpers (`mkWebService`, `mkPostgres`, `mkValkey`).
+
+1. **Create** `common/services/<newservice>/default.nix` with the helper:
    ```nix
    { config, host, ... }:
 
    let
-     inherit (config.virtualisation.quadlet) networks;
+     ws = import ../lib/web-service.nix { inherit config host; };
+     svc = ws.mkWebService {
+       name = "newservice";
+       subdomain = "newservice";
+       image = "org/newservice:latest";
+       port = 80;
+       volumes = [ "/var/lib/newservice:/data" ];
+       environmentFiles = [ config.sops.templates."newservice.env".path ];
+       dataDirs = [ "/var/lib/newservice" ];
+     };
    in
    {
-     virtualisation.quadlet.containers.newservice = {
-       containerConfig = {
-         image = "org/newservice:latest";
-         networks = [ networks.proxy.ref ];
-         volumes = [ "/var/lib/newservice:/data" ];
-         labels = {
-           "traefik.enable" = "true";
-           "traefik.http.routers.newservice.rule" = "Host(`newservice.${host.domain}`)";
-           "traefik.http.routers.newservice.entrypoints" = "websecure";
-           "traefik.http.routers.newservice.tls" = "true";
-           "traefik.http.routers.newservice.middlewares" = "secure-headers@file";
-           "traefik.http.services.newservice.loadbalancer.server.port" = "<port>";
-         };
-       };
-     };
-
-     systemd.tmpfiles.rules = [
-       "d /var/lib/newservice 0755 root root -"
-     ];
+     virtualisation.quadlet.containers.newservice.containerConfig = svc.containerConfig;
+     systemd.tmpfiles.rules = svc.tmpfilesRules;
    }
    ```
-2. **Import** it in `services/default.nix`
-3. **Add subdomain** to `tunnelSubdomains` in `hosts/nixos/wagoulab/variables.nix`. This automatically wires up:
+   The helper sets the `proxy` network, `noNewPrivileges`, and the Traefik labels (`Host()` rule, `websecure`, `secure-headers@file`). For DB/cache sidecars use `ws.mkPostgres` / `ws.mkValkey` (see `immich/` or `omnigent/`).
+2. **Import** `./<newservice>` in `common/services/default.nix`
+3. **Add subdomain** to `serviceTunnelSubdomains` in **both** `prime/variables.nix` and `clone/variables.nix`. This automatically wires up:
    - DNS rewrite in AdGuard Home (local HTTPS bypass)
    - Tunnel ingress rule in cloudflared (remote access)
-4. **Add secrets** if needed in `services/secrets.nix`
-5. **Add DNS CNAME record**: Run `cloudflared tunnel route dns wagoulab newservice.wagou.fr` once from a machine with `cert.pem` (your Mac after `cloudflared login`).
+4. **Add secrets** if needed: create `<newservice>/secrets.yaml` (via `sops`), declare with `sopsFile = ./secrets.yaml` in the service module (`.sops.yaml` already covers `services/*/secrets.yaml`)
+5. **Add DNS CNAME record**: Run `cloudflared tunnel route dns wagou-prime newservice.wagou.fr` once from a machine with `cert.pem` (your Mac after `cloudflared login`).
 6. **Push and rebuild**:
    ```bash
    git add -A && git commit -m "feat: add newservice" && git push
-   sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
+   sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagou-prime --refresh
    ```
 
 ## Quick reference
@@ -292,12 +298,12 @@ The homeserver uses a dedicated SSH key (`id_ed25519_homeserver`), separate from
 | Action | Command |
 |---|---|
 | SSH into server | `ssh wagoulab` |
-| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh` |
+| Rebuild from GitHub | `sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagou-prime --refresh` |
 | Check service status | `systemctl status <service>` |
 | View service logs | `journalctl -u <service> --no-pager -f` |
 | Stop/start a service | `sudo systemctl stop/start <service>` |
-| Edit secrets | `sops hosts/nixos/wagoulab/secrets.yaml` |
-| Test build locally | `nix eval .#nixosConfigurations.wagoulab.config.system.build.toplevel.drvPath` |
+| Edit secrets | `sops hosts/nixos/wagoulab/common/secrets.yaml` (shared) or `sops hosts/nixos/wagoulab/common/services/<name>/secrets.yaml` |
+| Test build locally | `nix eval .#nixosConfigurations.wagou-prime.config.system.build.toplevel.drvPath` |
 | AdGuard Home dashboard | `https://guard.wagou.fr` |
 | Homepage dashboard | `https://dash.wagou.fr` |
 | Vaultwarden | `https://vault.wagou.fr` |
@@ -339,9 +345,9 @@ If you see `'xterm-ghostty': unknown terminal type`, the `ghostty.terminfo` pack
 
 ### DNS not resolving locally
 
-1. `scutil --dns | grep nameserver` — should show `192.168.68.65`
+1. `scutil --dns | grep nameserver` — should show `192.168.68.66`
 2. Force DHCP renewal: `sudo ipconfig set en0 DHCP`
-3. Test directly: `nslookup vault.wagou.fr 192.168.68.65`
+3. Test directly: `nslookup vault.wagou.fr 192.168.68.66`
 4. Do NOT use `.local` domains — macOS intercepts them for mDNS
 
 ### "Internet not available" on macOS
@@ -350,7 +356,7 @@ Check if `captive.apple.com` is being blocked in AdGuard Home query log. If so, 
 
 ### Can't decrypt sops secrets (on Mac)
 
-Ensure `~/.config/sops/age/keys.txt` exists. If lost, regenerate with `age-keygen`, update `.sops.yaml` with the new public key, re-encrypt with `sops updatekeys hosts/nixos/wagoulab/secrets.yaml`.
+Ensure `~/.config/sops/age/keys.txt` exists. If lost, regenerate with `age-keygen`, update `.sops.yaml` with the new public key, re-encrypt with `sops updatekeys <each secrets.yaml>`.
 
 ## Planned services
 

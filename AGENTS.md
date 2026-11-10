@@ -7,7 +7,7 @@ Declarative Nix flake for macOS (`nix-darwin`) + NixOS. Source of truth: `~/Proj
 - `flake.nix` — all inputs, `darwinConfigurations` (`wagou-mac`, `alan-mac` / `aarch64-darwin`), `nixosConfigurations` (`wagou-prime`, `wagou-clone` / `x86_64-linux`), `checks`, `devShells`
 - `hosts/common/` — cross-platform (packages, fonts, users)
 - `hosts/darwin/` — macOS platform + `personal/` / `alan-mac/` layers + per-host `<layer>/<host>/{default.nix,variables.nix}`
-- `hosts/nixos/wagoulab/{common,prime,clone}/` — server config, `variables.nix` per machine, `services/` (one file per service)
+- `hosts/nixos/wagoulab/{common,prime,clone}/` — server config, `variables.nix` per machine (`prime`/`clone`), shared `common/services/<name>/` (one dir per service: `default.nix` + `secrets.yaml` via `lib/web-service.nix`)
 - `lib/checks.nix`, `lib/devshell.nix` — `nix flake check` + dev shell
 - `.sops.yaml` — age keys + encryption rules; `.mise.toml` — auto-enters `nix develop` on `cd` (installs git hooks)
 
@@ -40,14 +40,14 @@ CI (`.github/workflows/check.yml`): lint + build darwin (macos-15) + build NixOS
 
 - New packages: cross-platform → `hosts/common/packages.nix`; darwin-only → `hosts/darwin/packages.nix`; layer/host-specific → its `packages.nix`. GUI apps → Homebrew casks in `homebrew.nix`; CLI → nix packages. `onActivation.cleanup = "uninstall"` means removal uninstalls; `mutableTaps = false` means new taps must be flake inputs.
 - New darwin host: `<layer>/<host>/{default.nix,variables.nix}` + `darwinConfigurations` entry in `flake.nix` (see `nix-config` skill).
-- New NixOS service: `services/<name>.nix` (Podman via quadlet-nix, `proxy` network, Traefik labels) + import in `services/default.nix` + subdomain in `serviceTunnelSubdomains` (`variables.nix`). User-built apps go to Dokploy, not NixOS config (see `homeserver` skill).
+- New NixOS service: `common/services/<name>/default.nix` (dir per service, built with `lib/web-service.nix` `mkWebService`/`mkPostgres`/`mkValkey`) + import `./<name>` in `services/default.nix` + subdomain in `serviceTunnelSubdomains` (`prime`/`clone` `variables.nix`). Secrets colocated as `<name>/secrets.yaml` with `sopsFile`. User-built apps go to Dokploy, not NixOS config (see `homeserver` skill).
 - macOS settings: new file in `hosts/darwin/settings/` + import in its `default.nix`.
 - No home-manager — dotfiles are chezmoi-managed elsewhere.
 
 ## Secrets (sops-nix)
 
-- Encrypted `secrets.yaml` colocated with host/services; rules in `.sops.yaml` (keys: admin + all machines).
-- Edit with `sops hosts/.../secrets.yaml` inside `nix develop`; declare in `services/secrets.nix`; use `config.sops.placeholder.*` templates for `KEY=VALUE` env files. Never commit plaintext.
+- Encrypted `secrets.yaml` at `common/` (shared) and colocated per service (`common/services/<name>/secrets.yaml` with `sopsFile = ./secrets.yaml`); rules in `.sops.yaml` (keys: admin + all machines).
+- Edit with `sops hosts/.../secrets.yaml` inside `nix develop`; shared secrets declared in `common/services/secrets.nix`, per-service secrets in `<name>/default.nix` with `sopsFile = ./secrets.yaml`; use `config.sops.placeholder.*` templates for `KEY=VALUE` env files. Never commit plaintext.
 - See `homeserver` skill for key locations, adding secrets, and recovery.
 
 ## Don'ts

@@ -17,6 +17,7 @@ This repository manages multiple machines through a layered, reproducible config
 - **Cross-platform** — shared packages, fonts, and user config across macOS and NixOS
 - **Platform modules** — Homebrew, macOS settings, and icons for darwin; bootloader, networking, and services for NixOS
 - **Role-based layers** — personal and work layers for macOS machines
+- **Prime/clone pair** — NixOS homeserver runs as `wagou-prime` (primary) + `wagou-clone` (warm standby) sharing `wagoulab/common/`
 - **Per-host overrides** — machine-specific config where needed
 - **Quality gates** — pre-commit hooks via [git-hooks.nix](https://github.com/cachix/git-hooks.nix) and CI via GitHub Actions
 
@@ -50,6 +51,9 @@ wagounix/
     │   └── alan-mac/      # Work Mac (alan-mac)
     └── nixos/         # NixOS — platform config, services
         └── wagoulab/
+            ├── common/      # Shared services (one dir per service + lib/web-service.nix)
+            ├── prime/       # Primary machine (variables.nix, hardware.nix)
+            └── clone/       # Backup machine (variables.nix, hardware.nix, services-disabled.nix)
 ```
 
 <details>
@@ -105,35 +109,23 @@ wagounix/
         ├── configuration.nix
         ├── packages.nix
         └── wagoulab/
-            ├── default.nix
-            ├── variables.nix
-            ├── hardware.nix
-            ├── secrets.yaml
-            └── services/
+            ├── common/
+            │   ├── default.nix        # Imports services/
+            │   ├── secrets.yaml       # Shared secrets (sops-encrypted)
+            │   └── services/          # One dir per service: <name>/default.nix + secrets.yaml
+            │       ├── default.nix    # Imports all service dirs
+            │       ├── lib/web-service.nix  # mkWebService / mkPostgres / mkValkey helpers
+            │       ├── secrets.nix    # Shared-only secrets
+            │       └── <service>/     # vaultwarden, immich, seafile, authentik, ...
+            ├── prime/                 # wagou-prime (primary)
+            │   ├── default.nix
+            │   ├── variables.nix
+            │   └── hardware.nix
+            └── clone/                 # wagou-clone (warm standby, services disabled by default)
                 ├── default.nix
-                ├── podman.nix
-                ├── secrets.nix
-                ├── traefik.nix
-                ├── vaultwarden.nix
-                ├── seafile.nix
-                ├── immich.nix
-                ├── adguardhome.nix
-                ├── cloudflared.nix
-                ├── tailscale.nix
-                ├── homepage.nix
-                ├── branding.nix
-                ├── branding-assets/
-                ├── authentik.nix
-                ├── home-assistant.nix
-                ├── jellyfin.nix
-                ├── fail2ban.nix
-                ├── firewall.nix
-                ├── ttyd.nix
-                ├── rbw.nix
-                ├── creneau.nix
-                ├── webhook.nix
-                ├── renovate.nix
-                └── kitchenowl.nix
+                ├── variables.nix
+                ├── hardware.nix
+                └── services-disabled.nix
 ```
 
 </details>
@@ -151,7 +143,8 @@ wagounix/
 
 | Profile | System | Description |
 |---|---|---|
-| `wagoulab` | x86_64-linux | Home server (Podman, services) |
+| `wagou-prime` | x86_64-linux | Home server, primary (Podman services) |
+| `wagou-clone` | x86_64-linux | Home server, warm standby (services disabled by default, enabled on failover) |
 
 ## Getting Started
 
@@ -174,17 +167,17 @@ sudo nix run nix-darwin -- switch --flake github:pierreWagou/wagounix#<profile>
 
 ### NixOS
 
-Profiles: `wagoulab`
+Profiles: `wagou-prime` (primary), `wagou-clone` (warm standby)
 
 ```bash
 # 1. Install NixOS with Nix
 sh <(curl -L https://nixos.org/nix/install) install
 
 # 2. Apply the configuration
-sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagou-prime --refresh
 ```
 
-> Note: `hosts/nixos/<host>/hardware.nix` must be generated on the target machine (`sudo nixos-generate-config --show-hardware-config`) and committed to the repo before the first deploy.
+> Note: `hosts/nixos/wagoulab/{prime,clone}/hardware.nix` must be generated on the target machine (`sudo nixos-generate-config --show-hardware-config`) and committed to the repo before the first deploy.
 
 ### Rebuild
 
@@ -193,10 +186,10 @@ sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
 darwin-rebuild switch --flake ~/Projects/wagou/wagounix#<profile>
 
 # NixOS (local)
-sudo nixos-rebuild switch --flake ~/Projects/wagou/wagounix#wagoulab
+sudo nixos-rebuild switch --flake ~/Projects/wagou/wagounix#wagou-prime
 
 # NixOS (from GitHub, on server)
-sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagoulab --refresh
+sudo nixos-rebuild switch --flake github:pierreWagou/wagounix#wagou-prime --refresh
 ```
 
 ## Development
@@ -221,7 +214,7 @@ GitHub Actions runs on push to `main` and on PRs:
 |---|---|---|
 | Lint | ubuntu-latest | nixfmt, statix, deadnix |
 | Build darwin | macos-15 | wagou-mac, alan-mac (parallel) |
-| Build NixOS | ubuntu-latest | wagoulab |
+| Build NixOS | ubuntu-latest | wagou-prime, wagou-clone |
 
 ## Quick Reference
 
