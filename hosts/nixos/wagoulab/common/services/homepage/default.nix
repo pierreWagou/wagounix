@@ -205,6 +205,14 @@ let
           };
         }
         {
+          "Firecrawl" = {
+            icon = "mdi-spider";
+            href = "https://crawl.${host.domain}";
+            description = "Web search & crawl API";
+            siteMonitor = "http://firecrawl-api:3002";
+          };
+        }
+        {
           "Authentik" = {
             icon = "authentik.svg";
             href = "https://auth.${host.domain}";
