@@ -137,7 +137,7 @@ let
         }
         {
           "Stalwart Mail" = {
-            icon = "stalwart-mail.svg";
+            icon = "sh-stalwart.svg";
             href = "https://mailbox.${host.domain}";
             description = "Email server";
             siteMonitor = "http://stalwart:8080";
@@ -160,7 +160,7 @@ let
         }
         {
           "Satisfactory" = {
-            icon = "mdi-gamepad-variant";
+            icon = "satisfactory.png";
             description = "Game server";
           };
         }
@@ -238,7 +238,7 @@ let
         }
         {
           "Branding" = {
-            icon = "palette.svg";
+            icon = "https://raw.githubusercontent.com/imgproxy/imgproxy/master/logo.svg";
             href = "https://assets.${host.domain}";
             description = "Image proxy & assets";
             siteMonitor = "http://imgproxy:8080";
