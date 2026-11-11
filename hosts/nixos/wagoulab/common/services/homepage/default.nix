@@ -206,7 +206,7 @@ let
         }
         {
           "Firecrawl" = {
-            icon = "mdi-spider";
+            icon = "sh-firecrawl.svg";
             href = "https://crawl.${host.domain}";
             description = "Web search & crawl API";
             siteMonitor = "http://firecrawl-api:3002";
