@@ -7,7 +7,7 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   ws = import ../lib/web-service.nix { inherit config host; };
-  firecrawlVersion = "2.11.110";
+  firecrawlVersion = "2.11.209";
   api = ws.mkWebService {
     name = "firecrawl-api";
     subdomain = "crawl";
