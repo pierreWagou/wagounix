@@ -7,11 +7,15 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   ws = import ../lib/web-service.nix { inherit config host; };
-  firecrawlVersion = "2.11.209";
+  # Pinned by digest (`latest` as of 2026-11-13). The 2.11.x image line
+  # (last published 2026-08-18 as 2.11.209) predates the /v2/search schema
+  # fields firecrawl-mcp sends (toolDetail/domainTools) and rejects them with
+  # "Invalid request body". Re-check for a newer versioned tag periodically.
+  firecrawlImage = "ghcr.io/firecrawl/firecrawl@sha256:305ffea700eca1f50f0875b049206b9202ebee0d8efe3a70cc859cad20d46a1a";
   api = ws.mkWebService {
     name = "firecrawl-api";
     subdomain = "crawl";
-    image = "ghcr.io/firecrawl/firecrawl:${firecrawlVersion}";
+    image = firecrawlImage;
     port = 3002;
     exec = [
       "node"
