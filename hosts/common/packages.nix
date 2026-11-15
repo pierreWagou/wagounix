@@ -3,44 +3,8 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Packages for all machines (including wagoulab)
-  environment.systemPackages = with pkgs; [
-    age
-    ansible
-    bat
-    bottom
-    chezmoi
-    eza
-    fd
-    fzf
-    gcc
-    gh
-    git
-    gnupg
-    go
-    gws
-    mise
-    mprocs
-    neovim
-    opencode
-    openldap
-    openssl
-    pinentry-curses
-    rbw
-    ripgrep
-    sheldon
-    sops
-    speedtest-cli
-    sshfs
-    sshpass
-    stalwart-cli
-    starship
-    swaks
-    television
-    unzip
-    wget
-    zip
-    zoxide
-    zsh
-  ];
+  # Packages for all machines (including wagoulab).
+  # The list itself lives in ./package-list.nix so the SteamOS
+  # home-manager config can reuse the exact same set.
+  environment.systemPackages = import ./package-list.nix { inherit pkgs; };
 }

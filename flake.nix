@@ -23,6 +23,10 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     quadlet-nix = {
       url = "github:SEIAROTg/quadlet-nix";
     };
@@ -123,6 +127,28 @@
           specialArgs = {
             inherit inputs;
             host = import ./hosts/nixos/wagoulab/clone/variables.nix;
+          };
+        };
+
+      };
+
+      # -----------------------------------------------------------------------
+      # SteamOS (Steam Deck / Steam Machine) — home-manager standalone.
+      # SteamOS is immutable Arch, not NixOS, so no system modules: Nix +
+      # home-manager manage user packages only (one-command sync via
+      # `home-manager switch`). Dotfiles stay with chezmoi.
+      # One-time install documented in hosts/steamos/README.md.
+      # -----------------------------------------------------------------------
+      homeConfigurations = {
+
+        "deck@steamos" = inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          modules = [
+            ./hosts/steamos/home.nix
+          ];
+          extraSpecialArgs = {
+            inherit inputs;
+            host = import ./hosts/steamos/variables.nix;
           };
         };
 
