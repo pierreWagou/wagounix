@@ -163,6 +163,16 @@ in
     };
   };
 
+  # Host (and host-networked containers like Home Assistant) must resolve
+  # through AdGuard so local rewrites (tv.lan, *.wagou.fr) work server-side.
+  # DHCP DNS is ignored so Deco/ISP resolvers can't shadow AdGuard;
+  # 1.1.1.1 stays as fallback for when this container is down (e.g. clone).
+  networking.nameservers = [
+    host.serverIP
+    "1.1.1.1"
+  ];
+  networking.dhcpcd.extraConfig = "nohook resolv.conf";
+
   # Use the image's default entrypoint and CMD.
   # The seed config is copied by ExecStartPre below.
   virtualisation.quadlet.containers.adguard.containerConfig = svc.containerConfig;
