@@ -72,6 +72,11 @@ let
             answer = "192.168.68.72";
             enabled = true;
           }
+          {
+            domain = "x2hub.lan";
+            answer = "192.168.68.67";
+            enabled = true;
+          }
         ];
     };
     filters = [

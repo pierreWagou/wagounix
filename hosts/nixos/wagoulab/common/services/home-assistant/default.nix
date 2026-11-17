@@ -95,6 +95,12 @@ let
         script: !include scripts.yaml
         scene: !include scenes.yaml
 
+        mqtt:
+          broker: ${host.serverIP}
+          port: 1883
+          username: homeassistant
+          password: !secret mqtt_password
+
         auth_oidc:
           client_id: "B5xh86aOL0cHkNRHze8iA1HsDtZpwWSjmVL8j2K7"
           client_secret: !secret oidc_client_secret
@@ -139,7 +145,7 @@ in
 
     templates = {
       "ha-secrets.yaml" = {
-        content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\n";
+        content = "oidc_client_secret: ${config.sops.placeholder.oidc-client-secret}\nmqtt_password: ${config.sops.placeholder.mqtt-ha-password}\n";
       };
     };
   };

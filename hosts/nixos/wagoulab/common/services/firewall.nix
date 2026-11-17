@@ -10,6 +10,7 @@
       7777 # Satisfactory server
       8200 # SofaBaton hub connect-back
       8060 # SofaBaton Wifi Commands
+      1883 # MQTT (Mosquitto: X2 hub + Home Assistant)
       8888 # Satisfactory reliable messaging
       25 # SMTP (Stalwart)
       465 # SMTPS (Stalwart)
@@ -22,6 +23,8 @@
     ];
     allowedUDPPorts = [
       53 # DNS (AdGuard Home)
+      5353 # mDNS (Sofabaton hub + app discovery)
+      8102 # Sofabaton app proxy discovery (UDP)
       7777 # Satisfactory game traffic
     ];
 

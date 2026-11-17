@@ -12,6 +12,7 @@ _: {
     ./vaultwarden
     ./jellyfin
     ./home-assistant
+    ./mosquitto
     ./homepage
     ./adguardhome
     ./immich
