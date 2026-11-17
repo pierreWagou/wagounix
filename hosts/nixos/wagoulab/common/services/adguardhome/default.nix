@@ -60,11 +60,19 @@ let
       # public A records (LAN 192.168.68.66 + Tailscale 100.97.36.56) so one
       # name works home and away. Adding "prime" to any subdomain list in
       # variables.nix would shadow it with a single-IP rewrite. Don't.
-      rewrites = map (sub: {
-        domain = "${sub}.${host.domain}";
-        answer = host.serverIP;
-        enabled = true;
-      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
+      rewrites =
+        map (sub: {
+          domain = "${sub}.${host.domain}";
+          answer = host.serverIP;
+          enabled = true;
+        }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains)
+        ++ [
+          {
+            domain = "tv.lan";
+            answer = "192.168.68.72";
+            enabled = true;
+          }
+        ];
     };
     filters = [
       {
