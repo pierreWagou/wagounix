@@ -48,6 +48,11 @@ let
       # Podman gateway DNS (10.89.x.1) which times out on every reverse lookup.
       use_private_ptr_resolvers = false;
       local_ptr_upstreams = [ ];
+      # Explicit: .lan names are served from the container's /etc/hosts
+      # (see addHosts below), which answers A queries only. AAAA queries
+      # must NOT be answered locally or Python's pycares resolver treats
+      # the empty response as fatal for the whole lookup.
+      hostsfile_enabled = true;
     };
     trusted_proxies = [
       "127.0.0.0/8"
@@ -60,24 +65,19 @@ let
       # public A records (LAN 192.168.68.66 + Tailscale 100.97.36.56) so one
       # name works home and away. Adding "prime" to any subdomain list in
       # variables.nix would shadow it with a single-IP rewrite. Don't.
-      rewrites =
-        map (sub: {
-          domain = "${sub}.${host.domain}";
-          answer = host.serverIP;
-          enabled = true;
-        }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains)
-        ++ [
-          {
-            domain = "tv.lan";
-            answer = "192.168.68.72";
-            enabled = true;
-          }
-          {
-            domain = "x2hub.lan";
-            answer = "192.168.68.67";
-            enabled = true;
-          }
-        ];
+      # NOTE: .lan names intentionally do NOT live here. A rewrite entry
+      # answers every query type with an empty NOERROR response for types
+      # it has no data for (e.g. AAAA), and that empty answer makes
+      # Python's pycares resolver (Home Assistant's aiohttp path) fail the
+      # whole lookup, A record included. .lan A records live in the
+      # container's /etc/hosts via addHosts below (type-aware by
+      # construction); AAAA falls through to upstream NXDOMAIN, which every
+      # resolver tolerates. See user_rules for belt-and-suspenders.
+      rewrites = map (sub: {
+        domain = "${sub}.${host.domain}";
+        answer = host.serverIP;
+        enabled = true;
+      }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
     };
     # Answer NXDOMAIN (instead of AdGuard's default empty NOERROR) to AAAA
     # queries for our .lan rewrites. Empty answers make Python's pycares
@@ -126,6 +126,14 @@ let
     # and AdGuard tries to use it for reverse DNS lookups, causing 2s
     # timeouts on every PTR query and massive latency.
     dns = [ "127.0.0.1" ];
+    # .lan A records via the container's /etc/hosts (type-aware: A only,
+    # so AAAA falls through to upstream NXDOMAIN instead of a local empty
+    # NOERROR that breaks pycares-based resolvers). IPs mirror Deco DHCP
+    # reservations — keep both sides in sync when they change.
+    addHosts = [
+      "tv.lan:192.168.68.72"
+      "x2hub.lan:192.168.68.67"
+    ];
     volumes = [
       "/var/lib/adguardhome/work:/opt/adguardhome/work"
       "/var/lib/adguardhome/conf:/opt/adguardhome/conf"

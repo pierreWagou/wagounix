@@ -27,7 +27,7 @@ in
   # Variants:
   #   exposeViaTraefik = false  → no Traefik labels (traefik itself, game servers)
   #   networks = [ "host" ]     → host networking (satisfactory, home-assistant)
-  #   publishPorts / devices / addGroups / dns / exec / shmSize → passthrough
+  #   publishPorts / devices / addGroups / dns / addHosts / exec / shmSize → passthrough
   #   unitConfig / serviceConfig → quadlet systemd options passthrough
   mkWebService =
     {
@@ -46,6 +46,7 @@ in
       addGroups ? [ ],
       addCapabilities ? [ ],
       dns ? [ ],
+      addHosts ? [ ],
       exec ? null,
       shmSize ? null,
       healthCmd ? null,
@@ -84,6 +85,7 @@ in
           addGroups
           addCapabilities
           dns
+          addHosts
           ;
         environments = env;
         noNewPrivileges = true;
