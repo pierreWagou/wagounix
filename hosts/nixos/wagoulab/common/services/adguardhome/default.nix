@@ -88,6 +88,7 @@ let
     user_rules = [
       "||tv.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
       "||x2hub.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
+      "||dione.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
     ];
     filters = [
       {
@@ -133,6 +134,7 @@ let
     addHosts = [
       "tv.lan:192.168.68.72"
       "x2hub.lan:192.168.68.67"
+      "dione.lan:192.168.68.54"
     ];
     volumes = [
       "/var/lib/adguardhome/work:/opt/adguardhome/work"
