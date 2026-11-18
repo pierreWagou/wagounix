@@ -79,6 +79,16 @@ let
           }
         ];
     };
+    # Answer NXDOMAIN (instead of AdGuard's default empty NOERROR) to AAAA
+    # queries for our .lan rewrites. Empty answers make Python's pycares
+    # resolver fail the *whole* lookup (including the good A record), which
+    # breaks every aiohttp-based client (e.g. Home Assistant integrations)
+    # using .lan names. NXDOMAIN on AAAA + a good A is the standard
+    # dual-stack-miss shape every resolver tolerates.
+    user_rules = [
+      "||tv.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
+      "||x2hub.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
+    ];
     filters = [
       {
         enabled = true;
