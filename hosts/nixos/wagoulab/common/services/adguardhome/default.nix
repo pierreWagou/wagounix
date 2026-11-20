@@ -9,19 +9,13 @@ let
   ws = import ../lib/web-service.nix { inherit config host; };
   yamlFormat = pkgs.formats.yaml { };
 
-  # AdGuard config — generated as proper YAML from a Nix attrset.
-  # schema_version: 34 prevents the broken migration.
-  # bootstrap_dns uses :53 port suffix per the v34 schema.
-  # trusted_proxies includes the Podman network ranges so Traefik requests aren't rejected.
-  # The admin bcrypt hash is injected at activation via the sops template below
-  # (secrets don't exist at build time, so the generated YAML carries a sentinel).
   adguardSeed = yamlFormat.generate "AdGuardHome.yaml" {
+    # Pinned: later versions trigger a broken migration.
     schema_version = 34;
     users = [
       {
         name = "admin";
-        # Sentinel swapped for the real bcrypt hash from sops at activation
-        # (see seedTemplate below). Never a real secret in the store.
+        # Sentinel swapped for the real sops hash at activation; never a real secret in the store.
         password = "@ADGUARD_PASSWORD_HASH@";
       }
     ];
@@ -43,15 +37,8 @@ let
         "8.8.8.8:53"
       ];
       upstream_mode = "load_balance";
-      # Disable private reverse DNS — AdGuard runs in a container and has no
-      # useful local resolver for PTR queries. Without this, it tries the
-      # Podman gateway DNS (10.89.x.1) which times out on every reverse lookup.
       use_private_ptr_resolvers = false;
       local_ptr_upstreams = [ ];
-      # Explicit: .lan names are served from the container's /etc/hosts
-      # (see addHosts below), which answers A queries only. AAAA queries
-      # must NOT be answered locally or Python's pycares resolver treats
-      # the empty response as fatal for the whole lookup.
       hostsfile_enabled = true;
     };
     trusted_proxies = [
@@ -61,30 +48,13 @@ let
     filtering = {
       protection_enabled = true;
       filtering_enabled = true;
-      # NOTE: prime.wagou.fr intentionally has NO rewrite here. It carries two
-      # public A records (LAN 192.168.68.66 + Tailscale 100.97.36.56) so one
-      # name works home and away. Adding "prime" to any subdomain list in
-      # variables.nix would shadow it with a single-IP rewrite. Don't.
-      # NOTE: .lan names intentionally do NOT live here. A rewrite entry
-      # answers every query type with an empty NOERROR response for types
-      # it has no data for (e.g. AAAA), and that empty answer makes
-      # Python's pycares resolver (Home Assistant's aiohttp path) fail the
-      # whole lookup, A record included. .lan A records live in the
-      # container's /etc/hosts via addHosts below (type-aware by
-      # construction); AAAA falls through to upstream NXDOMAIN, which every
-      # resolver tolerates. See user_rules for belt-and-suspenders.
+      # prime.wagou.fr has no rewrite here — listing "prime" as a subdomain would shadow it.
       rewrites = map (sub: {
         domain = "${sub}.${host.domain}";
         answer = host.serverIP;
         enabled = true;
       }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
     };
-    # Answer NXDOMAIN (instead of AdGuard's default empty NOERROR) to AAAA
-    # queries for our .lan rewrites. Empty answers make Python's pycares
-    # resolver fail the *whole* lookup (including the good A record), which
-    # breaks every aiohttp-based client (e.g. Home Assistant integrations)
-    # using .lan names. NXDOMAIN on AAAA + a good A is the standard
-    # dual-stack-miss shape every resolver tolerates.
     user_rules = [
       "||tv.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
       "||x2hub.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
@@ -122,15 +92,7 @@ let
     subdomain = "guard";
     image = "docker.io/adguard/adguardhome:v0.107.76";
     port = 3000;
-    # Override Podman's DNS injection — without this, Podman injects the
-    # network gateway (10.89.x.1:53) into the container's resolv.conf,
-    # and AdGuard tries to use it for reverse DNS lookups, causing 2s
-    # timeouts on every PTR query and massive latency.
     dns = [ "127.0.0.1" ];
-    # .lan A records via the container's /etc/hosts (type-aware: A only,
-    # so AAAA falls through to upstream NXDOMAIN instead of a local empty
-    # NOERROR that breaks pycares-based resolvers). IPs mirror Deco DHCP
-    # reservations — keep both sides in sync when they change.
     addHosts = [
       "tv.lan:192.168.68.72"
       "x2hub.lan:192.168.68.67"
@@ -155,18 +117,11 @@ let
       "/var/lib/adguardhome/conf"
     ];
   };
-  # Rendered seed: generated YAML with the admin hash injected from sops.
-  # Colocated here (not in centralized secrets.nix) next to its consumer.
-  # replaceVars runs at build time (no content read at eval, so darwin-side
-  # `nix eval` keeps working); sops-nix substitutes the placeholder marker
-  # at activation. restartUnits picks up rotations automatically.
   seedTemplate = pkgs.replaceVars adguardSeed {
     ADGUARD_PASSWORD_HASH = config.sops.placeholder.adguard-password-hash;
   };
 in
 {
-  # Service secrets, colocated with the service. Values live in
-  # services/adguardhome/secrets.yaml (moved verbatim, not rotated).
   sops = {
     secrets = {
       adguard-password = {
@@ -188,23 +143,14 @@ in
     };
   };
 
-  # Host (and host-networked containers like Home Assistant) must resolve
-  # through AdGuard so local rewrites (tv.lan, *.wagou.fr) work server-side.
-  # DHCP DNS is ignored so Deco/ISP resolvers can't shadow AdGuard;
-  # 1.1.1.1 stays as fallback for when this container is down (e.g. clone).
   networking.nameservers = [
     host.serverIP
     "1.1.1.1"
   ];
   networking.dhcpcd.extraConfig = "nohook resolv.conf";
 
-  # Use the image's default entrypoint and CMD.
-  # The seed config is copied by ExecStartPre below.
   virtualisation.quadlet.containers.adguard.containerConfig = svc.containerConfig;
 
-  # Copy the Nix-generated seed config before the container starts.
-  # This ensures our declarative config is always the starting point while
-  # allowing AdGuard to write runtime changes to the file.
   systemd.services.adguard.serviceConfig.ExecStartPre = [
     "${pkgs.coreutils}/bin/cp ${
       config.sops.templates."AdGuardHome.yaml".path

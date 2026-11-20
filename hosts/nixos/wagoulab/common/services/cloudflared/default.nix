@@ -8,17 +8,12 @@
 let
   ws = import ../lib/web-service.nix { inherit config host; };
 
-  # Host-specific Cloudflare credentials
   cloudflareCredentials =
     if host.hostname == "wagou-clone" then
       config.sops.secrets.cloudflare-credentials-clone.path
     else
       config.sops.secrets.cloudflare-credentials-prime.path;
 
-  # Tunnel config — routes all subdomains to NixOS Traefik.
-  # NixOS Traefik dispatches: service subdomains to Podman containers,
-  # app subdomains to Dokploy Traefik (127.0.0.1:8080).
-  # Uses HTTPS with noTLSVerify (internal connection, cert is self-signed).
   configFile = pkgs.writeText "cloudflared-config.yml" (
     builtins.toJSON {
       tunnel = host.cloudflareTunnelId;
@@ -34,7 +29,7 @@ let
   );
   tunnel = ws.mkWebService {
     name = "cloudflared";
-    exposeViaTraefik = false; # the tunnel feeds Traefik, not the other way around
+    exposeViaTraefik = false;
     image = "docker.io/cloudflare/cloudflared:2026.5.1";
     volumes = [
       "${configFile}:/etc/cloudflared/config.yml:ro"
@@ -50,10 +45,6 @@ let
   };
 in
 {
-  # Cloudflare credentials file — mounted directly into the cloudflared container.
-  # Mode 0444 because cloudflared runs as nonroot (UID 65532) inside the container
-  # and needs to read the bind-mounted file. The secret is on tmpfs (/run/secrets/).
-  # Host-specific: wagou-prime uses "cloudflare-credentials-prime", wagou-clone uses "cloudflare-credentials-clone".
   sops = {
     secrets = {
       cloudflare-credentials-prime = {

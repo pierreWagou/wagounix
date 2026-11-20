@@ -14,20 +14,16 @@ rec {
   cloudflareAccountId = "65b2dca00576549f065820b1cd5c76c9";
   cloudflareTunnelId = "ca26559c-2858-4c78-867e-41e3c19edb52";
 
-  # Geographic coordinates (for weather widgets etc.)
   latitude = 48.8566;
   longitude = 2.3522;
 
-  # Shared container image versions
   valkeyImage = "docker.io/valkey/valkey:9.1.0";
 
-  # Podman network CIDRs — used by services that need to trust proxied requests
   podmanCIDRs = [
     "10.89.0.0/16"
     "172.16.0.0/12"
   ];
 
-  # Service ports (single source of truth — referenced by traefik, firewall, and service configs)
   ports = {
     ttyd = 7681;
     webhook = 9000;
@@ -35,9 +31,7 @@ rec {
     satisfactoryReliable = 8888;
   };
 
-  # Subdomains served by NixOS Traefik (services).
-  # Each entry generates: tunnel ingress rule → NixOS Traefik,
-  # AdGuard DNS rewrite → serverIP, Cloudflare CNAME (manual, one-time).
+  # Tunnel ingress + AdGuard rewrite + manual Cloudflare CNAME per entry.
   serviceTunnelSubdomains = [
     "vault"
     "pixel"
@@ -59,18 +53,13 @@ rec {
     "crawl"
   ];
 
-  # Subdomains for Dokploy-deployed apps.
-  # Each entry generates: tunnel ingress rule → NixOS Traefik (which forwards to Dokploy Traefik),
-  # AdGuard DNS rewrite → serverIP, NixOS Traefik forward rule → http://127.0.0.1:8080.
-  # Cloudflare CNAME must be added manually (one-time) per new app subdomain.
+  # As above, additionally forwarded to Dokploy.
   appTunnelSubdomains = [
     "creneau-preview"
     "creneau"
   ];
 
-  # Subdomains that only need an AdGuard DNS rewrite (no Traefik, no tunnel).
-  # Use for services that run on raw TCP/UDP ports (e.g. game servers).
-  # Cloudflare A record (proxy OFF) + router port forwarding needed for external access.
+  # AdGuard rewrite only + router port forwarding; no Traefik/tunnel.
   dnsOnlySubdomains = [
     "satisfactory"
     "mail"

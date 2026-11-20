@@ -8,8 +8,6 @@
 let
   ws = import ../lib/web-service.nix { inherit config host; };
 
-  # Single source of truth for Lovelace dashboards: drives the
-  # `lovelace.dashboards` section of configuration.yaml AND the volume mounts.
   dashboards = {
     heatmap-weather = {
       title = "Heatmap";
@@ -43,9 +41,6 @@ let
     };
   };
 
-  # NOTE: entries carry explicit leading spaces (double-quoted strings have no
-  # indent stripping) and the interpolation below sits at column 0, so the
-  # block lands nested under `dashboards:`.
   lovelaceDashboards = builtins.concatStringsSep "\n" (
     builtins.attrValues (
       builtins.mapAttrs (
@@ -59,11 +54,6 @@ let
     builtins.mapAttrs (_: d: "${d.file}:/config/dashboards/${baseNameOf d.file}:ro") dashboards
   );
 
-  # HACS pinned to a release tarball (hash-verified by Nix at build time).
-  # Seeded into the stateful custom_components dir before every start —
-  # same pattern as the Seafile seed. No remote pipe-to-bash, no restart dance.
-  # NOTE: HACS is merging into Home Assistant as built-in Marketplace from
-  # HA 2026.11 — this whole seed can go away once we upgrade past that.
   hacsVersion = "2.0.5";
   hacsZip = pkgs.fetchurl {
     url = "https://github.com/hacs/integration/releases/download/${hacsVersion}/hacs.zip";
@@ -108,7 +98,7 @@ let
   '';
   ha = ws.mkWebService {
     name = "home-assistant";
-    exposeViaTraefik = false; # routed via Traefik file provider (host network has no container discovery)
+    exposeViaTraefik = false;
     networks = [ "host" ];
     image = "docker.io/homeassistant/home-assistant:2026.8.3";
     env = {
@@ -149,8 +139,6 @@ in
   systemd = {
     tmpfiles.rules = ha.tmpfilesRules;
 
-    # Seed pinned HACS before every start. Convergent: reinstalls only when
-    # the version marker differs, so bumping hacsVersion applies on next start.
     services.home-assistant.serviceConfig.ExecStartPre = [
       (pkgs.writeShellScript "home-assistant-hacs-seed" ''
         set -euo pipefail

@@ -13,9 +13,6 @@ let
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
-  # CSS variable blocks generated from palettes — injected before the static CSS file.
-  # branding.css.ctpVars : shared :root { --ctp-* } block (Mocha, for always-dark elements)
-  # cssVars              : :root light mode (Latte AK/PF tokens) + [theme=dark] (Mocha AK/PF tokens)
   cssVars = ''
     /* === Light mode (Latte) === */
     :host,
@@ -101,13 +98,10 @@ let
     }
   '';
 
-  # Escape CSS for embedding in a YAML double-quoted string
   escapedCss = builtins.replaceStrings [ "\\" "\"" "\n" ] [ "\\\\" "\\\"" "\\n" ] (
     branding.css.ctpVars + cssVars + builtins.readFile ./authentik.css
   );
 
-  # Declarative branding blueprint — auto-applied by Authentik on startup.
-  # pkgs.replaceVars substitutes @placeholder@ markers and verifies no markers remain.
   brandBlueprint = pkgs.replaceVars ./wagou-brand.yaml {
     logoUrl = branding.urls.logoAuth;
     faviconUrl = branding.urls.favicon;
@@ -184,7 +178,6 @@ in
     };
   };
 
-  # Authentik-internal network for DB and Redis (not exposed to Traefik)
   virtualisation.quadlet.networks.authentik-internal = { };
 
   virtualisation.quadlet.containers = {

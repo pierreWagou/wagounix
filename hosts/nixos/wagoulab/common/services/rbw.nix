@@ -5,9 +5,6 @@
 }:
 
 let
-  # Custom pinentry script for rbw — reads the master password from a sops-decrypted file.
-  # Speaks the Assuan pinentry protocol: responds to GETPIN with the password.
-  # This enables zero-touch rbw unlock on the headless server.
   pinentry-rbw-sops = pkgs.writeShellScript "pinentry-rbw-sops" ''
     set -euo pipefail
     SECRET_FILE="${config.sops.secrets.rbw-master-password.path}"
@@ -35,6 +32,5 @@ let
   '';
 in
 {
-  # Make the pinentry script available at a stable path for the rbw config
   environment.etc."rbw/pinentry-sops".source = pinentry-rbw-sops;
 }

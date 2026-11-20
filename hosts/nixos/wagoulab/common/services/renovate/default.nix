@@ -5,10 +5,6 @@
 }:
 
 let
-  # Script that generates a short-lived GitHub App installation token.
-  # 1. Builds a JWT (RS256) from the App ID and private key PEM
-  # 2. Exchanges the JWT for an installation access token via GitHub API
-  # 3. Writes the token to /run/renovate/token
   generate-renovate-token = pkgs.writeShellApplication {
     name = "generate-renovate-token";
     runtimeInputs = [
@@ -83,7 +79,6 @@ in
     };
   };
 
-  # Oneshot service — generates token then runs Renovate CLI
   systemd.services.renovate = {
     description = "Renovate dependency update bot";
     after = [ "network-online.target" ];
@@ -103,12 +98,10 @@ in
           --env LOG_LEVEL=info \
           ghcr.io/renovatebot/renovate:43.196.1
       '';
-      # Hardening
       PrivateTmp = true;
     };
   };
 
-  # Timer — daily at 5 AM
   systemd.timers.renovate = {
     description = "Run Renovate daily";
     wantedBy = [ "timers.target" ];

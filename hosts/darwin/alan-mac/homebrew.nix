@@ -12,10 +12,8 @@
     ];
   };
 
-  # Work MDM periodically reinstalls some apps as root, which breaks
-  # `brew upgrade` (chmod EPERM on root-owned files). Re-assert user
-  # ownership here: extraActivation runs before the homebrew step.
-  # Activation runs as root, so no sudo needed. Never fails the switch.
+  # Work MDM reinstalls apps as root, breaking brew upgrade (chmod EPERM).
+  # Re-assert ownership pre-homebrew step, as root; must never fail the switch.
   system.activationScripts.extraActivation.text = lib.mkAfter ''
     for APP in \
       "/Applications/Visual Studio Code.app" \

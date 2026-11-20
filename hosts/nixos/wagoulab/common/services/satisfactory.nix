@@ -6,8 +6,6 @@ let
     name = "satisfactory";
     exposeViaTraefik = false;
     networks = [ "host" ];
-    # Pinned below latest: Seafile's own docs reference 8.1.x; 9.4 is
-    # baked since May 2026 (Docs 10.x is weeks old). Revisit on upgrade.
     image = "docker.io/wolveix/satisfactory-server:latest";
     healthCmd = "none";
     env = {

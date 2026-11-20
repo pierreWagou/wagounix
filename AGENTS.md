@@ -44,6 +44,19 @@ CI (`.github/workflows/check.yml`): lint + build darwin (macos-15) + build NixOS
 - macOS settings: new file in `hosts/darwin/settings/` + import in its `default.nix`.
 - No home-manager — dotfiles are chezmoi-managed elsewhere.
 
+## Gotchas (rules behind deleted comments — do not reintroduce)
+
+- Homepage `siteMonitor` must never target host-bound ports via loopback: ttyd/webhook bind the host LAN IP, unreachable from inside containers; every failed poll logs a stack trace (~200k journal lines/day, Nov 2026).
+- Firecrawl postgres DB must stay `postgres` (nuq-postgres hardcodes `cron.database_name`); renaming requires wiping the volume. Stay on Redis (upstream marks Valkey untested). Sized for one search user: 1 worker/job, minimal pools, `MemoryMax` caps on all six units.
+- AdGuard: keep `schema_version` pinned (upstream migration broken); never add `prime` to subdomain lists (shadows `prime.wagou.fr`); keep the 1.1.1.1 fallback and the `.lan`/PTR overrides (removal reintroduces 2s PTR timeouts and breaks `.lan`).
+- Seafile: never create the conf dir yourself — its absence is the first-init signal.
+- Mosquitto runs as a native service, not a container, so secrets never land in the Nix store.
+- `variables.nix` wiring contracts: `serviceTunnelSubdomains` → tunnel ingress + AdGuard rewrite + manual Cloudflare CNAME; `appTunnelSubdomains` → additionally forwarded to Dokploy; `dnsOnlySubdomains` → AdGuard rewrite only + router port forwarding.
+- Omnigent sets `dns = [ host.serverIP ]` so the server-side OIDC JWKS fetch reaches Authentik directly instead of looping through the Cloudflare tunnel.
+- Journald is capped (`SystemMaxUse=500M`, `RuntimeMaxUse=128M`) and zram swap enabled because the Nov 2026 incident showed journald holding 2.2 GB RAM (+4.1 GB disk) on a box with zero stock swap.
+- alan-mac: work MDM reinstalls apps as root, so the ownership fixup runs before the Homebrew step, as root, and must never fail the switch.
+- darwin: `nix.enable = false` — the daemon is owned by the external Nix installer, not nix-darwin.
+
 ## Secrets (sops-nix)
 
 - Encrypted `secrets.yaml` at `common/` (shared) and colocated per service (`common/services/<name>/secrets.yaml` with `sopsFile = ./secrets.yaml`); rules in `.sops.yaml` (keys: admin + all machines).

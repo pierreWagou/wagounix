@@ -1,7 +1,6 @@
 { pkgs, host, ... }:
 
 let
-  # Catppuccin Mocha theme for xterm.js (ttyd's terminal renderer)
   catppuccinMocha = builtins.toJSON {
     background = "#1e1e2e";
     foreground = "#cdd6f4";
@@ -30,10 +29,6 @@ in
 {
   environment.systemPackages = [ pkgs.ttyd ];
 
-  # ttyd — web-based terminal for remote development access.
-  # Exposes a tmux session via WebSocket, routed through Traefik at dev.wagou.fr.
-  # Authentication is handled by Cloudflare Access (Zero Trust) — no basic auth here.
-  # Binds only to the LAN IP (not exposed by the firewall, only reachable by Traefik).
   systemd.services.ttyd = {
     description = "ttyd - Web Terminal";
     after = [ "network-online.target" ];
@@ -57,7 +52,6 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-    # Ensure tools needed for the dev workflow (sesh, tv, nvim, etc.) are in PATH
     path = with pkgs; [
       zsh
       tmux

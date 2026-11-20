@@ -12,9 +12,7 @@ let
     subdomain = "ai";
     image = "ghcr.io/omnigent-ai/omnigent-server:latest";
     port = 8000;
-    # Use host DNS (AdGuard Home) so auth.wagou.fr resolves to the server IP
-    # instead of Cloudflare — the JWKS endpoint is fetched server-side and
-    # must reach Authentik directly, not through the Cloudflare tunnel.
+    # Host DNS so the server-side JWKS fetch reaches Authentik directly, bypassing Cloudflare.
     dns = [ host.serverIP ];
     env = {
       OMNIGENT_BUILTIN_AGENT_DIRS = "/agents/wagou:/agents/alan";
@@ -87,7 +85,6 @@ in
     };
   };
 
-  # OmniGent-internal network for Postgres ↔ Server traffic (not exposed to Traefik)
   virtualisation.quadlet.networks.omnigent-internal = { };
 
   virtualisation.quadlet.containers = {

@@ -77,10 +77,8 @@
     };
   };
 
-  # Load HMAC secret from sops at runtime
   systemd.services.webhook.serviceConfig.EnvironmentFile = config.sops.templates."webhook.env".path;
 
-  # Allow webhook user to start specific services
   security.sudo.extraRules = [
     {
       users = [ "webhook" ];

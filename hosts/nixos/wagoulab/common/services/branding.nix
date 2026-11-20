@@ -9,7 +9,6 @@
 let
   ws = import ./lib/web-service.nix { inherit config host; };
 
-  # === Catppuccin Palettes ===
   mocha = {
     base = "#1e1e2e";
     mantle = "#181825";
@@ -58,7 +57,6 @@ let
     end = "#7b2eff";
   };
 
-  # === Logo Generator ===
   mkLogo =
     name:
     let
@@ -92,7 +90,6 @@ let
       </svg>
     '';
 
-  # === Combined branding directory (real file copies for imgproxy) ===
   brandingDir = pkgs.runCommand "branding-dir" { } ''
     mkdir -p $out
     cp ${./branding-assets}/* $out/
@@ -100,10 +97,8 @@ let
     cp ${mkLogo "DISK"} $out/logo-disk.svg
   '';
 
-  # === imgproxy URL base ===
   assetsBaseUrl = "https://assets.${host.domain}/insecure";
 
-  # === Pre-built URLs for common assets ===
   urls = {
     favicon = "${assetsBaseUrl}/plain/local:///favicon.svg";
     logoAuth = "${assetsBaseUrl}/plain/local:///logo-auth.svg";
@@ -196,7 +191,6 @@ in
   };
 
   config = {
-    # === imgproxy container for serving branding assets ===
     virtualisation.quadlet.containers.imgproxy.containerConfig = imgproxy.containerConfig;
   };
 }

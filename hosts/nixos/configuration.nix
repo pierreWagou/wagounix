@@ -28,9 +28,7 @@
     firewall.enable = true;
   };
 
-  # Journald: bound disk usage and keep per-service spam from bloating RAM.
-  # (Nov 2026: journald held 2.2 GB resident + 4.1 GB disk from
-  # firecrawl-postgres pg_cron chatter and homepage monitor failures.)
+  # Caps from the Nov 2026 incident (journald held 2.2 GB RAM + 4.1 GB disk).
   services.journald.settings.Journal = {
     Storage = "persistent";
     SystemMaxUse = "500M";
@@ -39,8 +37,7 @@
     SystemKeepFree = "2G";
   };
 
-  # zram swap as OOM safety net — the box ships with zero swap.
-  # 25% of 31 GB ≈ 8 GB compressed (zstd ~3:1 → ~2.5 GB real RAM cost worst case).
+  # The box ships with zero swap; 25% is ~8 GB compressed.
   zramSwap = {
     enable = true;
     algorithm = "zstd";
@@ -75,7 +72,7 @@
     hashedPasswordFile = config.sops.secrets.wagou-password-hash.path;
     extraGroups = [
       "wheel"
-      "docker" # Allows wagou to use Docker CLI (required for Dokploy management)
+      "docker"
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB7V9q0WZKoODnbbHsHDFXwTE4JDEqmhvmKxWG05JhBp wagou@wagou-mac"

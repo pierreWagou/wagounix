@@ -3,7 +3,6 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Packages for all machines (including wagoulab)
   environment.systemPackages = with pkgs; [
     age
     ansible

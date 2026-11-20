@@ -1,8 +1,7 @@
 { host, ... }:
 
 {
-  # Nix daemon is managed externally by the standard Nix installer.
-  # Settings are in /etc/nix/nix.conf (managed by Nix, not nix-darwin).
+  # Daemon owned by the external Nix installer (/etc/nix/nix.conf), not nix-darwin.
   nix.enable = false;
 
   system = {

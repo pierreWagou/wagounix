@@ -85,7 +85,6 @@ in
     };
   };
 
-  # Immich-internal network for DB, Redis, and ML (not exposed to Traefik)
   virtualisation.quadlet.networks.immich-internal = { };
 
   virtualisation.quadlet.containers = {
@@ -99,7 +98,7 @@ in
         networks = [ networks.immich-internal.ref ];
         volumes = [ "/var/lib/immich-ml-cache:/cache" ];
         devices = [ "/dev/dri:/dev/dri" ];
-        addGroups = [ host.renderGroupGid ]; # render group GID on NixOS (also in jellyfin.nix)
+        addGroups = [ host.renderGroupGid ];
       };
     };
 
@@ -108,7 +107,6 @@ in
     immich-redis.containerConfig = cache.containerConfig;
   };
 
-  # GPU drivers shared with Jellyfin — primary declaration is in jellyfin.nix
   hardware.graphics.enable = true;
 
   systemd.tmpfiles.rules = [

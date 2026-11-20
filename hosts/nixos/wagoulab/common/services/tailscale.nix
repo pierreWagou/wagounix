@@ -7,18 +7,17 @@
     useRoutingFeatures = "server";
     extraUpFlags = [
       "--advertise-routes=${host.lanSubnet}"
-      "--accept-dns=false" # don't override DNS — the server runs AdGuard Home
+      "--accept-dns=false"
     ];
   };
 
-  # Tailscale needs IP forwarding for subnet routing
+  # IP forwarding required for subnet routing.
   boot.kernel.sysctl = {
     "net.ipv4.ip_forward" = 1;
     "net.ipv6.conf.all.forwarding" = 1;
   };
 
-  # UDP GRO forwarding optimization for subnet router throughput
-  # See: https://tailscale.com/s/ethtool-config-udp-gro
+  # UDP GRO forwarding optimization (tailscale.com/s/ethtool-config-udp-gro).
   systemd.services.tailscale-ethtool = {
     description = "Configure UDP GRO forwarding for Tailscale subnet routing";
     after = [ "network-online.target" ];

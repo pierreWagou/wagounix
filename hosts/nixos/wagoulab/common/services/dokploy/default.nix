@@ -6,12 +6,6 @@
 }:
 
 let
-  # Clean static config for Dokploy Traefik.
-  # Uses port 80 (not 8080) to avoid conflicts with the Dokploy-generated traefik.yml.
-  # Mounted at /etc/dokploy-traefik/traefik.yml so it takes precedence over
-  # /etc/dokploy/traefik/traefik.yml (which Traefik auto-loads from /etc/traefik/).
-  # Only uses the file provider pointing at Dokploy's dynamic config directory.
-  # No ACME, no dashboard — Cloudflare handles TLS at the edge.
   dokployTraefikConfig = pkgs.writeText "dokploy-traefik.yml" ''
     global:
       sendAnonymousUsage: false
@@ -27,27 +21,6 @@ let
   '';
 in
 {
-  # Dokploy: self-hosted PaaS for deploying apps via a web UI.
-  # It requires Docker Swarm (not Podman) — this file enables Docker alongside Podman
-  # and deploys Dokploy as a Docker Swarm service managed by a NixOS systemd unit.
-  #
-  # Architecture:
-  #   - NixOS Traefik (Podman/quadlet): single external entry point, handles *.wagou.fr.
-  #     Forwards Dokploy app traffic to Dokploy Traefik via 127.0.0.1:8080.
-  #   - Dokploy Traefik (Docker Swarm): internal router for Dokploy-deployed apps.
-  #     Published to 127.0.0.1:8080 only (not externally accessible).
-  #     Reads routing config from /etc/dokploy/traefik/dynamic/ (file provider).
-  #   - Two Docker networks:
-  #     - dokploy-network: Dokploy infra (UI, postgres, redis, traefik) — internal only.
-  #     - apps: Deployed app containers — isolated from Dokploy infra.
-  #   - Cloudflare tunnel: forwards all traffic to NixOS Traefik on 443.
-  #
-  # Dokploy UI: https://apps.wagou.fr
-  # Apps deployed by Dokploy: add domain in Dokploy UI + add a NixOS Traefik forward rule.
-  #
-  # First-time setup (run once after nixos-rebuild switch):
-  #   docker swarm init --advertise-addr <server-ip>
-  #   Then the systemd service below will auto-deploy Dokploy on next run.
   sops = {
     secrets = {
       dokploy-db-password = {
@@ -63,34 +36,26 @@ in
     };
   };
 
-  # Data directory for Dokploy config and Traefik configuration
   systemd.tmpfiles.rules = [
     "d /etc/dokploy 0777 root root -"
     "d /etc/dokploy/traefik 0777 root root -"
     "d /etc/dokploy/traefik/dynamic 0777 root root -"
   ];
 
-  # One-shot service that deploys (or updates) the Dokploy stack on every nixos-rebuild.
-  # Requires Docker daemon and Docker Swarm to already be initialized on the host.
   systemd.services.dokploy-deploy = {
     description = "Deploy Dokploy stack via Docker Swarm";
-    # Run after docker.service is up
     after = [ "docker.service" ];
     requires = [ "docker.service" ];
-    # Run on every boot (not just once) so updates are applied
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      # Retry a few times in case docker is still initializing
       Restart = "on-failure";
       RestartSec = "5s";
-      # Prevent blocking nixos-rebuild switch indefinitely (image pulls can take time)
       TimeoutStartSec = "300";
     };
 
-    # Make docker and standard tools available in the script PATH
     path = with pkgs; [
       docker
       coreutils

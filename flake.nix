@@ -56,9 +56,6 @@
 
     in
     {
-      # -----------------------------------------------------------------------
-      # macOS configurations
-      # -----------------------------------------------------------------------
       darwinConfigurations = {
 
         wagou-mac = nix-darwin.lib.darwinSystem {
@@ -89,9 +86,6 @@
 
       };
 
-      # -----------------------------------------------------------------------
-      # NixOS configurations
-      # -----------------------------------------------------------------------
       nixosConfigurations = {
 
         wagou-prime = nixpkgs.lib.nixosSystem {
@@ -128,9 +122,6 @@
 
       };
 
-      # -----------------------------------------------------------------------
-      # Checks — run with `nix flake check`
-      # -----------------------------------------------------------------------
       checks = import ./lib/checks.nix {
         inherit
           self
@@ -140,10 +131,6 @@
           ;
       };
 
-      # -----------------------------------------------------------------------
-      # Dev shell — enter with `nix develop` or automatically via mise
-      # Auto-installs git hooks on entry
-      # -----------------------------------------------------------------------
       devShells = import ./lib/devshell.nix { inherit self nixpkgs systems; };
     };
 }

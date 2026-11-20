@@ -38,6 +38,6 @@ in
   virtualisation.quadlet.containers.vaultwarden.containerConfig = svc.containerConfig;
 
   systemd.tmpfiles.rules = svc.tmpfilesRules ++ [
-    "d /var/backup/vaultwarden 0755 root root -" # for planned borgbackup/restic service
+    "d /var/backup/vaultwarden 0755 root root -"
   ];
 }

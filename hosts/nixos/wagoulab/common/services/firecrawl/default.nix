@@ -7,10 +7,6 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   ws = import ../lib/web-service.nix { inherit config host; };
-  # Pinned by digest (`latest` as of 2026-11-13). The 2.11.x image line
-  # (last published 2026-08-18 as 2.11.209) predates the /v2/search schema
-  # fields firecrawl-mcp sends (toolDetail/domainTools) and rejects them with
-  # "Invalid request body". Re-check for a newer versioned tag periodically.
   firecrawlImage = "ghcr.io/firecrawl/firecrawl@sha256:305ffea700eca1f50f0875b049206b9202ebee0d8efe3a70cc859cad20d46a1a";
   api = ws.mkWebService {
     name = "firecrawl-api";
@@ -28,8 +24,6 @@ let
       ENV = "local";
       LOGGING_LEVEL = "info";
       USE_DB_AUTHENTICATION = "false";
-      # Tuned down hard (2026-11-20): single search-only user via AI agent.
-      # Was 8 workers / 5 jobs / pool 5 — held ~4 GB idle with 276 tasks.
       NUM_WORKERS_PER_QUEUE = "1";
       MAX_CONCURRENT_JOBS = "1";
       BROWSER_POOL_SIZE = "1";
@@ -63,8 +57,6 @@ let
       ];
     };
     serviceConfig = {
-      # Single-worker search-only config idles ~1 GB; 2 GB cap leaves
-      # headroom while stopping the 5 GB runaway seen with 8 workers.
       MemoryMax = "2G";
     };
   };
@@ -87,7 +79,6 @@ let
     image = "docker.io/library/redis:alpine";
     exposeViaTraefik = false;
     networks = [ networks.firecrawl-internal.ref ];
-    # Upstream explicitly marks Valkey as untested with Firecrawl — stay on Redis.
     exec = [
       "redis-server"
       "--bind"
@@ -108,7 +99,6 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     env = {
       RABBITMQ_DEFAULT_USER = "firecrawl";
-      # Cap Erlang VM well below its 40%-of-RAM default watermark.
       RABBITMQ_VM_MEMORY_HIGH_WATERMARK = "0.02";
     };
     environmentFiles = [ config.sops.templates."firecrawl-rabbitmq.env".path ];
@@ -119,9 +109,6 @@ let
     };
   };
   pg = ws.mkPostgres {
-    # NOTE: the database must be `postgres` — the nuq-postgres image hardcodes
-    # cron.database_name = 'postgres', and its init script aborts in any other DB.
-    # The half-initialized volume must be wiped if this ever changes.
     name = "firecrawl-postgres";
     image = "ghcr.io/firecrawl/nuq-postgres:latest";
     db = "postgres";
@@ -130,9 +117,6 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     serviceConfig = {
       MemoryMax = "512M";
-      # nuq-postgres pg_cron jobs log full multi-line SQL at LOG (info)
-      # level every second (~270k journal lines/day). Drop info-level
-      # container output; warnings and errors still pass through.
       LogLevelMax = "notice";
       LogRateLimitIntervalSec = "30s";
       LogRateLimitBurst = 200;
@@ -194,8 +178,6 @@ in
     };
   };
 
-  # Firecrawl-internal network for API, Playwright, Redis, RabbitMQ,
-  # Postgres, and SearXNG traffic (not exposed to Traefik).
   virtualisation.quadlet.networks.firecrawl-internal = { };
 
   virtualisation.quadlet.containers = {

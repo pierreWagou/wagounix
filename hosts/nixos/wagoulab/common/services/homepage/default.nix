@@ -225,9 +225,6 @@ let
             icon = "terminal.svg";
             href = "https://dev.${host.domain}";
             description = "Web terminal";
-            # No siteMonitor: ttyd binds to the host LAN IP (not reachable
-            # as 127.0.0.1 from inside this container). A monitor here
-            # fails every poll and spams the journal with stack traces.
           };
         }
         {
@@ -235,8 +232,6 @@ let
             icon = "webhook.svg";
             href = "https://relay.${host.domain}";
             description = "GitHub webhook receiver";
-            # No siteMonitor: same reason as ttyd — the webhook service
-            # binds to the host LAN IP, unreachable via container loopback.
           };
         }
         {

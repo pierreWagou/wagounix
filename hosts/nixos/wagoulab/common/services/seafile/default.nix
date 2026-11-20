@@ -18,7 +18,6 @@ let
   l = branding.palette.latte;
   m = branding.palette.mocha;
 
-  # CSS variable blocks for light (Latte) and dark (Mocha) modes, prepended to the static CSS file
   seafileCssVars = ''
     /* === LIGHT MODE: Catppuccin Latte === */
     :root,
@@ -133,11 +132,8 @@ in
     };
   };
 
-  # Seafile-internal network for DB, Redis, and SeaDoc (not exposed to Traefik)
   virtualisation.quadlet.networks.seafile-internal = { };
 
-  # Complete seahub_settings.py rendered by sops-nix.
-  # Applied automatically by ExecStartPre below (no manual step).
   sops.templates."seahub_settings.py" = {
     content = builtins.concatStringsSep "\n" [
       "SECRET_KEY = '${config.sops.placeholder.seafile-secret-key}'"
@@ -238,20 +234,12 @@ in
     "d /var/lib/seafile 0755 root root -"
     "d /var/lib/seafile-mysql 0755 root root -"
     "d /var/lib/seadoc 0755 root root -"
-    # Branding assets directory
     "d /var/lib/seafile/seafile/seahub-data/custom 0755 root root -"
   ]
   ++ cache.tmpfilesRules;
 
-  # Seed declarative config + branding assets into the stateful volume before
-  # every start. Seafile only reads these files from inside its self-initialized
-  # data dir, so plain :ro mounts can't work (the paths don't exist until first
-  # init). LOGO_PATH etc. are media-relative (Seahub prepends /media/), so the
-  # asset files must live in seahub-data/custom/ — absolute imgproxy URLs get
-  # mangled into /media/https://... and 404.
-  # The guard preserves first-init: if conf/ is missing, Seafile hasn't
-  # initialized yet — skip seeding and let it run. Never mkdir the conf dir
-  # ourselves: its absence is the first-init signal.
+  # Never mkdir the conf dir: its absence is the first-init signal.
+  # Media-relative paths; :ro mounts only work post-init.
   systemd.services.seafile.serviceConfig.ExecStartPre = [
     (pkgs.writeShellScript "seafile-seed" ''
       set -euo pipefail

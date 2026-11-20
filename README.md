@@ -216,6 +216,11 @@ GitHub Actions runs on push to `main` and on PRs:
 | Build darwin | macos-15 | wagou-mac, alan-mac (parallel) |
 | Build NixOS | ubuntu-latest | wagou-prime, wagou-clone |
 
+## Operational notes
+
+- First Dokploy boot: run `docker swarm init` once after `nixos-rebuild switch`. Traefik on the host uses port 80 (not 8080) to avoid clashing with Dokploy's generated config.
+- Failover to `wagou-clone`: services are disabled by default and started manually; Home Assistant stays off to avoid ZHA coordinator conflicts. Details in the `homeserver` skill.
+
 ## Quick Reference
 
 | Action | Command |

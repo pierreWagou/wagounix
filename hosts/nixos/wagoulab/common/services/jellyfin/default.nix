@@ -21,7 +21,7 @@ let
       "/var/lib/jellyfin/cache:/cache"
     ];
     devices = [ "/dev/dri:/dev/dri" ];
-    addGroups = [ host.renderGroupGid ]; # render group GID on NixOS (also in immich.nix)
+    addGroups = [ host.renderGroupGid ];
     dataDirs = [
       "/var/lib/jellyfin"
       "/var/lib/jellyfin/config"
@@ -43,7 +43,6 @@ in
 
   systemd.tmpfiles.rules = svc.tmpfilesRules;
 
-  # Intel hardware transcoding (VAAPI/QSV)
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [

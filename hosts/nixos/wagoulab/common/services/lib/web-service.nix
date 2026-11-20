@@ -4,31 +4,6 @@ let
   qNetworks = config.virtualisation.quadlet.networks;
 in
 {
-  # Standard container on the proxy network, optionally exposed via Traefik.
-  # Encodes wagoulab opinions: proxy network, noNewPrivileges,
-  # secure-headers middleware, websecure entrypoint.
-  #
-  # Usage:
-  #   ws = import ./lib/web-service.nix { inherit config host; };
-  #   svc = ws.mkWebService {
-  #     name = "vaultwarden";
-  #     subdomain = "vault";
-  #     image = "docker.io/vaultwarden/server:1.37.2";
-  #     port = 80;
-  #     env = { SIGNUPS_ALLOWED = "false"; };
-  #     volumes = [ "/var/lib/vaultwarden:/data" ];
-  #     environmentFiles = [ config.sops.templates."vaultwarden.env".path ];
-  #     dataDirs = [ "/var/lib/vaultwarden" ];
-  #   };
-  # Then:
-  #   virtualisation.quadlet.containers.vaultwarden.containerConfig = svc.containerConfig;
-  #   systemd.tmpfiles.rules = svc.tmpfilesRules;
-  #
-  # Variants:
-  #   exposeViaTraefik = false  → no Traefik labels (traefik itself, game servers)
-  #   networks = [ "host" ]     → host networking (satisfactory, home-assistant)
-  #   publishPorts / devices / addGroups / dns / addHosts / exec / shmSize → passthrough
-  #   unitConfig / serviceConfig → quadlet systemd options passthrough
   mkWebService =
     {
       name,
@@ -101,9 +76,6 @@ in
       inherit unitConfig serviceConfig;
     };
 
-  # Dedicated PostgreSQL on an internal network. Versions differ per app
-  # on purpose (e.g. Immich needs its vectorchord fork) — image is required.
-  # Returns the same shape as mkWebService (containerConfig/unitConfig/...).
   mkPostgres =
     {
       name,
@@ -142,8 +114,6 @@ in
       inherit unitConfig serviceConfig;
     };
 
-  # Valkey/Redis cache on an internal network. persist=true appends the
-  # standard RDB snapshot flags; penpot runs ephemeral (persist=false).
   mkValkey =
     {
       name,
