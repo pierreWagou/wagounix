@@ -5,7 +5,23 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Bathroom
+            heading: Living Room
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 3
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - entity_id:
+                    - light.kitchen
+                    - light.tv
+                    - light.dining
+                  options:
+                    type: tile
+                    features:
+                      - type: light-brightness
           - type: custom:auto-entities
             card:
               type: grid
@@ -15,30 +31,18 @@ views:
             filter:
               include:
                 - domain: light
-                  area: Bathroom
+                  area: Living Room
                   options:
                     type: tile
                     features:
                       - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Bedroom
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Bedroom
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
+              exclude:
+                - entity_id:
+                    - light.kitchen
+                    - light.tv
+                    - light.dining
+                    - light.library
+                    - light.workshop
 
       - type: grid
         cards:
@@ -62,7 +66,7 @@ views:
       - type: grid
         cards:
           - type: heading
-            heading: Living Room
+            heading: Bathroom
           - type: custom:auto-entities
             card:
               type: grid
@@ -72,7 +76,26 @@ views:
             filter:
               include:
                 - domain: light
-                  area: Living Room
+                  area: Bathroom
+                  options:
+                    type: tile
+                    features:
+                      - type: light-brightness
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Restroom
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 3
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - domain: light
+                  area: Restroom
                   options:
                     type: tile
                     features:
@@ -90,169 +113,50 @@ views:
             card_param: cards
             filter:
               include:
+                - entity_id:
+                    - light.computer
+                  options:
+                    type: tile
+                    features:
+                      - type: light-brightness
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 3
+              square: false
+            card_param: cards
+            filter:
+              include:
                 - domain: light
                   area: Office
                   options:
                     type: tile
                     features:
                       - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Kitchen
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Kitchen
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Library
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Library
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Dining
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Dining
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Wardrobe
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Wardrobe
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Workshop
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Workshop
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Computer
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Computer
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: TV
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: TV
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
-
-      - type: grid
-        cards:
-          - type: heading
-            heading: Toilet
-          - type: custom:auto-entities
-            card:
-              type: grid
-              columns: 3
-              square: false
-            card_param: cards
-            filter:
-              include:
-                - domain: light
-                  area: Toilet
-                  options:
-                    type: tile
-                    features:
-                      - type: light-brightness
+              exclude:
+                - entity_id:
+                    - light.computer
 
       - type: grid
         cards:
           - type: heading
             heading: Suite
+          - type: custom:auto-entities
+            card:
+              type: grid
+              columns: 3
+              square: false
+            card_param: cards
+            filter:
+              include:
+                - entity_id:
+                    - light.bedroom
+                    - light.wardrobe
+                    - light.suite
+                  options:
+                    type: tile
+                    features:
+                      - type: light-brightness
           - type: custom:auto-entities
             card:
               type: grid
@@ -267,3 +171,8 @@ views:
                     type: tile
                     features:
                       - type: light-brightness
+              exclude:
+                - entity_id:
+                    - light.bedroom
+                    - light.wardrobe
+                    - light.suite
