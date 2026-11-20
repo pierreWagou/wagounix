@@ -1,5 +1,6 @@
 {
   config,
+  pkgs,
   host,
   ...
 }:
@@ -7,6 +8,7 @@
 let
   inherit (config.virtualisation.quadlet) networks containers;
   ws = import ../lib/web-service.nix { inherit config host; };
+  # Pinned by digest: 2.11.x rejects the /v2/search schema fields firecrawl-mcp sends.
   firecrawlImage = "ghcr.io/firecrawl/firecrawl@sha256:305ffea700eca1f50f0875b049206b9202ebee0d8efe3a70cc859cad20d46a1a";
   api = ws.mkWebService {
     name = "firecrawl-api";
@@ -24,6 +26,7 @@ let
       ENV = "local";
       LOGGING_LEVEL = "info";
       USE_DB_AUTHENTICATION = "false";
+      # Sized for one search user (Nov 2026): 8 workers held ~4 GB idle.
       NUM_WORKERS_PER_QUEUE = "1";
       MAX_CONCURRENT_JOBS = "1";
       BROWSER_POOL_SIZE = "1";
@@ -57,6 +60,7 @@ let
       ];
     };
     serviceConfig = {
+      # 2 GB cap stops the 5 GB runaway seen with 8 workers.
       MemoryMax = "2G";
     };
   };
@@ -79,6 +83,7 @@ let
     image = "docker.io/library/redis:alpine";
     exposeViaTraefik = false;
     networks = [ networks.firecrawl-internal.ref ];
+    # Upstream marks Valkey untested with Firecrawl — stay on Redis.
     exec = [
       "redis-server"
       "--bind"
@@ -92,6 +97,13 @@ let
       MemoryMax = "384M";
     };
   };
+  # rabbitmq.conf: the RABBITMQ_VM_MEMORY_HIGH_WATERMARK env var is fatal
+  # on recent images ("deprecated environment variables detected", Nov 2026
+  # crash loop). Relative watermark sits under the 768M cgroup cap so RabbitMQ
+  # throttles publishers before the OOM killer fires.
+  rabbitmqConf = pkgs.writeText "firecrawl-rabbitmq.conf" ''
+    vm_memory_high_watermark.relative = 0.02
+  '';
   rabbitmq = ws.mkWebService {
     name = "firecrawl-rabbitmq";
     image = "docker.io/rabbitmq:3-management";
@@ -99,8 +111,8 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     env = {
       RABBITMQ_DEFAULT_USER = "firecrawl";
-      RABBITMQ_VM_MEMORY_HIGH_WATERMARK = "0.02";
     };
+    volumes = [ "${rabbitmqConf}:/etc/rabbitmq/rabbitmq.conf:ro" ];
     environmentFiles = [ config.sops.templates."firecrawl-rabbitmq.env".path ];
     dataDirs = [ "/var/lib/firecrawl-rabbitmq" ];
     dataDirsMode = "0755 999 999";
@@ -108,6 +120,7 @@ let
       MemoryMax = "768M";
     };
   };
+  # DB must be postgres (nuq-postgres hardcodes cron.database_name); renaming requires wiping the volume.
   pg = ws.mkPostgres {
     name = "firecrawl-postgres";
     image = "ghcr.io/firecrawl/nuq-postgres:latest";
@@ -117,6 +130,7 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     serviceConfig = {
       MemoryMax = "512M";
+      # pg_cron logs full SQL every second (~270k lines/day): drop info-level output.
       LogLevelMax = "notice";
       LogRateLimitIntervalSec = "30s";
       LogRateLimitBurst = 200;
