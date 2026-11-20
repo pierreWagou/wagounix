@@ -1,5 +1,8 @@
 { config, host }:
 
+# Shared quadlet container helpers: mkWebService (proxy network + Traefik labels),
+# mkPostgres (dedicated DB per app), mkValkey (cache).
+# Variants: exposeViaTraefik=false skips labels; networks=["host"] for host networking.
 let
   qNetworks = config.virtualisation.quadlet.networks;
 in
@@ -76,6 +79,7 @@ in
       inherit unitConfig serviceConfig;
     };
 
+  # Versions differ per app on purpose (e.g. Immich needs its vectorchord fork).
   mkPostgres =
     {
       name,
@@ -114,6 +118,7 @@ in
       inherit unitConfig serviceConfig;
     };
 
+  # persist=true appends RDB snapshot flags; penpot runs ephemeral.
   mkValkey =
     {
       name,

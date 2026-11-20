@@ -221,6 +221,7 @@ let
           };
         }
         {
+          # No siteMonitor: binds the host LAN IP, unreachable via container loopback; failed polls spam the journal.
           "ttyd" = {
             icon = "terminal.svg";
             href = "https://dev.${host.domain}";
@@ -228,6 +229,7 @@ let
           };
         }
         {
+          # No siteMonitor: binds the host LAN IP, unreachable via container loopback; failed polls spam the journal.
           "Webhook" = {
             icon = "webhook.svg";
             href = "https://relay.${host.domain}";

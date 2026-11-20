@@ -41,6 +41,7 @@ let
     };
   };
 
+  # Entries carry explicit leading spaces; the column-0 interpolation below preserves them.
   lovelaceDashboards = builtins.concatStringsSep "\n" (
     builtins.attrValues (
       builtins.mapAttrs (
@@ -54,6 +55,7 @@ let
     builtins.mapAttrs (_: d: "${d.file}:/config/dashboards/${baseNameOf d.file}:ro") dashboards
   );
 
+  # TEMP: HACS becomes built-in Marketplace from HA 2026.11 — then this seed goes away.
   hacsVersion = "2.0.5";
   hacsZip = pkgs.fetchurl {
     url = "https://github.com/hacs/integration/releases/download/${hacsVersion}/hacs.zip";
@@ -98,6 +100,7 @@ let
   '';
   ha = ws.mkWebService {
     name = "home-assistant";
+    # Routed via Traefik file provider (host network has no container discovery).
     exposeViaTraefik = false;
     networks = [ "host" ];
     image = "docker.io/homeassistant/home-assistant:2026.8.3";

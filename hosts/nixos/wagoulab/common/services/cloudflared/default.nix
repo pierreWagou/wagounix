@@ -21,6 +21,7 @@ let
       ingress =
         (map (sub: {
           hostname = "${sub}.${host.domain}";
+          # Traffic flows tunnel -> Traefik, not the reverse.
           service = "https://${host.serverIP}:443";
           originRequest.noTLSVerify = true;
         }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains))
@@ -47,6 +48,7 @@ in
 {
   sops = {
     secrets = {
+      # Mode 0444: cloudflared runs nonroot (UID 65532).
       cloudflare-credentials-prime = {
         sopsFile = ./secrets.yaml;
         mode = "0444";

@@ -16,6 +16,7 @@
     };
   };
 
+  # Native service, not a container, so secrets never land in the Nix store.
   services.mosquitto = {
     enable = true;
     listeners = [

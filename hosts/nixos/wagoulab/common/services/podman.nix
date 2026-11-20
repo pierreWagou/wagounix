@@ -8,6 +8,7 @@
       defaultNetwork.settings.dns_enabled = true;
     };
 
+    # dockerCompat off: Docker itself is enabled separately for Dokploy.
     docker = {
       enable = true;
       autoPrune.enable = true;

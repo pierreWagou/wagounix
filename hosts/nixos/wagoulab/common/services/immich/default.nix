@@ -107,6 +107,7 @@ in
     immich-redis.containerConfig = cache.containerConfig;
   };
 
+  # GPU drivers shared with Jellyfin — declared in jellyfin.nix.
   hardware.graphics.enable = true;
 
   systemd.tmpfiles.rules = [

@@ -15,6 +15,7 @@ let
         watch: true
     entryPoints:
       web:
+        # Port 80 (not 8080): avoids conflict with Dokploy's generated traefik.yml.
         address: ":80"
     api:
       insecure: false
@@ -71,6 +72,7 @@ in
       DOKPLOY_TRAEFIK_HTTPS_PORT="8443"
 
       # Ensure Docker Swarm is initialized
+      # First boot only: docker swarm init once after switch.
       if ! docker info 2>/dev/null | grep -q "Swarm: active"; then
         echo "Initializing Docker Swarm..."
         docker swarm init --advertise-addr "$ADVERTISE_ADDR"
@@ -91,6 +93,7 @@ in
       fi
 
       # Deploy or update dokploy-postgres service
+      # grep -qx: docker service inspect exits 0 even for missing services.
       DB_PASSWORD=$(cat ${config.sops.secrets.dokploy-db-password.path})
       if docker service ls --filter name=dokploy-postgres --format '{{.Name}}' 2>/dev/null | grep -qx 'dokploy-postgres'; then
         echo "dokploy-postgres already deployed, skipping."

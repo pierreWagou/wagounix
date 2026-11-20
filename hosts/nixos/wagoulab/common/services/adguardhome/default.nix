@@ -55,6 +55,8 @@ let
         enabled = true;
       }) (host.serviceTunnelSubdomains ++ host.appTunnelSubdomains ++ host.dnsOnlySubdomains);
     };
+    # .lan stays out: resolvers fail AAAA here with NOERROR instead of falling back.
+    # Answer NXDOMAIN (not empty NOERROR) so clients fail over.
     user_rules = [
       "||tv.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
       "||x2hub.lan^$dnstype=AAAA,$dnsrewrite=NXDOMAIN"
@@ -92,7 +94,9 @@ let
     subdomain = "guard";
     image = "docker.io/adguard/adguardhome:v0.107.76";
     port = 3000;
+    # Overrides Podman DNS injection, which caused 2s timeouts on every PTR query.
     dns = [ "127.0.0.1" ];
+    # IPs mirror Deco DHCP reservations — keep both sides in sync.
     addHosts = [
       "tv.lan:192.168.68.72"
       "x2hub.lan:192.168.68.67"
@@ -117,6 +121,7 @@ let
       "/var/lib/adguardhome/conf"
     ];
   };
+  # Runs at build time, keeping darwin-side nix eval working.
   seedTemplate = pkgs.replaceVars adguardSeed {
     ADGUARD_PASSWORD_HASH = config.sops.placeholder.adguard-password-hash;
   };
@@ -145,6 +150,7 @@ in
 
   networking.nameservers = [
     host.serverIP
+    # Fallback for when this container is down.
     "1.1.1.1"
   ];
   networking.dhcpcd.extraConfig = "nohook resolv.conf";
