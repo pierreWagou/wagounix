@@ -24,7 +24,6 @@ _: {
     ./seafile
     ./firecrawl
     ./onlyoffice
-    ./penpot
     ./branding.nix
     ./dokploy
     ./stalwart

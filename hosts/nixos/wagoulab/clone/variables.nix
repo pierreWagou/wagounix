@@ -48,7 +48,6 @@ rec {
     "mailbox"
     "ai"
     "docs"
-    "pantone"
     "crawl"
   ];
 
