@@ -28,10 +28,12 @@ let
       ENV = "local";
       LOGGING_LEVEL = "info";
       USE_DB_AUTHENTICATION = "false";
-      NUM_WORKERS_PER_QUEUE = "8";
-      MAX_CONCURRENT_JOBS = "5";
-      BROWSER_POOL_SIZE = "5";
-      CRAWL_CONCURRENT_REQUESTS = "10";
+      # Tuned down hard (2026-11-20): single search-only user via AI agent.
+      # Was 8 workers / 5 jobs / pool 5 — held ~4 GB idle with 276 tasks.
+      NUM_WORKERS_PER_QUEUE = "1";
+      MAX_CONCURRENT_JOBS = "1";
+      BROWSER_POOL_SIZE = "1";
+      CRAWL_CONCURRENT_REQUESTS = "2";
       HARNESS_STARTUP_TIMEOUT_MS = "60000";
       REDIS_URL = "redis://firecrawl-redis:6379";
       REDIS_RATE_LIMIT_URL = "redis://firecrawl-redis:6379";
@@ -60,6 +62,11 @@ let
         containers.firecrawl-searxng.ref
       ];
     };
+    serviceConfig = {
+      # Single-worker search-only config idles ~1 GB; 2 GB cap leaves
+      # headroom while stopping the 5 GB runaway seen with 8 workers.
+      MemoryMax = "2G";
+    };
   };
   playwright = ws.mkWebService {
     name = "firecrawl-playwright";
@@ -68,9 +75,12 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     env = {
       PORT = "3000";
-      MAX_CONCURRENT_PAGES = "10";
+      MAX_CONCURRENT_PAGES = "2";
     };
     shmSize = "1g";
+    serviceConfig = {
+      MemoryMax = "1G";
+    };
   };
   redis = ws.mkWebService {
     name = "firecrawl-redis";
@@ -82,7 +92,14 @@ let
       "redis-server"
       "--bind"
       "0.0.0.0"
+      "--maxmemory"
+      "256mb"
+      "--maxmemory-policy"
+      "noeviction"
     ];
+    serviceConfig = {
+      MemoryMax = "384M";
+    };
   };
   rabbitmq = ws.mkWebService {
     name = "firecrawl-rabbitmq";
@@ -91,10 +108,15 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     env = {
       RABBITMQ_DEFAULT_USER = "firecrawl";
+      # Cap Erlang VM well below its 40%-of-RAM default watermark.
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK = "0.02";
     };
     environmentFiles = [ config.sops.templates."firecrawl-rabbitmq.env".path ];
     dataDirs = [ "/var/lib/firecrawl-rabbitmq" ];
     dataDirsMode = "0755 999 999";
+    serviceConfig = {
+      MemoryMax = "768M";
+    };
   };
   pg = ws.mkPostgres {
     # NOTE: the database must be `postgres` — the nuq-postgres image hardcodes
@@ -106,6 +128,15 @@ let
     user = "firecrawl";
     passwordEnvFile = config.sops.templates."firecrawl-postgres.env".path;
     networks = [ networks.firecrawl-internal.ref ];
+    serviceConfig = {
+      MemoryMax = "512M";
+      # nuq-postgres pg_cron jobs log full multi-line SQL at LOG (info)
+      # level every second (~270k journal lines/day). Drop info-level
+      # container output; warnings and errors still pass through.
+      LogLevelMax = "notice";
+      LogRateLimitIntervalSec = "30s";
+      LogRateLimitBurst = 200;
+    };
   };
   searxng = ws.mkWebService {
     name = "firecrawl-searxng";
@@ -114,6 +145,9 @@ let
     networks = [ networks.firecrawl-internal.ref ];
     env = {
       BASE_URL = "http://firecrawl-searxng:8080/";
+    };
+    serviceConfig = {
+      MemoryMax = "512M";
     };
   };
 in
@@ -165,18 +199,29 @@ in
   virtualisation.quadlet.networks.firecrawl-internal = { };
 
   virtualisation.quadlet.containers = {
-    firecrawl-api.containerConfig = api.containerConfig;
-    firecrawl-api.unitConfig = api.unitConfig;
+    firecrawl-api = {
+      inherit (api) containerConfig unitConfig serviceConfig;
+    };
 
-    firecrawl-playwright.containerConfig = playwright.containerConfig;
+    firecrawl-playwright = {
+      inherit (playwright) containerConfig serviceConfig;
+    };
 
-    firecrawl-redis.containerConfig = redis.containerConfig;
+    firecrawl-redis = {
+      inherit (redis) containerConfig serviceConfig;
+    };
 
-    firecrawl-rabbitmq.containerConfig = rabbitmq.containerConfig;
+    firecrawl-rabbitmq = {
+      inherit (rabbitmq) containerConfig serviceConfig;
+    };
 
-    firecrawl-postgres.containerConfig = pg.containerConfig;
+    firecrawl-postgres = {
+      inherit (pg) containerConfig serviceConfig;
+    };
 
-    firecrawl-searxng.containerConfig = searxng.containerConfig;
+    firecrawl-searxng = {
+      inherit (searxng) containerConfig serviceConfig;
+    };
   };
 
   systemd.tmpfiles.rules = pg.tmpfilesRules ++ rabbitmq.tmpfilesRules;

@@ -28,6 +28,26 @@
     firewall.enable = true;
   };
 
+  # Journald: bound disk usage and keep per-service spam from bloating RAM.
+  # (Nov 2026: journald held 2.2 GB resident + 4.1 GB disk from
+  # firecrawl-postgres pg_cron chatter and homepage monitor failures.)
+  services.journald.settings.Journal = {
+    Storage = "persistent";
+    SystemMaxUse = "500M";
+    RuntimeMaxUse = "128M";
+    SystemMaxFileSize = "50M";
+    SystemKeepFree = "2G";
+  };
+
+  # zram swap as OOM safety net — the box ships with zero swap.
+  # 25% of 31 GB ≈ 8 GB compressed (zstd ~3:1 → ~2.5 GB real RAM cost worst case).
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 25;
+    priority = 100;
+  };
+
   services.openssh = {
     enable = true;
     settings = {
