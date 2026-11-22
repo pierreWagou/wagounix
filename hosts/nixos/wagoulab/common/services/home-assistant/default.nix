@@ -19,11 +19,6 @@ let
       icon = "mdi:devices";
       file = ./dashboards/devices.yaml;
     };
-    hue-lights = {
-      title = "Lights";
-      icon = "mdi:lightbulb";
-      file = ./dashboards/lights.yaml;
-    };
     plant-monitor = {
       title = "Plants";
       icon = "mdi:flower";
