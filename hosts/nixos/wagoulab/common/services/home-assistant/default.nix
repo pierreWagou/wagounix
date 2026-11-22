@@ -24,11 +24,6 @@ let
       icon = "mdi:lightbulb";
       file = ./dashboards/lights.yaml;
     };
-    miette-pets = {
-      title = "Miette";
-      icon = "mdi:cat";
-      file = ./dashboards/miette.yaml;
-    };
     plant-monitor = {
       title = "Plants";
       icon = "mdi:flower";
