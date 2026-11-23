@@ -50,6 +50,15 @@ let
     (pkgs.writeText "seafile-vars.css" seafileCssVars)
     ./seafile.css
   ];
+  seafdavConf = pkgs.writeText "seafdav.conf" ''
+    [WEBDAV]
+    enabled = true
+    port = 8080
+    share_name = /seafdav
+    workers = 5
+    timeout = 1200
+    debug = false
+  '';
   frontend = ws.mkWebService {
     name = "seafile";
     subdomain = "disk";
@@ -251,6 +260,8 @@ in
       fi
       cp ${config.sops.templates."seahub_settings.py".path} "$CONF_DIR/seahub_settings.py"
       chmod 644 "$CONF_DIR/seahub_settings.py"
+      cp ${seafdavConf} "$CONF_DIR/seafdav.conf"
+      chmod 644 "$CONF_DIR/seafdav.conf"
       mkdir -p "$CUSTOM_DIR"
       cp ${customCss} "$CUSTOM_DIR/custom.css"
       cp ${branding.files.logoDisk} "$CUSTOM_DIR/logo-disk.svg"
