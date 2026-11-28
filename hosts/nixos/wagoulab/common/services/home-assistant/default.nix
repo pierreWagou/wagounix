@@ -93,7 +93,7 @@ let
     # Routed via Traefik file provider (host network has no container discovery).
     exposeViaTraefik = false;
     networks = [ "host" ];
-    image = "docker.io/homeassistant/home-assistant:2026.8.3";
+    image = "docker.io/homeassistant/home-assistant:2026.11.3";
     env = {
       TZ = host.timezone;
     };

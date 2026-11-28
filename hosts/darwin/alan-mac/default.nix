@@ -11,7 +11,7 @@
   ];
 
   wagou.dock.development = [
-    "/Applications/Rex Beta.app/"
+    "/Applications/Rex.app/"
     "/Applications/Notion.app/"
   ];
 }

@@ -1,6 +1,9 @@
 { host, lib, ... }:
 {
   homebrew = {
+    brews = [
+      "portless"
+    ];
     casks = [
       "1password"
       "android-studio"

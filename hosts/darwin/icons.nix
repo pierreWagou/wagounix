@@ -61,7 +61,7 @@
         icon = ./icons/raycast.icns;
       }
       {
-        path = "/Applications/Rex Beta.app";
+        path = "/Applications/Rex.app";
         icon = ./icons/rex.icns;
       }
       {
